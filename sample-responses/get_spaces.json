@@ -1,0 +1,112 @@
+{
+    "spaces": [
+        {
+            "id": "14865529",
+            "name": "John's Happy Place",
+            "private": true,
+            "statuses": [
+                {
+                    "id": "p14865529_4MV5P2Xm",
+                    "status": "Open",
+                    "type": "open",
+                    "orderindex": 0,
+                    "color": "#d3d3d3"
+                },
+                {
+                    "id": "p14865529_9X3GGpHJ",
+                    "status": "in progress",
+                    "type": "custom",
+                    "orderindex": 1,
+                    "color": "#a875ff"
+                },
+                {
+                    "id": "p14865529_yxBSLfjN",
+                    "status": "Closed",
+                    "type": "closed",
+                    "orderindex": 2,
+                    "color": "#6bc950"
+                }
+            ],
+            "multiple_assignees": false,
+            "features": {
+                "due_dates": {
+                    "enabled": true,
+                    "start_date": true,
+                    "remap_due_dates": false,
+                    "remap_closed_due_date": false
+                },
+                "sprints": {
+                    "enabled": false
+                },
+                "points": {
+                    "enabled": false
+                },
+                "custom_items": {
+                    "enabled": false
+                },
+                "priorities": {
+                    "enabled": true,
+                    "priorities": [
+                        {
+                            "id": "1",
+                            "priority": "urgent",
+                            "color": "#f50000",
+                            "orderindex": "1"
+                        },
+                        {
+                            "id": "2",
+                            "priority": "high",
+                            "color": "#ffcc00",
+                            "orderindex": "2"
+                        },
+                        {
+                            "id": "3",
+                            "priority": "normal",
+                            "color": "#6fddff",
+                            "orderindex": "3"
+                        },
+                        {
+                            "id": "4",
+                            "priority": "low",
+                            "color": "#d8d8d8",
+                            "orderindex": "4"
+                        }
+                    ]
+                },
+                "tags": {
+                    "enabled": true
+                },
+                "check_unresolved": {
+                    "enabled": true,
+                    "subtasks": {},
+                    "checklists": {},
+                    "comments": {}
+                },
+                "zoom": {
+                    "enabled": false
+                },
+                "milestones": {
+                    "enabled": false
+                },
+                "custom_fields": {
+                    "enabled": true
+                },
+                "dependency_warning": {
+                    "enabled": true
+                }
+            },
+            "archived": false,
+            "members": [
+                {
+                    "user": {
+                        "id": 12874753,
+                        "username": "John Moore",
+                        "color": "#ffa727",
+                        "profilePicture": "https://attachments.clickup.com/profilePictures/12874753_L8k.jpg",
+                        "initials": "JM"
+                    }
+                }
+            ]
+        }
+    ]
+}

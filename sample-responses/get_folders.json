@@ -1,0 +1,63 @@
+{
+    "folders": [
+        {
+            "id": "35876376",
+            "name": "Notes",
+            "orderindex": 0,
+            "override_statuses": false,
+            "hidden": false,
+            "space": {
+                "id": "14865529",
+                "name": "John's Happy Place"
+            },
+            "task_count": "46",
+            "archived": false,
+            "statuses": [],
+            "lists": [
+                {
+                    "id": "71635360",
+                    "name": "Daily",
+                    "orderindex": 0,
+                    "status": {},
+                    "priority": {},
+                    "assignee": {},
+                    "task_count": 46,
+                    "due_date": {},
+                    "start_date": {},
+                    "space": {
+                        "id": "14865529",
+                        "name": "John's Happy Place",
+                        "access": true
+                    },
+                    "archived": false,
+                    "override_statuses": false,
+                    "statuses": [
+                        {
+                            "id": "p14865529_4MV5P2Xm",
+                            "status": "Open",
+                            "orderindex": 0,
+                            "color": "#d3d3d3",
+                            "type": "open"
+                        },
+                        {
+                            "id": "p14865529_9X3GGpHJ",
+                            "status": "in progress",
+                            "orderindex": 1,
+                            "color": "#a875ff",
+                            "type": "custom"
+                        },
+                        {
+                            "id": "p14865529_yxBSLfjN",
+                            "status": "Closed",
+                            "orderindex": 2,
+                            "color": "#6bc950",
+                            "type": "closed"
+                        }
+                    ],
+                    "permission_level": "create"
+                }
+            ],
+            "permission_level": "create"
+        }
+    ]
+}

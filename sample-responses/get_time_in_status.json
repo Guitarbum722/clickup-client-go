@@ -1,0 +1,52 @@
+{
+    "current_status": {
+        "status": "in progress",
+        "color": "#4194f6",
+        "total_time": {
+            "by_minute": 8536,
+            "since": "1629740259748"
+        }
+    },
+    "status_history": [
+        {
+            "status": "Open",
+            "color": "#d3d3d3",
+            "type": "open",
+            "total_time": {
+                "by_minute": 30105,
+                "since": "1625081597478"
+            },
+            "orderindex": 0
+        },
+        {
+            "status": "ready",
+            "color": "#1bbc9c",
+            "type": "custom",
+            "total_time": {
+                "by_minute": 12952,
+                "since": "1626887957957"
+            },
+            "orderindex": 2
+        },
+        {
+            "status": "in progress",
+            "color": "#4194f6",
+            "type": "custom",
+            "total_time": {
+                "by_minute": 37250,
+                "since": "1629740259748"
+            },
+            "orderindex": 3
+        },
+        {
+            "status": "code review",
+            "color": "#A06039",
+            "type": "custom",
+            "total_time": {
+                "by_minute": 5871,
+                "since": "1629387985466"
+            },
+            "orderindex": 4
+        }
+    ]
+}

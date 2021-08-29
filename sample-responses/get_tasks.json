@@ -1,0 +1,124 @@
+{
+    "tasks": [
+        {
+            "id": "1e6bkvp",
+            "custom_id": "JKM-640",
+            "name": "Dmitry Favorskiy",
+            "text_content": "Initial Screen / Cultural Fit Scorecard\n\nCandidate aligns with Myndshft mission and vision [Yes / No]\nCandidate aligns with Myndshft ground rules [Yes/No]\nCandidate’s background and skill set match the role? [Yes/No]\nCandidate is willing to learn skills / gaps in requirements of the role? [Yes/No]\nWill this candidate fit in our Myndshft culture?[Yes/No]\nDoes the candidate align with our development team structure and process? [Yes/No]\nDoes the candidate have a clear idea of what they want next in their career? [Yes/No]\nDesired salary or salary range [asked Ben if this could be asked in the initial application so we don’t have to ask at this step]\nCandidates notice period\nCandidates reasoning for looking for a new opportunity are reasonable, no red flags [Yes/ No] optional comment\nCandidate able to communicate clearly and effectively [Yes/No]\nLeverage summary section at bottom to explain if candidate is fit for hire\n\n",
+            "description": "Initial Screen / Cultural Fit Scorecard\n\nCandidate aligns with Myndshft mission and vision [Yes / No]\nCandidate aligns with Myndshft ground rules [Yes/No]\nCandidate’s background and skill set match the role? [Yes/No]\nCandidate is willing to learn skills / gaps in requirements of the role? [Yes/No]\nWill this candidate fit in our Myndshft culture?[Yes/No]\nDoes the candidate align with our development team structure and process? [Yes/No]\nDoes the candidate have a clear idea of what they want next in their career? [Yes/No]\nDesired salary or salary range [asked Ben if this could be asked in the initial application so we don’t have to ask at this step]\nCandidates notice period\nCandidates reasoning for looking for a new opportunity are reasonable, no red flags [Yes/ No] optional comment\nCandidate able to communicate clearly and effectively [Yes/No]\nLeverage summary section at bottom to explain if candidate is fit for hire\n\n",
+            "status": {
+                "status": "Open",
+                "color": "#d3d3d3",
+                "type": "open",
+                "orderindex": 0
+            },
+            "orderindex": "53199.00000000000000000000000000000000",
+            "date_created": "1629830957939",
+            "date_updated": "1629830962898",
+            "date_closed": null,
+            "archived": false,
+            "creator": {
+                "id": 12874753,
+                "username": "John Moore",
+                "color": "#ffa727",
+                "email": "john@myndshft.com",
+                "profilePicture": "https://attachments.clickup.com/profilePictures/12874753_L8k.jpg"
+            },
+            "assignees": [
+                {
+                    "id": 12874753,
+                    "username": "John Moore",
+                    "color": "#ffa727",
+                    "initials": "JM",
+                    "email": "john@myndshft.com",
+                    "profilePicture": "https://attachments.clickup.com/profilePictures/12874753_L8k.jpg"
+                }
+            ],
+            "watchers": [],
+            "checklists": [],
+            "tags": [],
+            "parent": null,
+            "priority": null,
+            "due_date": null,
+            "start_date": null,
+            "points": null,
+            "time_estimate": null,
+            "custom_fields": [
+                {
+                    "id": "293e83c3-04a7-43eb-9d3a-cd77596bd9b4",
+                    "name": "Product",
+                    "type": "drop_down",
+                    "type_config": {
+                        "new_drop_down": true,
+                        "options": [
+                            {
+                                "id": "6485ac94-1519-4be3-89fd-91abb92e2cc5",
+                                "name": "Myndview",
+                                "color": "#3397dd",
+                                "orderindex": 0
+                            },
+                            {
+                                "id": "b5d96905-f11b-474e-abf0-2f6ca18a4448",
+                                "name": "Myndcontrol",
+                                "color": "#f9d900",
+                                "orderindex": 1
+                            },
+                            {
+                                "id": "8afe1359-c587-4607-a17a-6903bf9bea0c",
+                                "name": "Myndauth - Provider",
+                                "color": "#2ecd6f",
+                                "orderindex": 2
+                            },
+                            {
+                                "id": "dc7f342a-e860-412f-9ceb-13f934e30486",
+                                "name": "Myndauth - Payer",
+                                "color": "#0231E8",
+                                "orderindex": 3
+                            },
+                            {
+                                "id": "3c225095-c0eb-4e5f-845f-f9d7b3f45015",
+                                "name": "CVS",
+                                "color": "#E65100",
+                                "orderindex": 4
+                            },
+                            {
+                                "id": "918131e3-4950-4c46-81f8-0b028e9dd7fb",
+                                "name": "Data Project",
+                                "color": "#800000",
+                                "orderindex": 5
+                            }
+                        ]
+                    },
+                    "date_created": "1617075464743",
+                    "hide_from_guests": false,
+                    "required": false
+                }
+            ],
+            "dependencies": [],
+            "linked_tasks": [],
+            "team_id": "10500804",
+            "url": "https://app.clickup.com/t/1e6bkvp",
+            "permission_level": "create",
+            "list": {
+                "id": "73571783",
+                "name": "Interviews",
+                "access": true
+            },
+            "project": {
+                "id": "35727501",
+                "name": "Candidates",
+                "hidden": false,
+                "access": true
+            },
+            "folder": {
+                "id": "35727501",
+                "name": "Candidates",
+                "hidden": false,
+                "access": true
+            },
+            "space": {
+                "id": "14865529"
+            }
+        }
+    ]
+}

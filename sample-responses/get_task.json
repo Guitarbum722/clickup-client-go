@@ -1,0 +1,736 @@
+{
+    "id": "zbjuzp",
+    "custom_id": "MS-6487",
+    "name": "De-duping MCO data",
+    "text_content": "DESCRIPTION/ USER STORY \nAs a client, I do not want to see duplicate MCO data, so I can have a clean Myndview\n\nACCEPTANCE CRITERIA\nGiven MCO are present\nWhen MCOs are displayed in Myndview\nThen there should not be duplicated MCO data in the MCO section\n \nREQUIREMENTS\nMCOs listed under Managed Care Organization Section in Myndview should not have duplicate data\nde-dup MCO data only within that payer\nde-dup MCO data after all MCO gathering logic has been executed\nde-dup initially on org name or first name and last name -> group any differing data found into one record\n\nTEAM DISCUSSION POINTS\nAdd talking points that will support the understanding, development and testing of the requirements above. \n\n",
+    "description": "DESCRIPTION/ USER STORY \nAs a client, I do not want to see duplicate MCO data, so I can have a clean Myndview\n\nACCEPTANCE CRITERIA\nGiven MCO are present\nWhen MCOs are displayed in Myndview\nThen there should not be duplicated MCO data in the MCO section\n \nREQUIREMENTS\nMCOs listed under Managed Care Organization Section in Myndview should not have duplicate data\nde-dup MCO data only within that payer\nde-dup MCO data after all MCO gathering logic has been executed\nde-dup initially on org name or first name and last name -> group any differing data found into one record\n\nTEAM DISCUSSION POINTS\nAdd talking points that will support the understanding, development and testing of the requirements above. \n\n",
+    "status": {
+        "id": "p14825098_MjpxroC6",
+        "status": "in progress",
+        "color": "#4194f6",
+        "orderindex": 3,
+        "type": "custom"
+    },
+    "orderindex": "1.00000000000000000000000000000000",
+    "date_created": "1625081597474",
+    "date_updated": "1629740259748",
+    "date_closed": null,
+    "archived": false,
+    "creator": {
+        "id": 12883454,
+        "username": "Lenee",
+        "color": "#BF4ACC",
+        "email": "lenee@myndshft.com",
+        "profilePicture": null
+    },
+    "assignees": [
+        {
+            "id": 14706028,
+            "username": "Daniel Villela",
+            "color": "#04a9f4",
+            "initials": "DV",
+            "email": "daniel@myndshft.com",
+            "profilePicture": "https://attachments.clickup.com/profilePictures/14706028_tle.jpg"
+        }
+    ],
+    "watchers": [
+        {
+            "id": 10654989,
+            "username": "Angela McElwain",
+            "color": "#7b68ee",
+            "initials": "AM",
+            "email": "angela@myndshft.com",
+            "profilePicture": null
+        },
+        {
+            "id": 12874753,
+            "username": "John Moore",
+            "color": "#ffa727",
+            "initials": "JM",
+            "email": "john@myndshft.com",
+            "profilePicture": "https://attachments.clickup.com/profilePictures/12874753_L8k.jpg"
+        },
+        {
+            "id": 12883454,
+            "username": "Lenee",
+            "color": "#BF4ACC",
+            "initials": "L",
+            "email": "lenee@myndshft.com",
+            "profilePicture": null
+        },
+        {
+            "id": 12892612,
+            "username": "Ashmit Pyakurel",
+            "color": "#006063",
+            "initials": "AP",
+            "email": "ashmit@myndshft.com",
+            "profilePicture": null
+        },
+        {
+            "id": 14704054,
+            "username": "John Brainard",
+            "color": "#304ffe",
+            "initials": "JB",
+            "email": "johnb@myndshft.com",
+            "profilePicture": "https://attachments.clickup.com/profilePictures/14704054_YH5.jpg"
+        },
+        {
+            "id": 14706028,
+            "username": "Daniel Villela",
+            "color": "#04a9f4",
+            "initials": "DV",
+            "email": "daniel@myndshft.com",
+            "profilePicture": "https://attachments.clickup.com/profilePictures/14706028_tle.jpg"
+        }
+    ],
+    "checklists": [],
+    "tags": [],
+    "parent": "zbjuu1",
+    "priority": {
+        "id": "2",
+        "priority": "high",
+        "color": "#ffcc00",
+        "orderindex": "2"
+    },
+    "due_date": null,
+    "start_date": null,
+    "points": null,
+    "time_estimate": null,
+    "time_spent": 0,
+    "custom_fields": [
+        {
+            "id": "d41e2ac3-3cd6-41f9-9686-792d3b677334",
+            "name": "Epic Link (imported)",
+            "type": "drop_down",
+            "type_config": {
+                "default": 0,
+                "placeholder": null,
+                "options": [
+                    {
+                        "id": "7485dbf7-cbc9-4cf3-84cc-81b951c81fe4",
+                        "name": "Eligibility Ingress Corrections",
+                        "color": null,
+                        "orderindex": 0
+                    },
+                    {
+                        "id": "5ae2a12e-344a-46f4-a7cc-f590be5c6c2c",
+                        "name": "Fix MV Transaction Responses",
+                        "color": null,
+                        "orderindex": 1
+                    },
+                    {
+                        "id": "18dc4372-c213-4347-9a22-ab7d3fe4ae15",
+                        "name": "PAD FHIR API",
+                        "color": null,
+                        "orderindex": 2
+                    },
+                    {
+                        "id": "4b274ed9-69c7-406d-af14-96678604dbdc",
+                        "name": "Pendo Free Trial UX Improvements",
+                        "color": null,
+                        "orderindex": 3
+                    },
+                    {
+                        "id": "a6e3c736-7c9e-48d6-9f49-3faefd5d9c68",
+                        "name": "PAD Logic & Data Enhancements",
+                        "color": null,
+                        "orderindex": 4
+                    },
+                    {
+                        "id": "a1b3051d-cb82-4286-873b-69d50c317890",
+                        "name": "Additional Eligibility Data on Response",
+                        "color": null,
+                        "orderindex": 5
+                    },
+                    {
+                        "id": "8d26fbea-2be4-4d1d-8e2f-0e689fcc68ce",
+                        "name": "Explorer Tool UX Enhancements",
+                        "color": null,
+                        "orderindex": 6
+                    },
+                    {
+                        "id": "d0c3de8c-46ce-49ef-a8e5-c35ef957c38a",
+                        "name": "Batch Eligibility Table Enhancements",
+                        "color": null,
+                        "orderindex": 7
+                    },
+                    {
+                        "id": "0288bec8-e283-43e2-9f18-da58d4710a71",
+                        "name": "Events Database",
+                        "color": null,
+                        "orderindex": 8
+                    },
+                    {
+                        "id": "84f22e34-1f98-49b9-a984-320394952938",
+                        "name": "UAT Mock Responses Load",
+                        "color": null,
+                        "orderindex": 9
+                    },
+                    {
+                        "id": "69bf37c6-6ef6-4ad2-a815-8f9379059787",
+                        "name": "PAD MV Implementation",
+                        "color": null,
+                        "orderindex": 10
+                    },
+                    {
+                        "id": "3b01c073-13ae-4bb0-83e4-32b5ce62969c",
+                        "name": "PBM B1/B2 FHIR API Implementation",
+                        "color": null,
+                        "orderindex": 11
+                    },
+                    {
+                        "id": "b19a64d5-4b52-421a-909b-ebf37927ca63",
+                        "name": "PBM B1/B2 MV Implementation",
+                        "color": null,
+                        "orderindex": 12
+                    },
+                    {
+                        "id": "491ba7ba-568e-474f-b95c-35a0b953d614",
+                        "name": "Eligibility Plan Updates",
+                        "color": null,
+                        "orderindex": 13
+                    },
+                    {
+                        "id": "3e22d647-6af3-4b92-aea3-87afabc4db16",
+                        "name": "PA Determination API",
+                        "color": null,
+                        "orderindex": 14
+                    },
+                    {
+                        "id": "971c5769-7980-4c46-b2b9-6b56d5850ea9",
+                        "name": "Eligibility - Other Payers Feature & OON Feature",
+                        "color": null,
+                        "orderindex": 15
+                    },
+                    {
+                        "id": "a1cb5e76-98f4-4942-920d-d4bc264fbbdd",
+                        "name": "Change Healthcare Migration",
+                        "color": null,
+                        "orderindex": 16
+                    },
+                    {
+                        "id": "1255ab20-6f43-456d-825a-17e998e58064",
+                        "name": "Eligibility Response Returned",
+                        "color": null,
+                        "orderindex": 17
+                    },
+                    {
+                        "id": "8f621606-c4f0-432e-a84e-572fd85c9b42",
+                        "name": "PFR API",
+                        "color": null,
+                        "orderindex": 18
+                    },
+                    {
+                        "id": "cee3368f-0f9a-4516-b9c3-831b93aa4c99",
+                        "name": "PBM E1 FHIR API Implementation",
+                        "color": null,
+                        "orderindex": 19
+                    },
+                    {
+                        "id": "1993f978-4626-4af6-a353-11d241653c4e",
+                        "name": "Service Type Category",
+                        "color": null,
+                        "orderindex": 20
+                    },
+                    {
+                        "id": "261f4e58-d48b-44be-a20e-414036276c54",
+                        "name": "Domain Services",
+                        "color": null,
+                        "orderindex": 21
+                    },
+                    {
+                        "id": "a32b5569-9723-4644-ad65-406b94ba19f5",
+                        "name": "Client User Roles",
+                        "color": null,
+                        "orderindex": 22
+                    },
+                    {
+                        "id": "bcd3d565-df38-40e6-830e-bbae4bee2294",
+                        "name": "PBM E1 MV Implementation",
+                        "color": null,
+                        "orderindex": 23
+                    },
+                    {
+                        "id": "ed6b7b0b-7d4f-429c-be6f-26c783ab97c5",
+                        "name": "My Account Pages",
+                        "color": null,
+                        "orderindex": 24
+                    },
+                    {
+                        "id": "4fa03e6b-f0c7-435d-9791-7ccdf0bd6023",
+                        "name": "Myndview Navigation",
+                        "color": null,
+                        "orderindex": 25
+                    },
+                    {
+                        "id": "1cab8a03-d11e-47a2-82dc-3205c197728d",
+                        "name": "Internal MV Admin Section",
+                        "color": null,
+                        "orderindex": 26
+                    },
+                    {
+                        "id": "3b39b949-073e-4b8a-b1a8-c072cbeaff87",
+                        "name": "Realtime Medical Benefits Check Enhancements",
+                        "color": null,
+                        "orderindex": 27
+                    },
+                    {
+                        "id": "c329eef6-a383-48e2-9c81-66c39317da4f",
+                        "name": "Updates to the Past Transactions Page",
+                        "color": null,
+                        "orderindex": 28
+                    },
+                    {
+                        "id": "ee791772-8b6e-428c-98d6-d30b43f735a9",
+                        "name": "Portal Security",
+                        "color": null,
+                        "orderindex": 29
+                    },
+                    {
+                        "id": "c1e13c04-6827-477b-9860-3932c85c5459",
+                        "name": "Bulk Eligibility",
+                        "color": null,
+                        "orderindex": 30
+                    },
+                    {
+                        "id": "2f5492fd-9ada-4990-af56-911e5403ce01",
+                        "name": "Portal Transactions History",
+                        "color": null,
+                        "orderindex": 31
+                    },
+                    {
+                        "id": "8f5df69c-3d56-4abe-9632-d86decd7879b",
+                        "name": "Deployment",
+                        "color": null,
+                        "orderindex": 32
+                    },
+                    {
+                        "id": "fb2cb9a3-c3f3-4175-9157-f454a079be08",
+                        "name": "Test Environment Bugs",
+                        "color": null,
+                        "orderindex": 33
+                    },
+                    {
+                        "id": "e3f018d1-43c7-466b-8324-e768516a61bb",
+                        "name": "Production Bugs",
+                        "color": null,
+                        "orderindex": 34
+                    },
+                    {
+                        "id": "9a0506ad-0fb8-4ace-81f2-43381473b072",
+                        "name": "Technical Debt",
+                        "color": null,
+                        "orderindex": 35
+                    },
+                    {
+                        "id": "b32e91ba-0e0c-4ffc-80a3-2f2beaf425ca",
+                        "name": "Maintenance",
+                        "color": null,
+                        "orderindex": 36
+                    },
+                    {
+                        "id": "190f5b7f-b472-47b4-af43-e4d130827614",
+                        "name": "QA Testing",
+                        "color": null,
+                        "orderindex": 37
+                    },
+                    {
+                        "id": "f8adb233-168d-47ab-832c-e0a774e1d925",
+                        "name": "User Self-Service",
+                        "color": null,
+                        "orderindex": 38
+                    },
+                    {
+                        "id": "f6d9180b-3ba6-4d4a-a74c-788054a26969",
+                        "name": "Myndview User Documentation",
+                        "color": null,
+                        "orderindex": 39
+                    },
+                    {
+                        "id": "f2336e36-e4b6-4ed0-9505-8379512382ee",
+                        "name": "Myndcontrol Integration",
+                        "color": null,
+                        "orderindex": 40
+                    },
+                    {
+                        "id": "480bdf62-1fb2-4f28-9bf3-d44e3c1db031",
+                        "name": "Code Refactoring",
+                        "color": null,
+                        "orderindex": 41
+                    },
+                    {
+                        "id": "cba00c47-71ca-4767-9a24-8b26e0b34ae7",
+                        "name": "PA Determination Enhancements",
+                        "color": null,
+                        "orderindex": 42
+                    },
+                    {
+                        "id": "50ae95a4-7a34-4cea-bbd1-747ed62c1600",
+                        "name": "Expose Full Payer List to Portal",
+                        "color": null,
+                        "orderindex": 43
+                    },
+                    {
+                        "id": "93539c4d-71a1-42dc-9e4f-e94618306524",
+                        "name": "Message/Alert Section",
+                        "color": null,
+                        "orderindex": 44
+                    },
+                    {
+                        "id": "30bd7c16-c86c-4544-bdcd-6102024c0735",
+                        "name": "PFR Enhancement",
+                        "color": null,
+                        "orderindex": 45
+                    },
+                    {
+                        "id": "15422142-e28a-4380-8c9c-2127495c475e",
+                        "name": "Portal Transaction ID and Date/Time Stamp",
+                        "color": null,
+                        "orderindex": 46
+                    },
+                    {
+                        "id": "16ff0b7d-d36a-4046-ab18-20c59875e2a9",
+                        "name": "Persist Terms of Use Link",
+                        "color": null,
+                        "orderindex": 47
+                    },
+                    {
+                        "id": "091e4519-def8-43ef-91ae-5f7099026032",
+                        "name": "Highlight Response Fields with Corrected Data",
+                        "color": null,
+                        "orderindex": 48
+                    },
+                    {
+                        "id": "5bfd9d0f-54a7-4145-b03b-7db4da57b33a",
+                        "name": "Mulitiple Payer Selection on Elig. Request",
+                        "color": null,
+                        "orderindex": 49
+                    },
+                    {
+                        "id": "e4c77ae8-6b7f-4b02-9891-a8bd76dff38c",
+                        "name": "Elig. Response Enhancements",
+                        "color": null,
+                        "orderindex": 50
+                    },
+                    {
+                        "id": "0c3f58a5-9795-4ca5-b1cc-bdfc93680d7e",
+                        "name": "User Account Configuration",
+                        "color": null,
+                        "orderindex": 51
+                    },
+                    {
+                        "id": "27c648e1-78c6-437d-8cfa-19528ec260f1",
+                        "name": "Exception Processing Rules",
+                        "color": null,
+                        "orderindex": 52
+                    },
+                    {
+                        "id": "08dbfbe3-37e5-480d-8dab-3a0ab461d67c",
+                        "name": "Create End User Agreement for Portal Access",
+                        "color": null,
+                        "orderindex": 53
+                    },
+                    {
+                        "id": "385c1c8e-67ff-4355-9ac6-12d94be79265",
+                        "name": "Create Multiple Portal Environments",
+                        "color": null,
+                        "orderindex": 54
+                    },
+                    {
+                        "id": "4fc5ab1e-d6bf-481f-93b2-2117d6feff0b",
+                        "name": "Elig. Service Type E/BV Requests",
+                        "color": null,
+                        "orderindex": 55
+                    },
+                    {
+                        "id": "0e1ac177-1df4-4bcb-bc10-fa2dce39205c",
+                        "name": "Add Optional Fields for all TXNs ",
+                        "color": null,
+                        "orderindex": 56
+                    },
+                    {
+                        "id": "ceb4652b-981f-4075-8d94-425f2e25765b",
+                        "name": "PA Determination Response",
+                        "color": null,
+                        "orderindex": 57
+                    },
+                    {
+                        "id": "2d0d1550-2ca0-408e-ade8-73283062055c",
+                        "name": "PA Determination Request",
+                        "color": null,
+                        "orderindex": 58
+                    },
+                    {
+                        "id": "a1b90244-39aa-415a-bd45-b207f4339ff2",
+                        "name": "Myndshft Configurable Fields",
+                        "color": null,
+                        "orderindex": 59
+                    },
+                    {
+                        "id": "9f112cf8-ea3c-4659-a9c7-8954759a0a6b",
+                        "name": "Portal New User Registration",
+                        "color": null,
+                        "orderindex": 60
+                    },
+                    {
+                        "id": "01e26562-61f2-4123-8589-680d28fc7e68",
+                        "name": "Security",
+                        "color": null,
+                        "orderindex": 61
+                    },
+                    {
+                        "id": "74a76ca2-261a-40e9-a19c-e4707c5da557",
+                        "name": "Portal User Experience",
+                        "color": null,
+                        "orderindex": 62
+                    },
+                    {
+                        "id": "b8c941a7-4e00-4c66-a170-a0b5e7e3caa9",
+                        "name": "PFR Response",
+                        "color": null,
+                        "orderindex": 63
+                    },
+                    {
+                        "id": "322f2b07-a011-4a2b-8ceb-598b7967d7d8",
+                        "name": "Display PFR Response to Portal ",
+                        "color": null,
+                        "orderindex": 64
+                    },
+                    {
+                        "id": "5abb169f-12c3-43ed-8751-157e0fc7ae4a",
+                        "name": "Generate PFR Request to Myndshft",
+                        "color": null,
+                        "orderindex": 65
+                    },
+                    {
+                        "id": "abb14f75-8677-4d45-be67-ebcbd432ae53",
+                        "name": "PFR Request",
+                        "color": null,
+                        "orderindex": 66
+                    },
+                    {
+                        "id": "6f4ec17a-0f99-45d9-8940-082dac8a979e",
+                        "name": "Eligibility/Benefit Response",
+                        "color": null,
+                        "orderindex": 67
+                    },
+                    {
+                        "id": "310817d4-1d6a-4ee7-b697-33926e45c0ab",
+                        "name": "Display Eligibility API Response to Portal ",
+                        "color": null,
+                        "orderindex": 68
+                    },
+                    {
+                        "id": "f0e4c6a1-a701-4c96-8cc2-9dcdf01f2825",
+                        "name": "Transaction Processing Rules",
+                        "color": null,
+                        "orderindex": 69
+                    },
+                    {
+                        "id": "3f2425a3-f093-4f46-8200-03f1ae462b46",
+                        "name": "Eligibility/Benefit Request",
+                        "color": null,
+                        "orderindex": 70
+                    },
+                    {
+                        "id": "d7458096-8de6-48df-ad52-d60d2d0cb66d",
+                        "name": "Myndshft Portal Landing Page",
+                        "color": null,
+                        "orderindex": 71
+                    },
+                    {
+                        "id": "9d87f744-2966-4ce7-90c8-b7d56b551319",
+                        "name": "Creation and maintenance of user login credentials (MSG)",
+                        "color": null,
+                        "orderindex": 72
+                    },
+                    {
+                        "id": "aa76b749-b714-499c-8903-7783027a3fbd",
+                        "name": "Support multiple browsers to access the Myndshft transaction portal",
+                        "color": null,
+                        "orderindex": 73
+                    },
+                    {
+                        "id": "25e2729f-0f46-40fc-ba0a-2443ac140b38",
+                        "name": "Test",
+                        "color": null,
+                        "orderindex": 74
+                    }
+                ]
+            },
+            "date_created": "1618502863313",
+            "hide_from_guests": false,
+            "required": false
+        }
+    ],
+    "dependencies": [],
+    "linked_tasks": [],
+    "team_id": "10500804",
+    "url": "https://app.clickup.com/t/zbjuzp",
+    "permission_level": "create",
+    "list": {
+        "id": "69467224",
+        "name": "Roadmap",
+        "access": true
+    },
+    "project": {
+        "id": "33680576",
+        "name": "Myndview",
+        "hidden": false,
+        "access": true
+    },
+    "folder": {
+        "id": "33680576",
+        "name": "Myndview",
+        "hidden": false,
+        "access": true
+    },
+    "space": {
+        "id": "14825098"
+    },
+    "subtasks": [
+        {
+            "id": "19qwd8k",
+            "custom_id": "MS-6814",
+            "name": "Create Rule set in domain service",
+            "status": {
+                "status": "done",
+                "orderindex": 8,
+                "color": "#667684",
+                "type": "done"
+            },
+            "orderindex": "1.00000000000000000000000000000000",
+            "date_created": "1627490025544",
+            "date_updated": "1629740205468",
+            "date_closed": null,
+            "archived": false,
+            "creator": {
+                "id": 14706028,
+                "username": "Daniel Villela",
+                "color": "#04a9f4",
+                "email": "daniel@myndshft.com",
+                "profilePicture": "https://attachments.clickup.com/profilePictures/14706028_tle.jpg"
+            },
+            "assignees": [
+                {
+                    "id": 12883454,
+                    "username": "Lenee",
+                    "color": "#BF4ACC",
+                    "initials": "L",
+                    "email": "lenee@myndshft.com",
+                    "profilePicture": null
+                }
+            ],
+            "watchers": [],
+            "checklists": [],
+            "tags": [],
+            "parent": "zbjuzp",
+            "due_date": null,
+            "start_date": null,
+            "points": null,
+            "time_estimate": null,
+            "custom_fields": [],
+            "dependencies": [],
+            "linked_tasks": [],
+            "url": "https://app.clickup.com/t/19qwd8k"
+        },
+        {
+            "id": "19qwdm3",
+            "custom_id": "MS-6815",
+            "name": "mia-gateway to map and call domain service rule",
+            "status": {
+                "status": "in progress",
+                "orderindex": 3,
+                "color": "#4194f6",
+                "type": "custom"
+            },
+            "orderindex": "2.00000000000000000000000000000000",
+            "date_created": "1627490105509",
+            "date_updated": "1629740256787",
+            "date_closed": null,
+            "archived": false,
+            "creator": {
+                "id": 14706028,
+                "username": "Daniel Villela",
+                "color": "#04a9f4",
+                "email": "daniel@myndshft.com",
+                "profilePicture": "https://attachments.clickup.com/profilePictures/14706028_tle.jpg"
+            },
+            "assignees": [
+                {
+                    "id": 14706028,
+                    "username": "Daniel Villela",
+                    "color": "#04a9f4",
+                    "initials": "DV",
+                    "email": "daniel@myndshft.com",
+                    "profilePicture": "https://attachments.clickup.com/profilePictures/14706028_tle.jpg"
+                }
+            ],
+            "watchers": [],
+            "checklists": [],
+            "tags": [],
+            "parent": "zbjuzp",
+            "due_date": null,
+            "start_date": null,
+            "points": null,
+            "time_estimate": null,
+            "custom_fields": [],
+            "dependencies": [],
+            "linked_tasks": [],
+            "url": "https://app.clickup.com/t/19qwdm3"
+        },
+        {
+            "id": "1c1n74y",
+            "custom_id": "MS-6921",
+            "name": "Design",
+            "status": {
+                "status": "Closed",
+                "orderindex": 9,
+                "color": "#6bc950",
+                "type": "closed"
+            },
+            "orderindex": "3.00000000000000000000000000000000",
+            "date_created": "1628009481054",
+            "date_updated": "1628178065706",
+            "archived": false,
+            "creator": {
+                "id": 10654989,
+                "username": "Angela McElwain",
+                "color": "#7b68ee",
+                "email": "angela@myndshft.com",
+                "profilePicture": null
+            },
+            "assignees": [
+                {
+                    "id": 14706028,
+                    "username": "Daniel Villela",
+                    "color": "#04a9f4",
+                    "initials": "DV",
+                    "email": "daniel@myndshft.com",
+                    "profilePicture": "https://attachments.clickup.com/profilePictures/14706028_tle.jpg"
+                },
+                {
+                    "id": 14706031,
+                    "username": "Zach",
+                    "color": "#0388d1",
+                    "initials": "Z",
+                    "email": "zach@myndshft.com",
+                    "profilePicture": "https://attachments.clickup.com/profilePictures/14706031_yiV.jpg"
+                }
+            ],
+            "watchers": [],
+            "checklists": [],
+            "tags": [],
+            "parent": "zbjuzp",
+            "due_date": null,
+            "start_date": null,
+            "points": null,
+            "time_estimate": null,
+            "custom_fields": [],
+            "dependencies": [],
+            "linked_tasks": [],
+            "url": "https://app.clickup.com/t/1c1n74y"
+        }
+    ],
+    "attachments": []
+}
