@@ -3,6 +3,8 @@ package clickup
 import (
 	"bytes"
 	"encoding/json"
+	"fmt"
+	"io/ioutil"
 	"net/http"
 	"time"
 )
@@ -69,5 +71,15 @@ func (c *Client) call(method, uri string, data *bytes.Buffer, result interface{}
 	}
 	defer res.Body.Close()
 
-	return json.NewDecoder(res.Body).Decode(result)
+	b, err := ioutil.ReadAll(res.Body)
+	if err != nil {
+		return fmt.Errorf("failed to read response body: %w", err)
+	}
+
+	// clickup doesn't document the structure of their error response and it also seems to return a 200 when they say it won't -_-
+	if err := json.Unmarshal(b, result); err != nil {
+		return fmt.Errorf("failed to parse response from clickup: %v %v", err, string(b))
+	}
+	return nil
+	// return json.NewDecoder(res.Body).Decode(result)
 }

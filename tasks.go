@@ -194,8 +194,8 @@ func (c *Client) TaskTimeInStatus(taskID, workspaceID string, useCustomTaskIDs b
 }
 
 func (c *Client) BulkTaskTimeInStatus(taskIDs []string, workspaceID string, useCustomTaskIDs bool) (map[string]TaskTimeInStatusResponse, error) {
-	if len(taskIDs) < 2 {
-		return nil, fmt.Errorf("must provide 2 or more tasks to retrieve bulk tasks time in status: %w", ValidationError)
+	if len(taskIDs) < 2 || len(taskIDs) > 100 {
+		return nil, fmt.Errorf("must provide between 2 and 100 tasks to retrieve bulk tasks time in status: %w", ValidationError)
 	}
 
 	var bulkTaskTimeInStatus map[string]TaskTimeInStatusResponse
