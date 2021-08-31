@@ -1,34 +1,119 @@
 package main
 
 import (
+	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"os"
+	"strconv"
+	"time"
 
 	"github.com/Guitarbum722/clickup-client-go"
 )
 
+type Config struct {
+	SpaceID   string            `json:"space_id"`
+	FolderIDs map[string]string `json:"folder_ids"`
+	ListIDs   map[string]string `json:"list_ids"`
+	TaskIDs   []string          `json:"task_ids"`
+}
+
 func main() {
+	configFile, err := os.Open("config.json")
+	if err != nil {
+		panic(err)
+	}
+	defer configFile.Close()
+
+	b, err := ioutil.ReadAll(configFile)
+	if err != nil {
+		panic(err)
+	}
+
+	var config Config
+
+	if err := json.Unmarshal(b, &config); err != nil {
+		panic(err)
+	}
 
 	client := clickup.NewClient(&clickup.ClientOpts{
 		APIToken:   os.Args[1],
 		HTTPClient: nil,
 	})
 
-	task, err := client.GetTask(os.Args[2], os.Args[3], true, true)
+	queriedTasks := map[string]clickup.SingleTask{}
+
+	for _, val := range config.ListIDs {
+		tasks, err := client.GetTasks(val, false)
+		if err != nil {
+			panic(err)
+		}
+		for _, v := range tasks.Tasks {
+			queriedTasks[v.CustomID] = v
+		}
+	}
+
+	taskIDs := make([]string, 0, len(queriedTasks))
+	for k := range queriedTasks {
+		taskIDs = append(taskIDs, k)
+	}
+
+	taskIDChunks := chunkSlice(taskIDs, 100)
+
+	fmt.Printf("task_id,team_folder,historic_status,status_duration_mins,status_start,status_order,current_status,current_status_since,current_status_duration\n")
+	for _, v := range taskIDChunks {
+		bulkTimeInStatusResponse, err := client.BulkTaskTimeInStatus(v, config.SpaceID, true)
+		if err != nil {
+			panic(err)
+		}
+
+		for taskID, statusHistory := range bulkTimeInStatusResponse {
+			currentTimeSince, err := unixMillisToTime(statusHistory.CurrentStatus.TotalTime.Since)
+			if err != nil {
+				panic(err)
+			}
+			for _, v := range statusHistory.StatusHistory {
+				historyTimeSince, err := unixMillisToTime(v.TotalTime.Since)
+				if err != nil {
+					panic(err)
+				}
+				fmt.Printf("%s,%s,%s,%d,%s,%d,%s,%s,%d\n",
+					taskID,
+					queriedTasks[taskID].Folder.Name,
+					v.Status,
+					v.TotalTime.ByMinute,
+					historyTimeSince,
+					v.Orderindex,
+					statusHistory.CurrentStatus.Status,
+					currentTimeSince,
+					statusHistory.CurrentStatus.TotalTime.ByMinute,
+				)
+			}
+		}
+	}
+}
+
+func unixMillisToTime(m string) (time.Time, error) {
+	i, err := strconv.ParseInt(m, 10, 64)
 	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
+		return time.Time{}, err
+	}
+	return time.Unix(0, i*int64(time.Millisecond)), nil
+}
+
+func chunkSlice(slice []string, chunkSize int) [][]string {
+	var chunks [][]string
+	for i := 0; i < len(slice); i += chunkSize {
+		end := i + chunkSize
+
+		// necessary check to avoid slicing beyond
+		// slice capacity
+		if end > len(slice) {
+			end = len(slice)
+		}
+
+		chunks = append(chunks, slice[i:end])
 	}
 
-	fmt.Println("Task", task.CustomID, task.Name)
-
-	tasks, err := client.GetTasks(os.Args[4], false)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-
-	for _, task := range tasks.Tasks {
-		fmt.Println("Task: ", task.Name, task.ID)
-	}
+	return chunks
 }
