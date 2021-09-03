@@ -1,6 +1,7 @@
 package clickup
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -162,17 +163,46 @@ type TaskQueryOptions struct {
 }
 
 func (c *Client) TaskTimeInStatus(taskID, workspaceID string, useCustomTaskIDs bool) (*TaskTimeInStatusResponse, error) {
-	var taskTimeInStatus TaskTimeInStatusResponse
 
 	urlValues := url.Values{}
 	urlValues.Set("task_id", taskID)
 	urlValues.Add("custom_task_ids", strconv.FormatBool(useCustomTaskIDs))
 	urlValues.Add("team_id", workspaceID)
 
-	uri := fmt.Sprintf("/task/%s/time_in_status/?%s", taskID, urlValues.Encode())
+	endpoint := fmt.Sprintf("%s/task/%s/time_in_status/?%s", c.baseURL, taskID, urlValues.Encode())
 
-	if err := c.call(http.MethodGet, uri, nil, &taskTimeInStatus); err != nil {
-		return nil, err
+	req, err := http.NewRequest(http.MethodGet, endpoint, nil)
+	if err != nil {
+		return nil, fmt.Errorf("time in status request failed: %w", err)
+	}
+	req.Header.Add("Authorization", c.opts.APIToken)
+
+	res, err := c.hc.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to make time in status request: %w", err)
+	}
+	defer res.Body.Close()
+
+	decoder := json.NewDecoder(res.Body)
+
+	if res.StatusCode != http.StatusOK {
+		var errResponse ErrClickupResponse
+		if err := decoder.Decode(&errResponse); err != nil {
+			return nil, &HTTPError{
+				Status:     res.Status,
+				StatusCode: res.StatusCode,
+				URL:        res.Request.URL.String(),
+			}
+		}
+		errResponse.StatusCode = res.StatusCode
+		errResponse.Status = res.Status
+		return nil, &errResponse
+	}
+
+	var taskTimeInStatus TaskTimeInStatusResponse
+
+	if err := decoder.Decode(&taskTimeInStatus); err != nil {
+		return nil, fmt.Errorf("failed to parse time in status: %w", err)
 	}
 
 	return &taskTimeInStatus, nil
@@ -183,8 +213,6 @@ func (c *Client) BulkTaskTimeInStatus(taskIDs []string, workspaceID string, useC
 		return nil, fmt.Errorf("must provide between 2 and 100 tasks to retrieve bulk tasks time in status: %w", ErrValidation)
 	}
 
-	var bulkTaskTimeInStatus map[string]TaskTimeInStatusResponse
-
 	urlValues := url.Values{}
 	urlValues.Set("custom_task_ids", strconv.FormatBool(useCustomTaskIDs))
 	urlValues.Add("team_id", workspaceID)
@@ -192,18 +220,46 @@ func (c *Client) BulkTaskTimeInStatus(taskIDs []string, workspaceID string, useC
 		urlValues.Add("task_ids", v)
 	}
 
-	uri := fmt.Sprintf("/task/bulk_time_in_status/task_ids/?%s", urlValues.Encode())
+	endpoint := fmt.Sprintf("%s/task/bulk_time_in_status/task_ids/?%s", c.baseURL, urlValues.Encode())
 
-	if err := c.call(http.MethodGet, uri, nil, &bulkTaskTimeInStatus); err != nil {
-		return nil, err
+	req, err := http.NewRequest(http.MethodGet, endpoint, nil)
+	if err != nil {
+		return nil, fmt.Errorf("bulk time in status request failed: %w", err)
+	}
+	req.Header.Add("Authorization", c.opts.APIToken)
+
+	res, err := c.hc.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to make bulk time in status request: %w", err)
+	}
+	defer res.Body.Close()
+
+	decoder := json.NewDecoder(res.Body)
+
+	if res.StatusCode != http.StatusOK {
+		var errResponse ErrClickupResponse
+		if err := decoder.Decode(&errResponse); err != nil {
+			return nil, &HTTPError{
+				Status:     res.Status,
+				StatusCode: res.StatusCode,
+				URL:        res.Request.URL.String(),
+			}
+		}
+		errResponse.StatusCode = res.StatusCode
+		errResponse.Status = res.Status
+		return nil, &errResponse
+	}
+
+	var bulkTaskTimeInStatus map[string]TaskTimeInStatusResponse
+	fmt.Println(res.StatusCode)
+	if err := decoder.Decode(&bulkTaskTimeInStatus); err != nil {
+		return nil, fmt.Errorf("failed to parse bulk time in status: %w", err)
 	}
 
 	return bulkTaskTimeInStatus, nil
 }
 
-// TODO: need a query options struct to inject because there are so many options for this call
 func (c *Client) TasksForList(listID string, queryOpts TaskQueryOptions) (*GetTasksResponse, error) {
-	var tasks GetTasksResponse
 
 	urlValues := url.Values{}
 	urlValues.Set("archived", strconv.FormatBool(queryOpts.IncludeArchived))
@@ -211,10 +267,40 @@ func (c *Client) TasksForList(listID string, queryOpts TaskQueryOptions) (*GetTa
 	urlValues.Set("include_closed", strconv.FormatBool(queryOpts.IncludeClosed))
 	// urlValues.Set("date_updated_gt", strconv.Itoa(queryOpts.DateUpdatedGreaterThan))
 
-	uri := fmt.Sprintf("/list/%s/task/?%s", listID, urlValues.Encode())
-	fmt.Println("uri: ", uri)
-	if err := c.call(http.MethodGet, uri, nil, &tasks); err != nil {
-		return nil, err
+	endpoint := fmt.Sprintf("%s/list/%s/task/?%s", c.baseURL, listID, urlValues.Encode())
+
+	req, err := http.NewRequest(http.MethodGet, endpoint, nil)
+	if err != nil {
+		return nil, fmt.Errorf("tasks by list request failed: %w", err)
+	}
+	req.Header.Add("Authorization", c.opts.APIToken)
+
+	res, err := c.hc.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to make tasks by list request: %w", err)
+	}
+	defer res.Body.Close()
+
+	decoder := json.NewDecoder(res.Body)
+
+	if res.StatusCode != http.StatusOK {
+		var errResponse ErrClickupResponse
+		if err := decoder.Decode(&errResponse); err != nil {
+			return nil, &HTTPError{
+				Status:     res.Status,
+				StatusCode: res.StatusCode,
+				URL:        res.Request.URL.String(),
+			}
+		}
+		errResponse.StatusCode = res.StatusCode
+		errResponse.Status = res.Status
+		return nil, &errResponse
+	}
+
+	var tasks GetTasksResponse
+
+	if err := decoder.Decode(&tasks); err != nil {
+		return nil, fmt.Errorf("failed to parse tasks: %w", err)
 	}
 
 	return &tasks, nil
@@ -222,17 +308,47 @@ func (c *Client) TasksForList(listID string, queryOpts TaskQueryOptions) (*GetTa
 
 // TODO: need a query options struct to inject because there are so many options for this call
 func (c *Client) TaskByID(taskID, workspaceID string, useCustomTaskIDs, includeSubtasks bool) (*SingleTask, error) {
-	var task SingleTask
 
 	urlValues := url.Values{}
 	urlValues.Set("custom_task_ids", strconv.FormatBool(useCustomTaskIDs))
 	urlValues.Add("include_subtasks", strconv.FormatBool(includeSubtasks))
 	urlValues.Add("team_id", workspaceID)
 
-	uri := fmt.Sprintf("/task/%s/?%s", taskID, urlValues.Encode())
+	endpoint := fmt.Sprintf("%s/task/%s/?%s", c.baseURL, taskID, urlValues.Encode())
 
-	if err := c.call(http.MethodGet, uri, nil, &task); err != nil {
-		return nil, err
+	req, err := http.NewRequest(http.MethodGet, endpoint, nil)
+	if err != nil {
+		return nil, fmt.Errorf("task by id request failed: %w", err)
+	}
+	req.Header.Add("Authorization", c.opts.APIToken)
+
+	res, err := c.hc.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to make task by id request: %w", err)
+	}
+	defer res.Body.Close()
+
+	decoder := json.NewDecoder(res.Body)
+
+	if res.StatusCode != http.StatusOK {
+		var errResponse ErrClickupResponse
+		if err := decoder.Decode(&errResponse); err != nil {
+			return nil, &HTTPError{
+				Status:     res.Status,
+				StatusCode: res.StatusCode,
+				URL:        res.Request.URL.String(),
+			}
+		}
+		errResponse.StatusCode = res.StatusCode
+		errResponse.Status = res.Status
+		return nil, &errResponse
+	}
+
+	var task SingleTask
+
+	if err := decoder.Decode(&task); err != nil {
+		return nil, fmt.Errorf("failed to parse task: %w", err)
+
 	}
 
 	return &task, nil

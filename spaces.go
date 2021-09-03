@@ -1,6 +1,7 @@
 package clickup
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -81,32 +82,87 @@ type SingleSpace struct {
 	} `json:"members"`
 }
 
-type GetSpacesResponse struct {
+type SpacesResponse struct {
 	Spaces []SingleSpace `json:"spaces"`
 }
 
-func (c *Client) GetSpaces(teamID string, includeArchived bool) (*GetSpacesResponse, error) {
-	var spacesResponse GetSpacesResponse
-
+func (c *Client) SpacesForWorkspace(teamID string, includeArchived bool) (*SpacesResponse, error) {
 	urlValues := url.Values{}
 	urlValues.Set("archived", strconv.FormatBool(includeArchived))
 
-	uri := fmt.Sprintf("/team/%s/space/?%s", teamID, urlValues.Encode())
+	endpoint := fmt.Sprintf("%s/team/%s/space/?%s", c.baseURL, teamID, urlValues.Encode())
 
-	if err := c.call(http.MethodGet, uri, nil, &spacesResponse); err != nil {
-		return nil, err
+	req, err := http.NewRequest(http.MethodGet, endpoint, nil)
+	if err != nil {
+		return nil, fmt.Errorf("spaces request failed: %w", err)
+	}
+
+	res, err := c.hc.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to make spaces request: %w", err)
+	}
+	defer res.Body.Close()
+
+	decoder := json.NewDecoder(res.Body)
+
+	if res.StatusCode != http.StatusOK {
+		var errResponse ErrClickupResponse
+		if err := decoder.Decode(&errResponse); err != nil {
+			return nil, &HTTPError{
+				Status:     res.Status,
+				StatusCode: res.StatusCode,
+				URL:        res.Request.URL.String(),
+			}
+		}
+		errResponse.StatusCode = res.StatusCode
+		errResponse.Status = res.Status
+		return nil, &errResponse
+	}
+
+	var spacesResponse SpacesResponse
+
+	if err := decoder.Decode(&spacesResponse); err != nil {
+		return nil, fmt.Errorf("failed parse to spaces: %w", err)
 	}
 
 	return &spacesResponse, nil
 }
 
-func (c *Client) GetSpace(spaceID string) (*SingleSpace, error) {
+func (c *Client) SpaceByID(spaceID string) (*SingleSpace, error) {
+
+	endpoint := fmt.Sprintf("%s/space/%s", c.baseURL, spaceID)
+
+	req, err := http.NewRequest(http.MethodGet, endpoint, nil)
+	if err != nil {
+		return nil, fmt.Errorf("space request failed: %w", err)
+	}
+
+	res, err := c.hc.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to make space request: %w", err)
+	}
+	defer res.Body.Close()
+
+	decoder := json.NewDecoder(res.Body)
+
+	if res.StatusCode != http.StatusOK {
+		var errResponse ErrClickupResponse
+		if err := decoder.Decode(&errResponse); err != nil {
+			return nil, &HTTPError{
+				Status:     res.Status,
+				StatusCode: res.StatusCode,
+				URL:        res.Request.URL.String(),
+			}
+		}
+		errResponse.StatusCode = res.StatusCode
+		errResponse.Status = res.Status
+		return nil, &errResponse
+	}
+
 	var spaceResponse SingleSpace
 
-	uri := fmt.Sprintf("/space/%s", spaceID)
-
-	if err := c.call(http.MethodGet, uri, nil, &spaceResponse); err != nil {
-		return nil, err
+	if err := decoder.Decode(&spaceResponse); err != nil {
+		return nil, fmt.Errorf("failed parse to space: %w", err)
 	}
 
 	return &spaceResponse, nil

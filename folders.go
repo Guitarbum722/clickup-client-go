@@ -1,6 +1,7 @@
 package clickup
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -54,32 +55,88 @@ type SingleFolder struct {
 	PermissionLevel string `json:"permission_level"`
 }
 
-type GetFoldersResponse struct {
+type FoldersResponse struct {
 	Folders []SingleFolder `json:"folders"`
 }
 
-func (c *Client) GetFolders(spaceID string, includeArchived bool) (*GetFoldersResponse, error) {
-	var folders GetFoldersResponse
+func (c *Client) FoldersForSpace(spaceID string, includeArchived bool) (*FoldersResponse, error) {
 
 	urlValues := url.Values{}
 	urlValues.Set("archived", strconv.FormatBool(includeArchived))
 
-	uri := fmt.Sprintf("/space/%s/folder/?%s", spaceID, urlValues.Encode())
+	endpoint := fmt.Sprintf("%s/space/%s/folder/?%s", c.baseURL, spaceID, urlValues.Encode())
 
-	if err := c.call(http.MethodGet, uri, nil, &folders); err != nil {
-		return nil, err
+	req, err := http.NewRequest(http.MethodGet, endpoint, nil)
+	if err != nil {
+		return nil, fmt.Errorf("folder by space request failed: %w", err)
+	}
+
+	res, err := c.hc.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to make folders by space request: %w", err)
+	}
+	defer res.Body.Close()
+
+	decoder := json.NewDecoder(res.Body)
+
+	if res.StatusCode != http.StatusOK {
+		var errResponse ErrClickupResponse
+		if err := decoder.Decode(&errResponse); err != nil {
+			return nil, &HTTPError{
+				Status:     res.Status,
+				StatusCode: res.StatusCode,
+				URL:        res.Request.URL.String(),
+			}
+		}
+		errResponse.StatusCode = res.StatusCode
+		errResponse.Status = res.Status
+		return nil, &errResponse
+	}
+
+	var folders FoldersResponse
+
+	if err := decoder.Decode(&folders); err != nil {
+		return nil, fmt.Errorf("failed to parse folders: %w", err)
 	}
 
 	return &folders, nil
 }
 
-func (c *Client) GetFolder(folderID string) (*SingleFolder, error) {
+func (c *Client) FolderByID(folderID string) (*SingleFolder, error) {
+
+	endpoint := fmt.Sprintf("%s/folder/%s", c.baseURL, folderID)
+
+	req, err := http.NewRequest(http.MethodGet, endpoint, nil)
+	if err != nil {
+		return nil, fmt.Errorf("folder request failed: %w", err)
+	}
+
+	res, err := c.hc.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to make folder request: %w", err)
+	}
+	defer res.Body.Close()
+
+	decoder := json.NewDecoder(res.Body)
+
+	if res.StatusCode != http.StatusOK {
+		var errResponse ErrClickupResponse
+		if err := decoder.Decode(&errResponse); err != nil {
+			return nil, &HTTPError{
+				Status:     res.Status,
+				StatusCode: res.StatusCode,
+				URL:        res.Request.URL.String(),
+			}
+		}
+		errResponse.StatusCode = res.StatusCode
+		errResponse.Status = res.Status
+		return nil, &errResponse
+	}
+
 	var folder SingleFolder
 
-	uri := fmt.Sprintf("/folder/%s", folderID)
-
-	if err := c.call(http.MethodGet, uri, nil, &folder); err != nil {
-		return nil, err
+	if err := decoder.Decode(&folder); err != nil {
+		return nil, fmt.Errorf("failed to parse folder: %w", err)
 	}
 
 	return &folder, nil

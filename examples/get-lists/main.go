@@ -19,7 +19,7 @@ func main() {
 		HTTPClient: nil,
 	})
 
-	lists, err := client.GetLists(folderID, false)
+	lists, err := client.ListsForFolder(folderID, false)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -29,7 +29,7 @@ func main() {
 		fmt.Printf("List ID: %s\nName: %s\n\n", folder.ID, folder.Name)
 	}
 
-	list, err := client.GetList(os.Args[3])
+	list, err := client.ListByID(os.Args[3])
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

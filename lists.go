@@ -1,6 +1,7 @@
 package clickup
 
 import (
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -38,32 +39,88 @@ type SingleList struct {
 	PermissionLevel  string `json:"permission_level"`
 }
 
-type GetListsResponse struct {
+type ListsResponse struct {
 	Lists []SingleList `json:"lists"`
 }
 
-func (c *Client) GetLists(folderID string, includeArchived bool) (*GetListsResponse, error) {
-	var lists GetListsResponse
+func (c *Client) ListsForFolder(folderID string, includeArchived bool) (*ListsResponse, error) {
 
 	urlValues := url.Values{}
 	urlValues.Set("archived", strconv.FormatBool(includeArchived))
 
-	uri := fmt.Sprintf("/folder/%s/list/?%s", folderID, urlValues.Encode())
+	endpoint := fmt.Sprintf("%s/folder/%s/list/?%s", c.baseURL, folderID, urlValues.Encode())
 
-	if err := c.call(http.MethodGet, uri, nil, &lists); err != nil {
-		return nil, err
+	req, err := http.NewRequest(http.MethodGet, endpoint, nil)
+	if err != nil {
+		return nil, fmt.Errorf("lists for folder request failed: %w", err)
+	}
+
+	res, err := c.hc.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to make lists request: %w", err)
+	}
+	defer res.Body.Close()
+
+	decoder := json.NewDecoder(res.Body)
+
+	if res.StatusCode != http.StatusOK {
+		var errResponse ErrClickupResponse
+		if err := decoder.Decode(&errResponse); err != nil {
+			return nil, &HTTPError{
+				Status:     res.Status,
+				StatusCode: res.StatusCode,
+				URL:        res.Request.URL.String(),
+			}
+		}
+		errResponse.StatusCode = res.StatusCode
+		errResponse.Status = res.Status
+		return nil, &errResponse
+	}
+
+	var lists ListsResponse
+
+	if err := decoder.Decode(&lists); err != nil {
+		return nil, fmt.Errorf("failed to parse lists: %w", err)
 	}
 
 	return &lists, nil
 }
 
-func (c *Client) GetList(listID string) (*SingleList, error) {
+func (c *Client) ListByID(listID string) (*SingleList, error) {
+
+	endpoint := fmt.Sprintf("%s/list/%s", c.baseURL, listID)
+
+	req, err := http.NewRequest(http.MethodGet, endpoint, nil)
+	if err != nil {
+		return nil, fmt.Errorf("list request failed: %w", err)
+	}
+
+	res, err := c.hc.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to make list request: %w", err)
+	}
+	defer res.Body.Close()
+
+	decoder := json.NewDecoder(res.Body)
+
+	if res.StatusCode != http.StatusOK {
+		var errResponse ErrClickupResponse
+		if err := decoder.Decode(&errResponse); err != nil {
+			return nil, &HTTPError{
+				Status:     res.Status,
+				StatusCode: res.StatusCode,
+				URL:        res.Request.URL.String(),
+			}
+		}
+		errResponse.StatusCode = res.StatusCode
+		errResponse.Status = res.Status
+		return nil, &errResponse
+	}
+
 	var list SingleList
 
-	uri := fmt.Sprintf("/list/%s", listID)
-
-	if err := c.call(http.MethodGet, uri, nil, &list); err != nil {
-		return nil, err
+	if err := decoder.Decode(&list); err != nil {
+		return nil, fmt.Errorf("failed parse to list: %w", err)
 	}
 
 	return &list, nil

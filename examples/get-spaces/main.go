@@ -19,7 +19,7 @@ func main() {
 		HTTPClient: nil,
 	})
 
-	spaces, err := client.GetSpaces(teamID, false)
+	spaces, err := client.SpacesForWorkspace(teamID, false)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -29,7 +29,7 @@ func main() {
 		fmt.Printf("Space ID: %s\nName: %s\n\n", space.ID, space.Name)
 	}
 
-	singleSpace, err := client.GetSpace("14865529")
+	singleSpace, err := client.SpaceByID("14865529")
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
