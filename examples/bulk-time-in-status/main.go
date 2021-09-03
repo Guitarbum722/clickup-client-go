@@ -19,8 +19,8 @@ func main() {
 	workspaceID := os.Args[3]
 
 	client := clickup.NewClient(&clickup.ClientOpts{
-		APIToken:   apiKey,
-		HTTPClient: nil,
+		APIToken: apiKey,
+		Doer:     nil,
 	})
 
 	bulkTimeInStatusResponse, err := client.BulkTaskTimeInStatus(taskIDs, workspaceID, true)

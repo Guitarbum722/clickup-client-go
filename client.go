@@ -6,30 +6,37 @@ import (
 )
 
 type ClientOpts struct {
-	APIToken   string
-	HTTPClient *http.Client
+	APIToken string
+	Doer     ClientDoer
 }
 
 type Client struct {
-	hc      *http.Client
+	// hc      *http.Client
+	doer    ClientDoer
 	opts    *ClientOpts
 	baseURL string
 }
 
+type ClientDoer interface {
+	Do(req *http.Request) (*http.Response, error)
+}
+
+const basePath = "https://api.clickup.com/api/v2"
+
 func NewClient(opts *ClientOpts) *Client {
-	if opts.HTTPClient != nil {
+	if opts.Doer != nil {
 		return &Client{
-			hc:      opts.HTTPClient,
+			doer:    opts.Doer,
 			opts:    opts,
-			baseURL: "https://api.clickup.com/api/v2",
+			baseURL: basePath,
 		}
 	}
 
 	return &Client{
-		hc: &http.Client{
+		doer: &http.Client{
 			Timeout: time.Duration(time.Second * 20),
 		},
 		opts:    opts,
-		baseURL: "https://api.clickup.com/api/v2",
+		baseURL: basePath,
 	}
 }

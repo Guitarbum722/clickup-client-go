@@ -177,7 +177,7 @@ func (c *Client) TaskTimeInStatus(taskID, workspaceID string, useCustomTaskIDs b
 	}
 	req.Header.Add("Authorization", c.opts.APIToken)
 
-	res, err := c.hc.Do(req)
+	res, err := c.doer.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to make time in status request: %w", err)
 	}
@@ -228,7 +228,7 @@ func (c *Client) BulkTaskTimeInStatus(taskIDs []string, workspaceID string, useC
 	}
 	req.Header.Add("Authorization", c.opts.APIToken)
 
-	res, err := c.hc.Do(req)
+	res, err := c.doer.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to make bulk time in status request: %w", err)
 	}
@@ -275,7 +275,7 @@ func (c *Client) TasksForList(listID string, queryOpts TaskQueryOptions) (*GetTa
 	}
 	req.Header.Add("Authorization", c.opts.APIToken)
 
-	res, err := c.hc.Do(req)
+	res, err := c.doer.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to make tasks by list request: %w", err)
 	}
@@ -322,7 +322,7 @@ func (c *Client) TaskByID(taskID, workspaceID string, useCustomTaskIDs, includeS
 	}
 	req.Header.Add("Authorization", c.opts.APIToken)
 
-	res, err := c.hc.Do(req)
+	res, err := c.doer.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to make task by id request: %w", err)
 	}

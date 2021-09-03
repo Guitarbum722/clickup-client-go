@@ -55,7 +55,7 @@ func (c *Client) ListsForFolder(folderID string, includeArchived bool) (*ListsRe
 		return nil, fmt.Errorf("lists for folder request failed: %w", err)
 	}
 
-	res, err := c.hc.Do(req)
+	res, err := c.doer.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to make lists request: %w", err)
 	}
@@ -95,7 +95,7 @@ func (c *Client) ListByID(listID string) (*SingleList, error) {
 		return nil, fmt.Errorf("list request failed: %w", err)
 	}
 
-	res, err := c.hc.Do(req)
+	res, err := c.doer.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to make list request: %w", err)
 	}

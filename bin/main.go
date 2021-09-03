@@ -37,8 +37,8 @@ func main() {
 	}
 
 	client := clickup.NewClient(&clickup.ClientOpts{
-		APIToken:   os.Args[1],
-		HTTPClient: nil,
+		APIToken: os.Args[1],
+		Doer:     nil,
 	})
 
 	// queriedTasks := map[string]clickup.SingleTask{}

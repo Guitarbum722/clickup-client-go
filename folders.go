@@ -71,7 +71,7 @@ func (c *Client) FoldersForSpace(spaceID string, includeArchived bool) (*Folders
 		return nil, fmt.Errorf("folder by space request failed: %w", err)
 	}
 
-	res, err := c.hc.Do(req)
+	res, err := c.doer.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to make folders by space request: %w", err)
 	}
@@ -111,7 +111,7 @@ func (c *Client) FolderByID(folderID string) (*SingleFolder, error) {
 		return nil, fmt.Errorf("folder request failed: %w", err)
 	}
 
-	res, err := c.hc.Do(req)
+	res, err := c.doer.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to make folder request: %w", err)
 	}

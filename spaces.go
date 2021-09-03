@@ -97,7 +97,7 @@ func (c *Client) SpacesForWorkspace(teamID string, includeArchived bool) (*Space
 		return nil, fmt.Errorf("spaces request failed: %w", err)
 	}
 
-	res, err := c.hc.Do(req)
+	res, err := c.doer.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to make spaces request: %w", err)
 	}
@@ -137,7 +137,7 @@ func (c *Client) SpaceByID(spaceID string) (*SingleSpace, error) {
 		return nil, fmt.Errorf("space request failed: %w", err)
 	}
 
-	res, err := c.hc.Do(req)
+	res, err := c.doer.Do(req)
 	if err != nil {
 		return nil, fmt.Errorf("failed to make space request: %w", err)
 	}

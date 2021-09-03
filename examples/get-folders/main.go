@@ -15,8 +15,8 @@ func main() {
 	spaceID := os.Args[2]
 
 	client := clickup.NewClient(&clickup.ClientOpts{
-		APIToken:   apiKey,
-		HTTPClient: nil,
+		APIToken: apiKey,
+		Doer:     nil,
 	})
 
 	folders, err := client.FoldersForSpace(spaceID, false)
