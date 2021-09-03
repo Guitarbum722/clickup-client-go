@@ -105,49 +105,7 @@ type SingleTask struct {
 	Space struct {
 		ID string `json:"id"`
 	} `json:"space"`
-	Subtasks []struct {
-		ID       string `json:"id"`
-		CustomID string `json:"custom_id"`
-		Name     string `json:"name"`
-		Status   struct {
-			Status     string `json:"status"`
-			Orderindex int    `json:"orderindex"`
-			Color      string `json:"color"`
-			Type       string `json:"type"`
-		} `json:"status"`
-		Orderindex  string      `json:"orderindex"`
-		DateCreated string      `json:"date_created"`
-		DateUpdated string      `json:"date_updated"`
-		DateClosed  interface{} `json:"date_closed,omitempty"`
-		Archived    bool        `json:"archived"`
-		Creator     struct {
-			ID             int    `json:"id"`
-			Username       string `json:"username"`
-			Color          string `json:"color"`
-			Email          string `json:"email"`
-			ProfilePicture string `json:"profilePicture"`
-		} `json:"creator"`
-		Assignees []struct {
-			ID             int         `json:"id"`
-			Username       string      `json:"username"`
-			Color          string      `json:"color"`
-			Initials       string      `json:"initials"`
-			Email          string      `json:"email"`
-			ProfilePicture interface{} `json:"profilePicture"`
-		} `json:"assignees"`
-		Watchers     []interface{} `json:"watchers"`
-		Checklists   []interface{} `json:"checklists"`
-		Tags         []interface{} `json:"tags"`
-		Parent       string        `json:"parent"`
-		DueDate      interface{}   `json:"due_date"`
-		StartDate    interface{}   `json:"start_date"`
-		Points       interface{}   `json:"points"`
-		TimeEstimate interface{}   `json:"time_estimate"`
-		CustomFields []interface{} `json:"custom_fields"`
-		Dependencies []interface{} `json:"dependencies"`
-		LinkedTasks  []interface{} `json:"linked_tasks"`
-		URL          string        `json:"url"`
-	} `json:"subtasks"`
+	Subtasks    []SingleTask  `json:"subtasks"`
 	Attachments []interface{} `json:"attachments"`
 }
 
@@ -254,7 +212,7 @@ func (c *Client) TasksForList(listID string, queryOpts TaskQueryOptions) (*GetTa
 	// urlValues.Set("date_updated_gt", strconv.Itoa(queryOpts.DateUpdatedGreaterThan))
 
 	uri := fmt.Sprintf("/list/%s/task/?%s", listID, urlValues.Encode())
-
+	fmt.Println("uri: ", uri)
 	if err := c.call(http.MethodGet, uri, nil, &tasks); err != nil {
 		return nil, err
 	}
