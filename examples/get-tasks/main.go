@@ -16,7 +16,7 @@ func main() {
 		HTTPClient: nil,
 	})
 
-	task, err := client.GetTask(os.Args[2], os.Args[3], true, true)
+	task, err := client.TaskByID(os.Args[2], os.Args[3], true, true)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -24,7 +24,9 @@ func main() {
 	fmt.Println(task.DateUpdated)
 	fmt.Printf("Task:  %s %s %s\n", task.CustomID, task.Name, msToTime(task.DateUpdated))
 
-	tasks, err := client.GetTasks(os.Args[4], false)
+	tasks, err := client.TasksForList(os.Args[4], clickup.TaskQueryOptions{
+		IncludeArchived: false,
+	})
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

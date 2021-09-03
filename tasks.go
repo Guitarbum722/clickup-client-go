@@ -176,6 +176,33 @@ type TaskTimeInStatusResponse struct {
 	} `json:"status_history"`
 }
 
+type OrderByVal string
+
+const (
+	OrderByID      OrderByVal = "id"
+	OrderByCreated OrderByVal = "created"
+	OrderByUpdated OrderByVal = "updated"
+	OrderByDueDate OrderByVal = "due_date"
+)
+
+type TaskQueryOptions struct {
+	IncludeArchived        bool
+	Page                   int
+	OrderBy                OrderByVal
+	Reverse                bool
+	IncludeSubtasks        bool
+	Statuses               []string // statuses to query
+	IncludeClosed          bool
+	Assignees              []string
+	DueDateGreaterThan     int
+	DueDateLessThan        int
+	DateCreatedGreaterThan int
+	DateCreatedLessThan    int
+	DateUpdatedGreaterThan int
+	DateUpdatedLessThan    int
+	// CustomFields map[string]interface{}
+}
+
 func (c *Client) TaskTimeInStatus(taskID, workspaceID string, useCustomTaskIDs bool) (*TaskTimeInStatusResponse, error) {
 	var taskTimeInStatus TaskTimeInStatusResponse
 
@@ -217,11 +244,14 @@ func (c *Client) BulkTaskTimeInStatus(taskIDs []string, workspaceID string, useC
 }
 
 // TODO: need a query options struct to inject because there are so many options for this call
-func (c *Client) GetTasks(listID string, includeArchived bool) (*GetTasksResponse, error) {
+func (c *Client) TasksForList(listID string, queryOpts TaskQueryOptions) (*GetTasksResponse, error) {
 	var tasks GetTasksResponse
 
 	urlValues := url.Values{}
-	urlValues.Set("archived", strconv.FormatBool(includeArchived))
+	urlValues.Set("archived", strconv.FormatBool(queryOpts.IncludeArchived))
+	urlValues.Set("subtasks", strconv.FormatBool(queryOpts.IncludeSubtasks))
+	urlValues.Set("include_closed", strconv.FormatBool(queryOpts.IncludeClosed))
+	// urlValues.Set("date_updated_gt", strconv.Itoa(queryOpts.DateUpdatedGreaterThan))
 
 	uri := fmt.Sprintf("/list/%s/task/?%s", listID, urlValues.Encode())
 
@@ -233,7 +263,7 @@ func (c *Client) GetTasks(listID string, includeArchived bool) (*GetTasksRespons
 }
 
 // TODO: need a query options struct to inject because there are so many options for this call
-func (c *Client) GetTask(listID, workspaceID string, useCustomTaskIDs, includeSubtasks bool) (*SingleTask, error) {
+func (c *Client) TaskByID(taskID, workspaceID string, useCustomTaskIDs, includeSubtasks bool) (*SingleTask, error) {
 	var task SingleTask
 
 	urlValues := url.Values{}
@@ -241,7 +271,7 @@ func (c *Client) GetTask(listID, workspaceID string, useCustomTaskIDs, includeSu
 	urlValues.Add("include_subtasks", strconv.FormatBool(includeSubtasks))
 	urlValues.Add("team_id", workspaceID)
 
-	uri := fmt.Sprintf("/task/%s/?%s", listID, urlValues.Encode())
+	uri := fmt.Sprintf("/task/%s/?%s", taskID, urlValues.Encode())
 
 	if err := c.call(http.MethodGet, uri, nil, &task); err != nil {
 		return nil, err
