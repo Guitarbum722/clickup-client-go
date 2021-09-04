@@ -15,8 +15,10 @@ func main() {
 	teamID := os.Args[2]
 
 	client := clickup.NewClient(&clickup.ClientOpts{
-		APIToken: apiKey,
-		Doer:     nil,
+		Doer: nil,
+		Authenticator: &clickup.APITokenAuthenticator{
+			APIToken: apiKey,
+		},
 	})
 
 	spaces, err := client.SpacesForWorkspace(teamID, false)

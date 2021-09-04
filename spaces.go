@@ -96,7 +96,7 @@ func (c *Client) SpacesForWorkspace(teamID string, includeArchived bool) (*Space
 	if err != nil {
 		return nil, fmt.Errorf("spaces request failed: %w", err)
 	}
-	req.Header.Add("Authorization", c.opts.APIToken)
+	c.AuthenticateFor(req)
 
 	res, err := c.doer.Do(req)
 	if err != nil {
@@ -107,17 +107,7 @@ func (c *Client) SpacesForWorkspace(teamID string, includeArchived bool) (*Space
 	decoder := json.NewDecoder(res.Body)
 
 	if res.StatusCode != http.StatusOK {
-		var errResponse ErrClickupResponse
-		if err := decoder.Decode(&errResponse); err != nil {
-			return nil, &HTTPError{
-				Status:     res.Status,
-				StatusCode: res.StatusCode,
-				URL:        res.Request.URL.String(),
-			}
-		}
-		errResponse.StatusCode = res.StatusCode
-		errResponse.Status = res.Status
-		return nil, &errResponse
+		return nil, errorFromResponse(res, decoder)
 	}
 
 	var spacesResponse SpacesResponse
@@ -137,7 +127,7 @@ func (c *Client) SpaceByID(spaceID string) (*SingleSpace, error) {
 	if err != nil {
 		return nil, fmt.Errorf("space request failed: %w", err)
 	}
-	req.Header.Add("Authorization", c.opts.APIToken)
+	c.AuthenticateFor(req)
 
 	res, err := c.doer.Do(req)
 	if err != nil {
@@ -148,17 +138,7 @@ func (c *Client) SpaceByID(spaceID string) (*SingleSpace, error) {
 	decoder := json.NewDecoder(res.Body)
 
 	if res.StatusCode != http.StatusOK {
-		var errResponse ErrClickupResponse
-		if err := decoder.Decode(&errResponse); err != nil {
-			return nil, &HTTPError{
-				Status:     res.Status,
-				StatusCode: res.StatusCode,
-				URL:        res.Request.URL.String(),
-			}
-		}
-		errResponse.StatusCode = res.StatusCode
-		errResponse.Status = res.Status
-		return nil, &errResponse
+		return nil, errorFromResponse(res, decoder)
 	}
 
 	var spaceResponse SingleSpace

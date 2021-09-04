@@ -15,8 +15,10 @@ func main() {
 	folderID := os.Args[2]
 
 	client := clickup.NewClient(&clickup.ClientOpts{
-		APIToken: apiKey,
-		Doer:     nil,
+		Doer: nil,
+		Authenticator: &clickup.APITokenAuthenticator{
+			APIToken: apiKey,
+		},
 	})
 
 	lists, err := client.ListsForFolder(folderID, false)

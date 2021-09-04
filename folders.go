@@ -70,7 +70,7 @@ func (c *Client) FoldersForSpace(spaceID string, includeArchived bool) (*Folders
 	if err != nil {
 		return nil, fmt.Errorf("folder by space request failed: %w", err)
 	}
-	req.Header.Add("Authorization", c.opts.APIToken)
+	c.AuthenticateFor(req)
 
 	res, err := c.doer.Do(req)
 	if err != nil {
@@ -81,17 +81,7 @@ func (c *Client) FoldersForSpace(spaceID string, includeArchived bool) (*Folders
 	decoder := json.NewDecoder(res.Body)
 
 	if res.StatusCode != http.StatusOK {
-		var errResponse ErrClickupResponse
-		if err := decoder.Decode(&errResponse); err != nil {
-			return nil, &HTTPError{
-				Status:     res.Status,
-				StatusCode: res.StatusCode,
-				URL:        res.Request.URL.String(),
-			}
-		}
-		errResponse.StatusCode = res.StatusCode
-		errResponse.Status = res.Status
-		return nil, &errResponse
+		return nil, errorFromResponse(res, decoder)
 	}
 
 	var folders FoldersResponse
@@ -104,14 +94,13 @@ func (c *Client) FoldersForSpace(spaceID string, includeArchived bool) (*Folders
 }
 
 func (c *Client) FolderByID(folderID string) (*SingleFolder, error) {
-
 	endpoint := fmt.Sprintf("%s/folder/%s", c.baseURL, folderID)
 
 	req, err := http.NewRequest(http.MethodGet, endpoint, nil)
 	if err != nil {
 		return nil, fmt.Errorf("folder request failed: %w", err)
 	}
-	req.Header.Add("Authorization", c.opts.APIToken)
+	c.AuthenticateFor(req)
 
 	res, err := c.doer.Do(req)
 	if err != nil {
@@ -122,17 +111,7 @@ func (c *Client) FolderByID(folderID string) (*SingleFolder, error) {
 	decoder := json.NewDecoder(res.Body)
 
 	if res.StatusCode != http.StatusOK {
-		var errResponse ErrClickupResponse
-		if err := decoder.Decode(&errResponse); err != nil {
-			return nil, &HTTPError{
-				Status:     res.Status,
-				StatusCode: res.StatusCode,
-				URL:        res.Request.URL.String(),
-			}
-		}
-		errResponse.StatusCode = res.StatusCode
-		errResponse.Status = res.Status
-		return nil, &errResponse
+		return nil, errorFromResponse(res, decoder)
 	}
 
 	var folder SingleFolder

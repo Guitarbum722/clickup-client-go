@@ -178,7 +178,7 @@ func (c *Client) TaskTimeInStatus(taskID, workspaceID string, useCustomTaskIDs b
 	if err != nil {
 		return nil, fmt.Errorf("time in status request failed: %w", err)
 	}
-	req.Header.Add("Authorization", c.opts.APIToken)
+	c.AuthenticateFor(req)
 
 	res, err := c.doer.Do(req)
 	if err != nil {
@@ -189,17 +189,7 @@ func (c *Client) TaskTimeInStatus(taskID, workspaceID string, useCustomTaskIDs b
 	decoder := json.NewDecoder(res.Body)
 
 	if res.StatusCode != http.StatusOK {
-		var errResponse ErrClickupResponse
-		if err := decoder.Decode(&errResponse); err != nil {
-			return nil, &HTTPError{
-				Status:     res.Status,
-				StatusCode: res.StatusCode,
-				URL:        res.Request.URL.String(),
-			}
-		}
-		errResponse.StatusCode = res.StatusCode
-		errResponse.Status = res.Status
-		return nil, &errResponse
+		return nil, errorFromResponse(res, decoder)
 	}
 
 	var taskTimeInStatus TaskTimeInStatusResponse
@@ -233,7 +223,7 @@ func (c *Client) BulkTaskTimeInStatus(taskIDs []string, workspaceID string, useC
 	if err != nil {
 		return nil, fmt.Errorf("bulk time in status request failed: %w", err)
 	}
-	req.Header.Add("Authorization", c.opts.APIToken)
+	c.AuthenticateFor(req)
 
 	res, err := c.doer.Do(req)
 	if err != nil {
@@ -244,17 +234,7 @@ func (c *Client) BulkTaskTimeInStatus(taskIDs []string, workspaceID string, useC
 	decoder := json.NewDecoder(res.Body)
 
 	if res.StatusCode != http.StatusOK {
-		var errResponse ErrClickupResponse
-		if err := decoder.Decode(&errResponse); err != nil {
-			return nil, &HTTPError{
-				Status:     res.Status,
-				StatusCode: res.StatusCode,
-				URL:        res.Request.URL.String(),
-			}
-		}
-		errResponse.StatusCode = res.StatusCode
-		errResponse.Status = res.Status
-		return nil, &errResponse
+		return nil, errorFromResponse(res, decoder)
 	}
 
 	var bulkTaskTimeInStatus map[string]TaskTimeInStatusResponse
@@ -279,7 +259,7 @@ func (c *Client) TasksForList(listID string, queryOpts TaskQueryOptions) (*GetTa
 	if err != nil {
 		return nil, fmt.Errorf("tasks by list request failed: %w", err)
 	}
-	req.Header.Add("Authorization", c.opts.APIToken)
+	c.AuthenticateFor(req)
 
 	res, err := c.doer.Do(req)
 	if err != nil {
@@ -290,17 +270,7 @@ func (c *Client) TasksForList(listID string, queryOpts TaskQueryOptions) (*GetTa
 	decoder := json.NewDecoder(res.Body)
 
 	if res.StatusCode != http.StatusOK {
-		var errResponse ErrClickupResponse
-		if err := decoder.Decode(&errResponse); err != nil {
-			return nil, &HTTPError{
-				Status:     res.Status,
-				StatusCode: res.StatusCode,
-				URL:        res.Request.URL.String(),
-			}
-		}
-		errResponse.StatusCode = res.StatusCode
-		errResponse.Status = res.Status
-		return nil, &errResponse
+		return nil, errorFromResponse(res, decoder)
 	}
 
 	var tasks GetTasksResponse
@@ -329,7 +299,7 @@ func (c *Client) TaskByID(taskID, workspaceID string, useCustomTaskIDs, includeS
 	if err != nil {
 		return nil, fmt.Errorf("task by id request failed: %w", err)
 	}
-	req.Header.Add("Authorization", c.opts.APIToken)
+	c.AuthenticateFor(req)
 
 	res, err := c.doer.Do(req)
 	if err != nil {
@@ -340,17 +310,7 @@ func (c *Client) TaskByID(taskID, workspaceID string, useCustomTaskIDs, includeS
 	decoder := json.NewDecoder(res.Body)
 
 	if res.StatusCode != http.StatusOK {
-		var errResponse ErrClickupResponse
-		if err := decoder.Decode(&errResponse); err != nil {
-			return nil, &HTTPError{
-				Status:     res.Status,
-				StatusCode: res.StatusCode,
-				URL:        res.Request.URL.String(),
-			}
-		}
-		errResponse.StatusCode = res.StatusCode
-		errResponse.Status = res.Status
-		return nil, &errResponse
+		return nil, errorFromResponse(res, decoder)
 	}
 
 	var task SingleTask

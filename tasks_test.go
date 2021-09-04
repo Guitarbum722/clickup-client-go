@@ -10,7 +10,6 @@ import (
 func TestClient_TaskTimeInStatus(t *testing.T) {
 	type fields struct {
 		doer    ClientDoer
-		opts    *ClientOpts
 		baseURL string
 	}
 	type args struct {
@@ -35,7 +34,6 @@ func TestClient_TaskTimeInStatus(t *testing.T) {
 						Request:    req,
 					}, nil
 				}),
-				opts: &ClientOpts{},
 			},
 			args: args{
 				taskID: "fakeTaskID",
@@ -53,7 +51,6 @@ func TestClient_TaskTimeInStatus(t *testing.T) {
 						Request:    req,
 					}, nil
 				}),
-				opts: &ClientOpts{},
 			},
 			args: args{
 				taskID: "fakeTaskID",
@@ -71,7 +68,6 @@ func TestClient_TaskTimeInStatus(t *testing.T) {
 						Request:    req,
 					}, nil
 				}),
-				opts: &ClientOpts{},
 			},
 			args: args{
 				taskID: "fakeTaskID",
@@ -89,7 +85,6 @@ func TestClient_TaskTimeInStatus(t *testing.T) {
 						Request:    req,
 					}, nil
 				}),
-				opts: &ClientOpts{},
 			},
 			args: args{
 				taskID: "fakeTaskID",
@@ -100,7 +95,6 @@ func TestClient_TaskTimeInStatus(t *testing.T) {
 			name: "TestUseCustomTaskIDs No space ID provided",
 			fields: fields{
 				doer: newMockClientDoer(func(req *http.Request) (*http.Response, error) { return nil, nil }),
-				opts: &ClientOpts{},
 			},
 			args: args{
 				taskID:           "fakeTaskID",
@@ -113,9 +107,9 @@ func TestClient_TaskTimeInStatus(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Client{
-				doer:    tt.fields.doer,
-				opts:    tt.fields.opts,
-				baseURL: tt.fields.baseURL,
+				doer:          tt.fields.doer,
+				authenticator: &APITokenAuthenticator{},
+				baseURL:       tt.fields.baseURL,
 			}
 			_, err := c.TaskTimeInStatus(tt.args.taskID, tt.args.workspaceID, tt.args.useCustomTaskIDs)
 			if (err != nil) != tt.wantErr {
@@ -129,7 +123,6 @@ func TestClient_TaskTimeInStatus(t *testing.T) {
 func TestClient_BulkTaskTimeInStatus(t *testing.T) {
 	type fields struct {
 		doer    ClientDoer
-		opts    *ClientOpts
 		baseURL string
 	}
 	type args struct {
@@ -154,7 +147,6 @@ func TestClient_BulkTaskTimeInStatus(t *testing.T) {
 						Request:    req,
 					}, nil
 				}),
-				opts: &ClientOpts{},
 			},
 			args: args{
 				taskIDs: []string{"fakeTaskID", "fakeTaskID2"},
@@ -172,7 +164,6 @@ func TestClient_BulkTaskTimeInStatus(t *testing.T) {
 						Request:    req,
 					}, nil
 				}),
-				opts: &ClientOpts{},
 			},
 			args: args{
 				taskIDs: []string{"fakeTaskID", "fakeTaskID2"},
@@ -190,7 +181,6 @@ func TestClient_BulkTaskTimeInStatus(t *testing.T) {
 						Request:    req,
 					}, nil
 				}),
-				opts: &ClientOpts{},
 			},
 			args: args{
 				taskIDs: []string{"fakeTaskID", "fakeTaskID2"},
@@ -208,7 +198,6 @@ func TestClient_BulkTaskTimeInStatus(t *testing.T) {
 						Request:    req,
 					}, nil
 				}),
-				opts: &ClientOpts{},
 			},
 			args: args{
 				taskIDs: []string{"fakeTaskID", "fakeTaskID2"},
@@ -219,7 +208,6 @@ func TestClient_BulkTaskTimeInStatus(t *testing.T) {
 			name: "TestUseCustomTaskIDs No space ID provided",
 			fields: fields{
 				doer: newMockClientDoer(func(req *http.Request) (*http.Response, error) { return nil, nil }),
-				opts: &ClientOpts{},
 			},
 			args: args{
 				taskIDs:          []string{"fakeTaskID", "fakeTaskID2"},
@@ -232,7 +220,6 @@ func TestClient_BulkTaskTimeInStatus(t *testing.T) {
 			name: "TestLessThan2IDsProvided",
 			fields: fields{
 				doer: newMockClientDoer(func(req *http.Request) (*http.Response, error) { return nil, nil }),
-				opts: &ClientOpts{},
 			},
 			args: args{
 				taskIDs: []string{"fakeTaskID"},
@@ -243,7 +230,6 @@ func TestClient_BulkTaskTimeInStatus(t *testing.T) {
 			name: "TestMoreThan100IDsProvided",
 			fields: fields{
 				doer: newMockClientDoer(func(req *http.Request) (*http.Response, error) { return nil, nil }),
-				opts: &ClientOpts{},
 			},
 			args: args{
 				taskIDs: []string{"fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID", "fakeTaskID"},
@@ -254,9 +240,9 @@ func TestClient_BulkTaskTimeInStatus(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Client{
-				doer:    tt.fields.doer,
-				opts:    tt.fields.opts,
-				baseURL: tt.fields.baseURL,
+				doer:          tt.fields.doer,
+				authenticator: &APITokenAuthenticator{},
+				baseURL:       tt.fields.baseURL,
 			}
 			_, err := c.BulkTaskTimeInStatus(tt.args.taskIDs, tt.args.workspaceID, tt.args.useCustomTaskIDs)
 			if (err != nil) != tt.wantErr {
@@ -270,7 +256,6 @@ func TestClient_BulkTaskTimeInStatus(t *testing.T) {
 func TestClient_TasksForList(t *testing.T) {
 	type fields struct {
 		doer    ClientDoer
-		opts    *ClientOpts
 		baseURL string
 	}
 	type args struct {
@@ -294,7 +279,6 @@ func TestClient_TasksForList(t *testing.T) {
 						Request:    req,
 					}, nil
 				}),
-				opts: &ClientOpts{},
 			},
 			args: args{
 				listID: "fakeListID",
@@ -312,7 +296,6 @@ func TestClient_TasksForList(t *testing.T) {
 						Request:    req,
 					}, nil
 				}),
-				opts: &ClientOpts{},
 			},
 			args: args{
 				listID: "fakeListID",
@@ -330,7 +313,6 @@ func TestClient_TasksForList(t *testing.T) {
 						Request:    req,
 					}, nil
 				}),
-				opts: &ClientOpts{},
 			},
 			args: args{
 				listID: "fakeListID",
@@ -348,7 +330,6 @@ func TestClient_TasksForList(t *testing.T) {
 						Request:    req,
 					}, nil
 				}),
-				opts: &ClientOpts{},
 			},
 			args: args{
 				listID: "fakeListID",
@@ -359,9 +340,9 @@ func TestClient_TasksForList(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Client{
-				doer:    tt.fields.doer,
-				opts:    tt.fields.opts,
-				baseURL: tt.fields.baseURL,
+				doer:          tt.fields.doer,
+				authenticator: &APITokenAuthenticator{},
+				baseURL:       tt.fields.baseURL,
 			}
 			_, err := c.TasksForList(tt.args.listID, tt.args.queryOpts)
 			if (err != nil) != tt.wantErr {
@@ -375,7 +356,6 @@ func TestClient_TasksForList(t *testing.T) {
 func TestClient_TaskByID(t *testing.T) {
 	type fields struct {
 		doer    ClientDoer
-		opts    *ClientOpts
 		baseURL string
 	}
 	type args struct {
@@ -401,7 +381,6 @@ func TestClient_TaskByID(t *testing.T) {
 						Request:    req,
 					}, nil
 				}),
-				opts: &ClientOpts{},
 			},
 			args: args{
 				taskID: "fakeTaskID",
@@ -419,7 +398,6 @@ func TestClient_TaskByID(t *testing.T) {
 						Request:    req,
 					}, nil
 				}),
-				opts: &ClientOpts{},
 			},
 			args: args{
 				taskID: "fakeTaskID",
@@ -437,7 +415,6 @@ func TestClient_TaskByID(t *testing.T) {
 						Request:    req,
 					}, nil
 				}),
-				opts: &ClientOpts{},
 			},
 			args: args{
 				taskID: "fakeTaskID",
@@ -455,7 +432,6 @@ func TestClient_TaskByID(t *testing.T) {
 						Request:    req,
 					}, nil
 				}),
-				opts: &ClientOpts{},
 			},
 			args: args{
 				taskID: "fakeTaskID",
@@ -466,7 +442,6 @@ func TestClient_TaskByID(t *testing.T) {
 			name: "TestUseCustomTaskIDs No space ID provided",
 			fields: fields{
 				doer: newMockClientDoer(func(req *http.Request) (*http.Response, error) { return nil, nil }),
-				opts: &ClientOpts{},
 			},
 			args: args{
 				taskID:           "fakeTaskID",
@@ -479,9 +454,9 @@ func TestClient_TaskByID(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Client{
-				doer:    tt.fields.doer,
-				opts:    tt.fields.opts,
-				baseURL: tt.fields.baseURL,
+				doer:          tt.fields.doer,
+				authenticator: &APITokenAuthenticator{},
+				baseURL:       tt.fields.baseURL,
 			}
 			_, err := c.TaskByID(tt.args.taskID, tt.args.workspaceID, tt.args.useCustomTaskIDs, tt.args.includeSubtasks)
 			if (err != nil) != tt.wantErr {

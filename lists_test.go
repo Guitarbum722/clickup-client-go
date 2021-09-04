@@ -10,7 +10,6 @@ import (
 func TestClient_ListsForFolder(t *testing.T) {
 	type fields struct {
 		doer    ClientDoer
-		opts    *ClientOpts
 		baseURL string
 	}
 	type args struct {
@@ -34,7 +33,6 @@ func TestClient_ListsForFolder(t *testing.T) {
 						Request:    req,
 					}, nil
 				}),
-				opts: &ClientOpts{},
 			},
 			args: args{
 				folderID: "fakeFolderID",
@@ -52,7 +50,6 @@ func TestClient_ListsForFolder(t *testing.T) {
 						Request:    req,
 					}, nil
 				}),
-				opts: &ClientOpts{},
 			},
 			args: args{
 				folderID: "fakeTeamID",
@@ -70,7 +67,6 @@ func TestClient_ListsForFolder(t *testing.T) {
 						Request:    req,
 					}, nil
 				}),
-				opts: &ClientOpts{},
 			},
 			args: args{
 				folderID: "fakeTeamID",
@@ -88,7 +84,6 @@ func TestClient_ListsForFolder(t *testing.T) {
 						Request:    req,
 					}, nil
 				}),
-				opts: &ClientOpts{},
 			},
 			args: args{
 				folderID: "fakeTeamID",
@@ -99,9 +94,9 @@ func TestClient_ListsForFolder(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Client{
-				doer:    tt.fields.doer,
-				opts:    tt.fields.opts,
-				baseURL: tt.fields.baseURL,
+				doer:          tt.fields.doer,
+				authenticator: &APITokenAuthenticator{},
+				baseURL:       tt.fields.baseURL,
 			}
 			_, err := c.ListsForFolder(tt.args.folderID, tt.args.includeArchived)
 			if (err != nil) != tt.wantErr {
@@ -139,7 +134,6 @@ func TestClient_ListByID(t *testing.T) {
 						Request:    req,
 					}, nil
 				}),
-				opts: &ClientOpts{},
 			},
 			args: args{
 				listID: "fakeListID",
@@ -175,7 +169,6 @@ func TestClient_ListByID(t *testing.T) {
 						Request:    req,
 					}, nil
 				}),
-				opts: &ClientOpts{},
 			},
 			args: args{
 				listID: "fakeListID",
@@ -193,7 +186,6 @@ func TestClient_ListByID(t *testing.T) {
 						Request:    req,
 					}, nil
 				}),
-				opts: &ClientOpts{},
 			},
 			args: args{
 				listID: "fakeListID",
@@ -204,9 +196,9 @@ func TestClient_ListByID(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Client{
-				doer:    tt.fields.doer,
-				opts:    tt.fields.opts,
-				baseURL: tt.fields.baseURL,
+				doer:          tt.fields.doer,
+				authenticator: &APITokenAuthenticator{},
+				baseURL:       tt.fields.baseURL,
 			}
 			_, err := c.ListByID(tt.args.listID)
 			if (err != nil) != tt.wantErr {

@@ -12,8 +12,10 @@ import (
 func main() {
 
 	client := clickup.NewClient(&clickup.ClientOpts{
-		APIToken: os.Args[1],
-		Doer:     nil,
+		Doer: nil,
+		Authenticator: &clickup.APITokenAuthenticator{
+			APIToken: os.Args[1],
+		},
 	})
 
 	task, err := client.TaskByID(os.Args[2], os.Args[3], true, true)

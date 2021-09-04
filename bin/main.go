@@ -37,8 +37,10 @@ func main() {
 	}
 
 	client := clickup.NewClient(&clickup.ClientOpts{
-		APIToken: os.Args[1],
-		Doer:     nil,
+		Doer: nil,
+		Authenticator: &clickup.APITokenAuthenticator{
+			APIToken: os.Args[1],
+		},
 	})
 
 	// queriedTasks := map[string]clickup.SingleTask{}

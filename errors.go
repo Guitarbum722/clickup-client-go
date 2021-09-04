@@ -1,8 +1,10 @@
 package clickup
 
 import (
+	"encoding/json"
 	"errors"
 	"fmt"
+	"net/http"
 )
 
 var ErrValidation = errors.New("invalid input provided")
@@ -26,4 +28,18 @@ type ErrClickupResponse struct {
 
 func (e *ErrClickupResponse) Error() string {
 	return fmt.Sprintf("clickup response ECODE=%s Err=%s StatusCode=%d Status=%s", e.ECode, e.Err, e.StatusCode, e.Status)
+}
+
+func errorFromResponse(res *http.Response, decoder *json.Decoder) error {
+	var errResponse ErrClickupResponse
+	if err := decoder.Decode(&errResponse); err != nil {
+		return &HTTPError{
+			Status:     res.Status,
+			StatusCode: res.StatusCode,
+			URL:        res.Request.URL.String(),
+		}
+	}
+	errResponse.StatusCode = res.StatusCode
+	errResponse.Status = res.Status
+	return &errResponse
 }

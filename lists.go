@@ -54,7 +54,7 @@ func (c *Client) ListsForFolder(folderID string, includeArchived bool) (*ListsRe
 	if err != nil {
 		return nil, fmt.Errorf("lists for folder request failed: %w", err)
 	}
-	req.Header.Add("Authorization", c.opts.APIToken)
+	c.AuthenticateFor(req)
 
 	res, err := c.doer.Do(req)
 	if err != nil {
@@ -65,17 +65,7 @@ func (c *Client) ListsForFolder(folderID string, includeArchived bool) (*ListsRe
 	decoder := json.NewDecoder(res.Body)
 
 	if res.StatusCode != http.StatusOK {
-		var errResponse ErrClickupResponse
-		if err := decoder.Decode(&errResponse); err != nil {
-			return nil, &HTTPError{
-				Status:     res.Status,
-				StatusCode: res.StatusCode,
-				URL:        res.Request.URL.String(),
-			}
-		}
-		errResponse.StatusCode = res.StatusCode
-		errResponse.Status = res.Status
-		return nil, &errResponse
+		return nil, errorFromResponse(res, decoder)
 	}
 
 	var lists ListsResponse
@@ -95,7 +85,7 @@ func (c *Client) ListByID(listID string) (*SingleList, error) {
 	if err != nil {
 		return nil, fmt.Errorf("list request failed: %w", err)
 	}
-	req.Header.Add("Authorization", c.opts.APIToken)
+	c.AuthenticateFor(req)
 
 	res, err := c.doer.Do(req)
 	if err != nil {
@@ -106,17 +96,7 @@ func (c *Client) ListByID(listID string) (*SingleList, error) {
 	decoder := json.NewDecoder(res.Body)
 
 	if res.StatusCode != http.StatusOK {
-		var errResponse ErrClickupResponse
-		if err := decoder.Decode(&errResponse); err != nil {
-			return nil, &HTTPError{
-				Status:     res.Status,
-				StatusCode: res.StatusCode,
-				URL:        res.Request.URL.String(),
-			}
-		}
-		errResponse.StatusCode = res.StatusCode
-		errResponse.Status = res.Status
-		return nil, &errResponse
+		return nil, errorFromResponse(res, decoder)
 	}
 
 	var list SingleList

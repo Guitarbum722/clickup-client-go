@@ -103,9 +103,9 @@ func TestClient_SpacesForWorkspace(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Client{
-				doer:    tt.fields.doer,
-				opts:    tt.fields.opts,
-				baseURL: tt.fields.baseURL,
+				doer:          tt.fields.doer,
+				authenticator: &APITokenAuthenticator{},
+				baseURL:       tt.fields.baseURL,
 			}
 			_, err := c.SpacesForWorkspace(tt.args.teamID, tt.args.includeArchived)
 			if (err != nil) != tt.wantErr {
@@ -207,9 +207,9 @@ func TestClient_SpaceByID(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			c := &Client{
-				doer:    tt.fields.doer,
-				opts:    tt.fields.opts,
-				baseURL: tt.fields.baseURL,
+				doer:          tt.fields.doer,
+				authenticator: &APITokenAuthenticator{},
+				baseURL:       tt.fields.baseURL,
 			}
 			_, err := c.SpaceByID(tt.args.spaceID)
 			if (err != nil) != tt.wantErr {

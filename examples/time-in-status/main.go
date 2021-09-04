@@ -18,8 +18,10 @@ func main() {
 	workspaceID := os.Args[3]
 
 	client := clickup.NewClient(&clickup.ClientOpts{
-		APIToken: apiKey,
-		Doer:     nil,
+		Doer: nil,
+		Authenticator: &clickup.APITokenAuthenticator{
+			APIToken: apiKey,
+		},
 	})
 
 	timeInStatusResponse, err := client.TaskTimeInStatus(taskID, workspaceID, true)
