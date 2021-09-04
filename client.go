@@ -35,8 +35,9 @@ const basePath = "https://api.clickup.com/api/v2"
 func NewClient(opts *ClientOpts) *Client {
 	if opts.Doer != nil {
 		return &Client{
-			doer:    opts.Doer,
-			baseURL: basePath,
+			doer:          opts.Doer,
+			authenticator: opts.Authenticator,
+			baseURL:       basePath,
 		}
 	}
 
@@ -44,6 +45,7 @@ func NewClient(opts *ClientOpts) *Client {
 		doer: &http.Client{
 			Timeout: time.Duration(time.Second * 20),
 		},
-		baseURL: basePath,
+		authenticator: opts.Authenticator,
+		baseURL:       basePath,
 	}
 }

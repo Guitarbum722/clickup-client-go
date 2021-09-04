@@ -12,10 +12,11 @@ import (
 )
 
 type Config struct {
-	SpaceID   string            `json:"space_id"`
-	FolderIDs map[string]string `json:"folder_ids"`
-	ListIDs   map[string]string `json:"list_ids"`
-	TaskIDs   []string          `json:"task_ids"`
+	WorkspaceID string            `json:"workspace_id"`
+	SpaceID     string            `json:"space_id"`
+	FolderIDs   map[string]string `json:"folder_ids"`
+	ListIDs     map[string]string `json:"list_ids"`
+	TaskIDs     []string          `json:"task_ids"`
 }
 
 func main() {
@@ -80,7 +81,7 @@ func main() {
 
 	fmt.Printf("task_id,team_folder,historic_status,status_duration_mins,status_start,status_order,current_status,current_status_since,current_status_duration\n")
 	for _, v := range taskIDChunks {
-		bulkTimeInStatusResponse, err := client.BulkTaskTimeInStatus(v, config.SpaceID, true)
+		bulkTimeInStatusResponse, err := client.BulkTaskTimeInStatus(v, config.WorkspaceID, true)
 		if err != nil {
 			panic(err)
 		}
