@@ -14,7 +14,6 @@ func (d *APITokenAuthenticator) AuthenticateFor(req *http.Request) {
 }
 
 type ClientOpts struct {
-	// APIToken      string
 	Doer          ClientDoer
 	Authenticator Authenticator
 }
