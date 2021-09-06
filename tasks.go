@@ -1,6 +1,7 @@
 package clickup
 
 import (
+	"bytes"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -282,7 +283,6 @@ func (c *Client) TasksForList(listID string, queryOpts TaskQueryOptions) (*GetTa
 	return &tasks, nil
 }
 
-// TODO: need a query options struct to inject because there are so many options for this call
 func (c *Client) TaskByID(taskID, workspaceID string, useCustomTaskIDs, includeSubtasks bool) (*SingleTask, error) {
 	if useCustomTaskIDs && workspaceID == "" {
 		return nil, fmt.Errorf("workspaceID must be provided if querying by custom task id: %w", ErrValidation)
@@ -321,4 +321,55 @@ func (c *Client) TaskByID(taskID, workspaceID string, useCustomTaskIDs, includeS
 	}
 
 	return &task, nil
+}
+
+type TaskRequest struct {
+	Name        string   `json:"name"`
+	Description string   `json:"description,omitempty"`
+	Tags        []string `json:"tags,omitempty"`
+	Status      string   `json:"status,omitempty"`
+}
+
+func (c *Client) CreateTask(listID string, task TaskRequest) (*SingleTask, error) {
+	if listID == "" {
+		return nil, fmt.Errorf("must provide a list id to create a task: %w", ErrValidation)
+	}
+	if task.Name == "" {
+		return nil, fmt.Errorf("must provide a name for a new task: %w", ErrValidation)
+	}
+
+	b, err := json.Marshal(task)
+	if err != nil {
+		return nil, fmt.Errorf("unable to serialize new task: %w", err)
+	}
+	buf := bytes.NewBuffer(b)
+
+	endpoint := fmt.Sprintf("%s/list/%s/task", c.baseURL, listID)
+
+	req, err := http.NewRequest(http.MethodPost, endpoint, buf)
+	if err != nil {
+		return nil, fmt.Errorf("create task request failed: %w", err)
+	}
+	c.AuthenticateFor(req)
+	req.Header.Add("Content-type", "application/json")
+
+	res, err := c.doer.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to make create task request: %w", err)
+	}
+	defer res.Body.Close()
+
+	decoder := json.NewDecoder(res.Body)
+
+	if res.StatusCode != http.StatusOK {
+		return nil, errorFromResponse(res, decoder)
+	}
+
+	var newTask SingleTask
+
+	if err := decoder.Decode(&newTask); err != nil {
+		return nil, fmt.Errorf("failed to parse new task: %w", err)
+	}
+
+	return &newTask, nil
 }
