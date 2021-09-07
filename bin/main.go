@@ -19,6 +19,8 @@ type Config struct {
 	TaskIDs     []string          `json:"task_ids"`
 }
 
+const maxBulkStatusRecords = 100
+
 func main() {
 	configFile, err := os.Open("config.json")
 	if err != nil {
@@ -44,40 +46,12 @@ func main() {
 		},
 	})
 
-	// queriedTasks := map[string]clickup.SingleTask{}
-
-	// for listName, listID := range config.ListIDs {
-	// 	tasks, err := client.TasksForList(listID, clickup.TaskQueryOptions{
-	// 		IncludeArchived: false,
-	// 		IncludeSubtasks: true,
-	// 		IncludeClosed:   true,
-	// 	})
-	// 	if err != nil {
-	// 		panic(err)
-	// 	}
-
-	// 	for _, task := range tasks.Tasks {
-	// 		queriedTasks[task.CustomID] = task
-	// 		for _, subtask := range task.Subtasks {
-	// 			queriedTasks[subtask.CustomID] = subtask
-	// 		}
-	// 	}
-	// 	fmt.Printf("List ID: %s %s # Tasks: %v\n", listID, listName, len(queriedTasks)) // TODO: REMOVE!
-	// }
-
-	// taskIDs := make([]string, 0, len(queriedTasks))
-	// for k := range queriedTasks {
-	// 	taskIDs = append(taskIDs, k)
-	// }
-
-	// taskIDChunks := chunkSlice(taskIDs, 100)
-
 	taskIDs := map[string]struct{}{}
 	for _, v := range config.TaskIDs {
 		taskIDs[v] = struct{}{}
 	}
 
-	taskIDChunks := chunkSlice(config.TaskIDs, 100)
+	taskIDChunks := chunkSlice(config.TaskIDs, maxBulkStatusRecords)
 
 	fmt.Printf("task_id,team_folder,historic_status,status_duration_mins,status_start,status_order,current_status,current_status_since,current_status_duration\n")
 	for _, v := range taskIDChunks {
@@ -98,7 +72,6 @@ func main() {
 				}
 				fmt.Printf("%s,%s,%s,%d,%s,%d,%s,%s,%d\n",
 					taskID,
-					// queriedTasks[taskID].Folder.Name,
 					taskIDs[taskID],
 					v.Status,
 					v.TotalTime.ByMinute,

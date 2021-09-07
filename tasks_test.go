@@ -466,3 +466,77 @@ func TestClient_TaskByID(t *testing.T) {
 		})
 	}
 }
+
+func TestClient_CreateTask(t *testing.T) {
+	type fields struct {
+		doer    ClientDoer
+		baseURL string
+	}
+	type args struct {
+		listID string
+		task   TaskRequest
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "TestSuccessful Task Create",
+			fields: fields{
+				doer: newMockClientDoer(func(req *http.Request) (*http.Response, error) {
+					body := `{"id":"14865529","name":"John's Happy Task"}`
+					return &http.Response{
+						StatusCode: http.StatusOK,
+						Body:       ioutil.NopCloser(strings.NewReader(body)),
+						Request:    req,
+					}, nil
+				}),
+			},
+			args: args{
+				listID: "fakeListID",
+				task: TaskRequest{
+					Name: "Test Task",
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "TestFail Missing Task Name",
+			fields: fields{
+				doer: nil,
+			},
+			args: args{
+				listID: "fakeListID",
+				task:   TaskRequest{},
+			},
+			wantErr: true,
+		},
+		{
+			name: "TestFail Missing List ID",
+			fields: fields{
+				doer: nil,
+			},
+			args: args{
+				listID: "",
+				task:   TaskRequest{},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Client{
+				doer:          tt.fields.doer,
+				authenticator: &APITokenAuthenticator{},
+				baseURL:       tt.fields.baseURL,
+			}
+			_, err := c.CreateTask(tt.args.listID, tt.args.task)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Client.CreateTask() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+		})
+	}
+}
