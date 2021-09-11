@@ -46,11 +46,6 @@ func main() {
 		},
 	})
 
-	taskIDs := map[string]struct{}{}
-	for _, v := range config.TaskIDs {
-		taskIDs[v] = struct{}{}
-	}
-
 	taskIDChunks := chunkSlice(config.TaskIDs, maxBulkStatusRecords)
 
 	fmt.Printf("task_id,team_folder,historic_status,status_duration_mins,status_start,status_order,current_status,current_status_since,current_status_duration\n")
@@ -70,9 +65,8 @@ func main() {
 				if err != nil {
 					panic(err)
 				}
-				fmt.Printf("%s,%s,%s,%d,%s,%d,%s,%s,%d\n",
+				fmt.Printf("%s,%s,%d,%s,%d,%s,%s,%d\n",
 					taskID,
-					taskIDs[taskID],
 					v.Status,
 					v.TotalTime.ByMinute,
 					historyTimeSince,
