@@ -163,6 +163,61 @@ type TaskQueryOptions struct {
 	// CustomFields map[string]interface{}
 }
 
+// TODO: need to figure out paging!
+func queryParamsFor(opts *TaskQueryOptions) *url.Values {
+	urlValues := &url.Values{}
+
+	if opts.IncludeArchived {
+		urlValues.Add("archived", "true")
+	}
+	if opts.IncludeSubtasks {
+		urlValues.Add("subtasks", "true")
+	}
+	if opts.IncludeClosed {
+		urlValues.Add("include_closed", "true")
+	}
+	if opts.Reverse {
+		urlValues.Add("reverse", "true")
+	}
+	if len(opts.Statuses) > 0 {
+		for _, v := range opts.Statuses {
+			urlValues.Add("statuses%5B%5D", v)
+		}
+	}
+	if opts.DueDateGreaterThan > 0 {
+		urlValues.Add("due_date_gt", strconv.Itoa(opts.DueDateGreaterThan))
+	}
+	if opts.DueDateLessThan > 0 {
+		urlValues.Add("due_date_lt", strconv.Itoa(opts.DueDateLessThan))
+	}
+	if opts.DateCreatedGreaterThan > 0 {
+		urlValues.Add("date_created_gt", strconv.Itoa(opts.DateCreatedGreaterThan))
+	}
+	if opts.DateCreatedLessThan > 0 {
+		urlValues.Add("date_created_lt", strconv.Itoa(opts.DateCreatedLessThan))
+	}
+	if opts.DateUpdatedGreaterThan > 0 {
+		urlValues.Add("date_updated_gt", strconv.Itoa(opts.DateUpdatedGreaterThan))
+	}
+	if opts.DateUpdatedLessThan > 0 {
+		urlValues.Add("date_updated_lt", strconv.Itoa(opts.DateUpdatedLessThan))
+	}
+
+	switch opts.OrderBy {
+	case OrderByID:
+		urlValues.Add("order_by", string(OrderByID))
+	case OrderByDueDate:
+		urlValues.Add("order_by", string(OrderByDueDate))
+	case OrderByCreated:
+		urlValues.Add("order_by", string(OrderByCreated))
+	case OrderByUpdated:
+		urlValues.Add("order_by", string(OrderByUpdated))
+	default:
+
+	}
+	return urlValues
+}
+
 func (c *Client) TaskTimeInStatus(taskID, workspaceID string, useCustomTaskIDs bool) (*TaskTimeInStatusResponse, error) {
 	if useCustomTaskIDs && workspaceID == "" {
 		return nil, fmt.Errorf("workspaceID must be provided if querying by custom task id: %w", ErrValidation)
@@ -248,13 +303,7 @@ func (c *Client) BulkTaskTimeInStatus(taskIDs []string, workspaceID string, useC
 
 func (c *Client) TasksForList(listID string, queryOpts TaskQueryOptions) (*GetTasksResponse, error) {
 
-	urlValues := url.Values{}
-	urlValues.Set("archived", strconv.FormatBool(queryOpts.IncludeArchived))
-	urlValues.Set("subtasks", strconv.FormatBool(queryOpts.IncludeSubtasks))
-	urlValues.Set("include_closed", strconv.FormatBool(queryOpts.IncludeClosed))
-	// urlValues.Set("date_updated_gt", strconv.Itoa(queryOpts.DateUpdatedGreaterThan))
-
-	endpoint := fmt.Sprintf("%s/list/%s/task/?%s", c.baseURL, listID, urlValues.Encode())
+	endpoint := fmt.Sprintf("%s/list/%s/task/?%s", c.baseURL, listID, queryParamsFor(&queryOpts).Encode())
 
 	req, err := http.NewRequest(http.MethodGet, endpoint, nil)
 	if err != nil {
