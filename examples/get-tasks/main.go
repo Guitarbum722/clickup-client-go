@@ -28,6 +28,7 @@ func main() {
 
 	tasks, err := client.TasksForList(os.Args[4], clickup.TaskQueryOptions{
 		IncludeArchived: false,
+		DueDateLessThan: 1631572653000,
 	})
 	if err != nil {
 		fmt.Println(err)
