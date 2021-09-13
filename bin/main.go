@@ -48,7 +48,7 @@ func main() {
 
 	taskIDChunks := chunkSlice(config.TaskIDs, maxBulkStatusRecords)
 
-	fmt.Printf("task_id,team_folder,historic_status,status_duration_mins,status_start,status_order,current_status,current_status_since,current_status_duration\n")
+	fmt.Printf("task_id,historic_status,status_duration_mins,status_start,status_order,current_status,current_status_since,current_status_duration\n")
 	for _, v := range taskIDChunks {
 		bulkTimeInStatusResponse, err := client.BulkTaskTimeInStatus(v, config.WorkspaceID, true)
 		if err != nil {
