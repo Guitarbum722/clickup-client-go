@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io/ioutil"
+	"math"
 	"os"
 	"strconv"
 	"time"
@@ -48,7 +49,7 @@ func main() {
 
 	taskIDChunks := chunkSlice(config.TaskIDs, maxBulkStatusRecords)
 
-	fmt.Printf("task_id,historic_status,status_duration_mins,status_start,status_order,current_status,current_status_since,current_status_duration\n")
+	fmt.Printf("task_id,historic_status,status_start,status_end,status_weekdays_duration,status_order,current_status,current_status_start,current_status_end,current_status_weekdays_duration\n")
 	for _, v := range taskIDChunks {
 		bulkTimeInStatusResponse, err := client.BulkTaskTimeInStatus(v, config.WorkspaceID, true)
 		if err != nil {
@@ -60,24 +61,46 @@ func main() {
 			if err != nil {
 				panic(err)
 			}
+			currentStatusEnd := currentTimeSince.Add(time.Minute * time.Duration(statusHistory.CurrentStatus.TotalTime.ByMinute))
+
 			for _, v := range statusHistory.StatusHistory {
 				historyTimeSince, err := unixMillisToTime(v.TotalTime.Since)
 				if err != nil {
 					panic(err)
 				}
-				fmt.Printf("%s,%s,%d,%s,%d,%s,%s,%d\n",
+
+				historyStatusEnd := historyTimeSince.Add(time.Minute * time.Duration(v.TotalTime.ByMinute))
+
+				fmt.Printf("%s,%s,%s,%s,%v,%d,%s,%s,%s,%v\n",
 					taskID,
 					v.Status,
-					v.TotalTime.ByMinute,
 					historyTimeSince,
+					historyStatusEnd,
+					businessDaysBetweenTimes(historyTimeSince, historyStatusEnd),
 					v.Orderindex,
 					statusHistory.CurrentStatus.Status,
 					currentTimeSince,
-					statusHistory.CurrentStatus.TotalTime.ByMinute,
+					currentStatusEnd,
+					businessDaysBetweenTimes(currentTimeSince, currentStatusEnd),
 				)
 			}
 		}
 	}
+}
+
+func businessDaysBetweenTimes(start, end time.Time) int {
+	offset := -int(start.Weekday())
+	start = start.AddDate(0, 0, -int(start.Weekday()))
+
+	offset += int(end.Weekday())
+	if end.Weekday() == time.Sunday {
+		offset++
+	}
+	end = end.AddDate(0, 0, -int(end.Weekday()))
+
+	dif := end.Sub(start).Truncate(time.Hour * 24)
+	weeks := float64((dif.Hours() / 24) / 7)
+	return int(math.Round(weeks)*5) + offset
 }
 
 func unixMillisToTime(m string) (time.Time, error) {
