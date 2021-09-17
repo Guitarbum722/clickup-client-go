@@ -115,6 +115,10 @@ type GetTasksResponse struct {
 	Tasks []SingleTask `json:"tasks"`
 }
 
+const (
+	MaxPageSize = 100
+)
+
 type TaskTimeInStatusResponse struct {
 	CurrentStatus struct {
 		Status    string `json:"status"`
@@ -166,6 +170,8 @@ type TaskQueryOptions struct {
 // TODO: need to figure out paging!
 func queryParamsFor(opts *TaskQueryOptions) *url.Values {
 	urlValues := &url.Values{}
+
+	urlValues.Add("page", strconv.Itoa(opts.Page))
 
 	if opts.IncludeArchived {
 		urlValues.Add("archived", "true")
@@ -301,9 +307,13 @@ func (c *Client) BulkTaskTimeInStatus(taskIDs []string, workspaceID string, useC
 	return bulkTaskTimeInStatus, nil
 }
 
-func (c *Client) TasksForList(listID string, queryOpts TaskQueryOptions) (*GetTasksResponse, error) {
+// TasksForList returns a listing of tasks that belong to the specified listID and fall withing the constraints of queryOpts.
+// Clickup has some rather informal paging, so the caller is responsible for inspecting the count of tasks returned, and incrementing
+// the Page in queryOpts if the number of tasks is 100.
+// ie. if the current page returns 100 tasks (the maximum page size), then another query should be made to get the next page.
+func (c *Client) TasksForList(listID string, queryOpts *TaskQueryOptions) (*GetTasksResponse, error) {
 
-	endpoint := fmt.Sprintf("%s/list/%s/task/?%s", c.baseURL, listID, queryParamsFor(&queryOpts).Encode())
+	endpoint := fmt.Sprintf("%s/list/%s/task/?%s", c.baseURL, listID, queryParamsFor(queryOpts).Encode())
 
 	req, err := http.NewRequest(http.MethodGet, endpoint, nil)
 	if err != nil {

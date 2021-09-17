@@ -18,25 +18,24 @@ func main() {
 		},
 	})
 
-	task, err := client.TaskByID(os.Args[2], os.Args[3], true, true)
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
-	}
-	fmt.Println(task.DateUpdated)
-	fmt.Printf("Task:  %s %s %s\n", task.CustomID, task.Name, msToTime(task.DateUpdated))
-
-	tasks, err := client.TasksForList(os.Args[4], clickup.TaskQueryOptions{
+	queryOpts := &clickup.TaskQueryOptions{
 		IncludeArchived: false,
-		DueDateLessThan: 1631572653000,
-	})
-	if err != nil {
-		fmt.Println(err)
-		os.Exit(1)
 	}
 
-	for _, task := range tasks.Tasks {
-		fmt.Println("Task: ", task.ID, task.Name)
+	for {
+		tasks, err := client.TasksForList(os.Args[2], queryOpts)
+		if err != nil {
+			fmt.Println(err)
+			os.Exit(1)
+		}
+		for _, task := range tasks.Tasks {
+			fmt.Println("Task: ", task.CustomID, task.Name)
+		}
+		if len(tasks.Tasks) < clickup.MaxPageSize {
+			return
+		} else {
+			queryOpts.Page++
+		}
 	}
 }
 
