@@ -344,7 +344,7 @@ func TestClient_TasksForList(t *testing.T) {
 				authenticator: &APITokenAuthenticator{},
 				baseURL:       tt.fields.baseURL,
 			}
-			_, err := c.TasksForList(tt.args.listID, tt.args.queryOpts)
+			_, err := c.TasksForList(tt.args.listID, &tt.args.queryOpts)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.TasksForList() error = %v, wantErr %v", err, tt.wantErr)
 				return
