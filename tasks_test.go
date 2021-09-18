@@ -540,3 +540,179 @@ func TestClient_CreateTask(t *testing.T) {
 		})
 	}
 }
+
+func TestClient_UpdateTask(t *testing.T) {
+	type fields struct {
+		doer    ClientDoer
+		baseURL string
+	}
+	type args struct {
+		task             *TaskUpdateRequest
+		workspaceID      string
+		useCustomTaskIDs bool
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "TestFailure malformed JSON in request HTTP 400",
+			fields: fields{
+				doer: newMockClientDoer(func(req *http.Request) (*http.Response, error) {
+					body := `{"err": "Unexpected token } in JSON at position 107","ECODE":"JSON_001"}`
+					return &http.Response{
+						StatusCode: http.StatusBadRequest,
+						Body:       ioutil.NopCloser(strings.NewReader(body)),
+						Request:    req,
+					}, nil
+				}),
+			},
+			args: args{
+				task: &TaskUpdateRequest{
+					ID: "TestID",
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "TestFailure missing workspace ID",
+			fields: fields{
+				doer: nil,
+			},
+			args: args{
+				task: &TaskUpdateRequest{
+					ID: "TestID",
+				},
+				useCustomTaskIDs: true,
+			},
+			wantErr: true,
+		},
+		{
+			name: "TestFailure missing task ID",
+			fields: fields{
+				doer: nil,
+			},
+			args: args{
+				task: &TaskUpdateRequest{
+					ID: "",
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "TestFailure malformed response from clickup ",
+			fields: fields{
+				doer: newMockClientDoer(func(req *http.Request) (*http.Response, error) {
+					body := `{{}`
+					return &http.Response{
+						StatusCode: http.StatusOK,
+						Body:       ioutil.NopCloser(strings.NewReader(body)),
+						Request:    req,
+					}, nil
+				}),
+			},
+			args: args{
+				task: &TaskUpdateRequest{
+					ID:          "TestID",
+					Description: "Updated description",
+				},
+			},
+			wantErr: true,
+		},
+		{
+			name: "TestSuccess Update Task ",
+			fields: fields{
+				doer: newMockClientDoer(func(req *http.Request) (*http.Response, error) {
+					body := `{"id": "TestID","description":"Updated description"}`
+					return &http.Response{
+						StatusCode: http.StatusOK,
+						Body:       ioutil.NopCloser(strings.NewReader(body)),
+						Request:    req,
+					}, nil
+				}),
+			},
+			args: args{
+				task: &TaskUpdateRequest{
+					ID:          "TestID",
+					Description: "Updated description",
+				},
+			},
+			wantErr: false,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Client{
+				doer:          tt.fields.doer,
+				authenticator: &APITokenAuthenticator{},
+				baseURL:       tt.fields.baseURL,
+			}
+			_, err := c.UpdateTask(tt.args.task, tt.args.workspaceID, tt.args.useCustomTaskIDs)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Client.UpdateTask() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+		})
+	}
+}
+
+func TestClient_DeleteTask(t *testing.T) {
+	type fields struct {
+		doer    ClientDoer
+		baseURL string
+	}
+	type args struct {
+		taskID           string
+		workspaceID      string
+		useCustomTaskIDs bool
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "TestSuccess delete task",
+			fields: fields{
+				doer: newMockClientDoer(func(req *http.Request) (*http.Response, error) {
+					body := `{}`
+					return &http.Response{
+						StatusCode: http.StatusOK,
+						Body:       ioutil.NopCloser(strings.NewReader(body)),
+						Request:    req,
+					}, nil
+				}),
+			},
+			args: args{
+				taskID: "TestID",
+			},
+			wantErr: false,
+		},
+		{
+			name: "TestFailure missing workspace id",
+			fields: fields{
+				doer: nil,
+			},
+			args: args{
+				taskID:           "TestID",
+				useCustomTaskIDs: true,
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Client{
+				doer:          tt.fields.doer,
+				authenticator: &APITokenAuthenticator{},
+				baseURL:       tt.fields.baseURL,
+			}
+			if err := c.DeleteTask(tt.args.taskID, tt.args.workspaceID, tt.args.useCustomTaskIDs); (err != nil) != tt.wantErr {
+				t.Errorf("Client.DeleteTask() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
