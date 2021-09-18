@@ -432,3 +432,90 @@ func (c *Client) CreateTask(listID string, task TaskRequest) (*SingleTask, error
 
 	return &newTask, nil
 }
+
+type TaskUpdateRequest struct {
+	ID          string   `json:"id"`
+	Name        string   `json:"name"`
+	Description string   `json:"description,omitempty"`
+	Tags        []string `json:"tags,omitempty"`
+	Status      string   `json:"status,omitempty"`
+}
+
+func (c *Client) UpdateTask(task *TaskUpdateRequest, workspaceID string, useCustomTaskIDs bool) (*SingleTask, error) {
+	if useCustomTaskIDs && workspaceID == "" {
+		return nil, fmt.Errorf("workspaceID must be provided if updating by custom task id: %w", ErrValidation)
+	}
+	if task.ID == "" {
+		return nil, fmt.Errorf("task to update must have an id provided: %w", ErrValidation)
+	}
+
+	b, err := json.Marshal(task)
+	if err != nil {
+		return nil, fmt.Errorf("unable to serialize new task: %w", err)
+	}
+	buf := bytes.NewBuffer(b)
+
+	urlValues := url.Values{}
+	urlValues.Set("custom_task_ids", strconv.FormatBool(useCustomTaskIDs))
+	urlValues.Add("team_id", workspaceID)
+
+	endpoint := fmt.Sprintf("%s/task/%s/?%s", c.baseURL, task.ID, urlValues.Encode())
+
+	req, err := http.NewRequest(http.MethodPost, endpoint, buf)
+	if err != nil {
+		return nil, fmt.Errorf("create task request failed: %w", err)
+	}
+	c.AuthenticateFor(req)
+	req.Header.Add("Content-type", "application/json")
+
+	res, err := c.doer.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to make update task request: %w", err)
+	}
+	defer res.Body.Close()
+
+	decoder := json.NewDecoder(res.Body)
+
+	if res.StatusCode != http.StatusOK {
+		return nil, errorFromResponse(res, decoder)
+	}
+
+	var updatedTask SingleTask
+
+	if err := decoder.Decode(&updatedTask); err != nil {
+		return nil, fmt.Errorf("failed to parse new task: %w", err)
+	}
+
+	return &updatedTask, nil
+}
+
+func (c *Client) DeleteTask(taskID, workspaceID string, useCustomTaskIDs bool) error {
+	if useCustomTaskIDs && workspaceID == "" {
+		return fmt.Errorf("workspaceID must be provided if deleting by custom task id: %w", ErrValidation)
+	}
+
+	urlValues := url.Values{}
+	urlValues.Set("custom_task_ids", strconv.FormatBool(useCustomTaskIDs))
+	urlValues.Add("team_id", workspaceID)
+
+	endpoint := fmt.Sprintf("%s/task/%s/?%s", c.baseURL, taskID, urlValues.Encode())
+	req, err := http.NewRequest(http.MethodPost, endpoint, nil)
+	if err != nil {
+		return fmt.Errorf("delete task request failed: %w", err)
+	}
+	c.AuthenticateFor(req)
+
+	res, err := c.doer.Do(req)
+	if err != nil {
+		return fmt.Errorf("failed to make delete task request: %w", err)
+	}
+	defer res.Body.Close()
+
+	decoder := json.NewDecoder(res.Body)
+
+	if res.StatusCode != http.StatusOK {
+		return errorFromResponse(res, decoder)
+	}
+
+	return nil
+}
