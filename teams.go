@@ -43,7 +43,9 @@ func (c *Client) Teams() (*TeamsResponse, error) {
 	if err != nil {
 		return nil, fmt.Errorf("get teams request failed: %w", err)
 	}
-	c.AuthenticateFor(req)
+	if err := c.AuthenticateFor(req); err != nil {
+		return nil, fmt.Errorf("failed to authenticate client: %w", err)
+	}
 
 	res, err := c.doer.Do(req)
 	if err != nil {

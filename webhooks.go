@@ -109,7 +109,9 @@ func (c *Client) CreateWebhook(workspaceID string, webhook *CreateWebhookRequest
 	if err != nil {
 		return nil, fmt.Errorf("create task request failed: %w", err)
 	}
-	c.AuthenticateFor(req)
+	if err := c.AuthenticateFor(req); err != nil {
+		return nil, fmt.Errorf("failed to authenticate client: %w", err)
+	}
 	req.Header.Add("Content-type", "application/json")
 
 	res, err := c.doer.Do(req)
@@ -160,7 +162,9 @@ func (c *Client) UpdateWebhook(webhook *UpdateWebhookRequest) (*UpdateWebhookRes
 	if err != nil {
 		return nil, fmt.Errorf("create task request failed: %w", err)
 	}
-	c.AuthenticateFor(req)
+	if err := c.AuthenticateFor(req); err != nil {
+		return nil, fmt.Errorf("failed to authenticate client: %w", err)
+	}
 	req.Header.Add("Content-type", "application/json")
 
 	res, err := c.doer.Do(req)
@@ -191,7 +195,9 @@ func (c *Client) DeleteWebhook(id string) error {
 	if err != nil {
 		return fmt.Errorf("webhooks delete request failed: %w", err)
 	}
-	c.AuthenticateFor(req)
+	if err := c.AuthenticateFor(req); err != nil {
+		return fmt.Errorf("failed to authenticate client: %w", err)
+	}
 
 	res, err := c.doer.Do(req)
 	if err != nil {
@@ -216,7 +222,9 @@ func (c *Client) WebhooksFor(workspaceID string) (*WebhooksQueryResponse, error)
 	if err != nil {
 		return nil, fmt.Errorf("webhooks request failed: %w", err)
 	}
-	c.AuthenticateFor(req)
+	if err := c.AuthenticateFor(req); err != nil {
+		return nil, fmt.Errorf("failed to authenticate client: %w", err)
+	}
 
 	res, err := c.doer.Do(req)
 	if err != nil {
