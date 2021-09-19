@@ -96,7 +96,9 @@ func (c *Client) SpacesForWorkspace(teamID string, includeArchived bool) (*Space
 	if err != nil {
 		return nil, fmt.Errorf("spaces request failed: %w", err)
 	}
-	c.AuthenticateFor(req)
+	if err := c.AuthenticateFor(req); err != nil {
+		return nil, fmt.Errorf("failed to authenticate client: %w", err)
+	}
 
 	res, err := c.doer.Do(req)
 	if err != nil {
@@ -127,7 +129,9 @@ func (c *Client) SpaceByID(spaceID string) (*SingleSpace, error) {
 	if err != nil {
 		return nil, fmt.Errorf("space request failed: %w", err)
 	}
-	c.AuthenticateFor(req)
+	if err := c.AuthenticateFor(req); err != nil {
+		return nil, fmt.Errorf("failed to authenticate client: %w", err)
+	}
 
 	res, err := c.doer.Do(req)
 	if err != nil {

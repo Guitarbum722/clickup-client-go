@@ -240,7 +240,9 @@ func (c *Client) TaskTimeInStatus(taskID, workspaceID string, useCustomTaskIDs b
 	if err != nil {
 		return nil, fmt.Errorf("time in status request failed: %w", err)
 	}
-	c.AuthenticateFor(req)
+	if err := c.AuthenticateFor(req); err != nil {
+		return nil, fmt.Errorf("failed to authenticate client: %w", err)
+	}
 
 	res, err := c.doer.Do(req)
 	if err != nil {
@@ -285,7 +287,9 @@ func (c *Client) BulkTaskTimeInStatus(taskIDs []string, workspaceID string, useC
 	if err != nil {
 		return nil, fmt.Errorf("bulk time in status request failed: %w", err)
 	}
-	c.AuthenticateFor(req)
+	if err := c.AuthenticateFor(req); err != nil {
+		return nil, fmt.Errorf("failed to authenticate client: %w", err)
+	}
 
 	res, err := c.doer.Do(req)
 	if err != nil {
@@ -319,7 +323,9 @@ func (c *Client) TasksForList(listID string, queryOpts *TaskQueryOptions) (*GetT
 	if err != nil {
 		return nil, fmt.Errorf("tasks by list request failed: %w", err)
 	}
-	c.AuthenticateFor(req)
+	if err := c.AuthenticateFor(req); err != nil {
+		return nil, fmt.Errorf("failed to authenticate client: %w", err)
+	}
 
 	res, err := c.doer.Do(req)
 	if err != nil {
@@ -358,7 +364,9 @@ func (c *Client) TaskByID(taskID, workspaceID string, useCustomTaskIDs, includeS
 	if err != nil {
 		return nil, fmt.Errorf("task by id request failed: %w", err)
 	}
-	c.AuthenticateFor(req)
+	if err := c.AuthenticateFor(req); err != nil {
+		return nil, fmt.Errorf("failed to authenticate client: %w", err)
+	}
 
 	res, err := c.doer.Do(req)
 	if err != nil {
@@ -409,7 +417,9 @@ func (c *Client) CreateTask(listID string, task TaskRequest) (*SingleTask, error
 	if err != nil {
 		return nil, fmt.Errorf("create task request failed: %w", err)
 	}
-	c.AuthenticateFor(req)
+	if err := c.AuthenticateFor(req); err != nil {
+		return nil, fmt.Errorf("failed to authenticate client: %w", err)
+	}
 	req.Header.Add("Content-type", "application/json")
 
 	res, err := c.doer.Do(req)
@@ -465,7 +475,9 @@ func (c *Client) UpdateTask(task *TaskUpdateRequest, workspaceID string, useCust
 	if err != nil {
 		return nil, fmt.Errorf("create task request failed: %w", err)
 	}
-	c.AuthenticateFor(req)
+	if err := c.AuthenticateFor(req); err != nil {
+		return nil, fmt.Errorf("failed to authenticate client: %w", err)
+	}
 	req.Header.Add("Content-type", "application/json")
 
 	res, err := c.doer.Do(req)
@@ -503,7 +515,9 @@ func (c *Client) DeleteTask(taskID, workspaceID string, useCustomTaskIDs bool) e
 	if err != nil {
 		return fmt.Errorf("delete task request failed: %w", err)
 	}
-	c.AuthenticateFor(req)
+	if err := c.AuthenticateFor(req); err != nil {
+		return fmt.Errorf("failed to authenticate client: %w", err)
+	}
 
 	res, err := c.doer.Do(req)
 	if err != nil {

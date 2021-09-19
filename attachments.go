@@ -61,7 +61,9 @@ func (c *Client) CreateTaskAttachment(taskID, workspaceID string, useCustomTaskI
 	if err != nil {
 		return nil, fmt.Errorf("create attachment request failed: %w", err)
 	}
-	c.AuthenticateFor(req)
+	if err := c.AuthenticateFor(req); err != nil {
+		return nil, fmt.Errorf("failed to authenticate client: %w", err)
+	}
 	req.Header.Add("Content-Type", multipartWriter.FormDataContentType())
 
 	res, err := c.doer.Do(req)

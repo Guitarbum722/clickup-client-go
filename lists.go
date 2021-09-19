@@ -54,7 +54,9 @@ func (c *Client) ListsForFolder(folderID string, includeArchived bool) (*ListsRe
 	if err != nil {
 		return nil, fmt.Errorf("lists for folder request failed: %w", err)
 	}
-	c.AuthenticateFor(req)
+	if err := c.AuthenticateFor(req); err != nil {
+		return nil, fmt.Errorf("failed to authenticate client: %w", err)
+	}
 
 	res, err := c.doer.Do(req)
 	if err != nil {
@@ -85,7 +87,9 @@ func (c *Client) ListByID(listID string) (*SingleList, error) {
 	if err != nil {
 		return nil, fmt.Errorf("list request failed: %w", err)
 	}
-	c.AuthenticateFor(req)
+	if err := c.AuthenticateFor(req); err != nil {
+		return nil, fmt.Errorf("failed to authenticate client: %w", err)
+	}
 
 	res, err := c.doer.Do(req)
 	if err != nil {
