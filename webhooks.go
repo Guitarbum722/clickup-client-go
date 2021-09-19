@@ -53,10 +53,10 @@ type Webhook struct {
 	Endpoint string         `json:"endpoint"`
 	ClientID string         `json:"client_id"`
 	Events   []WebhookEvent `json:"events"`
-	TaskID   string         `json:"task_id"`
-	ListID   string         `json:"list_id"`
-	FolderID string         `json:"folder_id"`
-	SpaceID  string         `json:"space_id"`
+	TaskID   int            `json:"task_id"`
+	ListID   int            `json:"list_id"`
+	FolderID int            `json:"folder_id"`
+	SpaceID  int            `json:"space_id"`
 	Health   *WebhookHealth `json:"health"`
 	Secret   string         `json:"secret"`
 }
@@ -66,8 +66,21 @@ type WebhooksQueryResponse struct {
 }
 
 type CreateWebhookResponse struct {
-	ID      string   `json:"id"`
-	Webhook *Webhook `json:"webhook"`
+	ID      string `json:"id"`
+	Webhook struct {
+		ID       string         `json:"id"`
+		UserID   int            `json:"userid"`
+		TeamID   int            `json:"team_id"`
+		Endpoint string         `json:"endpoint"`
+		ClientID string         `json:"client_id"`
+		Events   []WebhookEvent `json:"events"`
+		TaskID   int            `json:"task_id"`
+		ListID   int            `json:"list_id"`
+		FolderID int            `json:"folder_id"`
+		SpaceID  int            `json:"space_id"`
+		Health   *WebhookHealth `json:"health"`
+		Secret   string         `json:"secret"`
+	} `json:"webhook"`
 }
 
 type UpdateWebhookResponse struct {
@@ -114,7 +127,7 @@ func (c *Client) CreateWebhook(workspaceID string, webhook *CreateWebhookRequest
 	var newWebhook CreateWebhookResponse
 
 	if err := decoder.Decode(&newWebhook); err != nil {
-		return nil, fmt.Errorf("failed to parse new webhook: %w", err)
+		return nil, fmt.Errorf("failed to parse new webhook - WARNING! WEBHOOK MIGHT HAVE BEEN CREATED: %w", err)
 	}
 
 	return &newWebhook, nil
