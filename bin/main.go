@@ -13,6 +13,7 @@ import (
 )
 
 type Config struct {
+	APIToken    string            `json:"api_token"`
 	WorkspaceID string            `json:"workspace_id"`
 	SpaceID     string            `json:"space_id"`
 	FolderIDs   map[string]string `json:"folder_ids"`
@@ -43,7 +44,7 @@ func main() {
 	client := clickup.NewClient(&clickup.ClientOpts{
 		Doer: nil,
 		Authenticator: &clickup.APITokenAuthenticator{
-			APIToken: os.Args[1],
+			APIToken: config.APIToken,
 		},
 	})
 
