@@ -391,10 +391,14 @@ func (c *Client) TaskByID(taskID, workspaceID string, useCustomTaskIDs, includeS
 }
 
 type TaskRequest struct {
-	Name        string   `json:"name"`
-	Description string   `json:"description,omitempty"`
-	Tags        []string `json:"tags,omitempty"`
-	Status      string   `json:"status,omitempty"`
+	Name          string   `json:"name"`
+	Description   string   `json:"description,omitempty"`
+	Tags          []string `json:"tags,omitempty"`
+	Status        string   `json:"status,omitempty"`
+	DueDate       int      `json:"due_date,omitempty"`
+	DueDateTime   bool     `json:"due_date_time,omitempty"`
+	StartDate     int      `json:"start_date,omitempty"`
+	StartDateTime bool     `json:"start_date_time,omitempty"`
 }
 
 func (c *Client) CreateTask(listID string, task TaskRequest) (*SingleTask, error) {
@@ -444,11 +448,15 @@ func (c *Client) CreateTask(listID string, task TaskRequest) (*SingleTask, error
 }
 
 type TaskUpdateRequest struct {
-	ID          string   `json:"id"`
-	Name        string   `json:"name"`
-	Description string   `json:"description,omitempty"`
-	Tags        []string `json:"tags,omitempty"`
-	Status      string   `json:"status,omitempty"`
+	ID            string   `json:"id"`
+	Name          string   `json:"name"`
+	Description   string   `json:"description,omitempty"`
+	Tags          []string `json:"tags,omitempty"`
+	Status        string   `json:"status,omitempty"`
+	DueDate       int      `json:"due_date,omitempty"`
+	DueDateTime   bool     `json:"due_date_time,omitempty"`
+	StartDate     int      `json:"start_date,omitempty"`
+	StartDateTime bool     `json:"start_date_time,omitempty"`
 }
 
 func (c *Client) UpdateTask(task *TaskUpdateRequest, workspaceID string, useCustomTaskIDs bool) (*SingleTask, error) {
