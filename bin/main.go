@@ -24,10 +24,24 @@ type Config struct {
 
 const maxBulkStatusRecords = 100
 
+const usage = `clickup-time-status [-h] [-f]
+Options:
+ -h         help
+ -f         configuration file path
+`
+
 func main() {
 	var configFilePath string
+	var help bool
+
 	flag.StringVar(&configFilePath, "f", "", "")
+	flag.BoolVar(&help, "h", false, "")
 	flag.Parse()
+
+	if help {
+		fmt.Println(usage)
+		os.Exit(0)
+	}
 
 	if configFilePath == "" {
 		myDir, err := os.Getwd()
