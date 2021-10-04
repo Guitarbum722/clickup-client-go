@@ -2,6 +2,7 @@ package main
 
 import (
 	"encoding/json"
+	"flag"
 	"fmt"
 	"io/ioutil"
 	"math"
@@ -24,7 +25,19 @@ type Config struct {
 const maxBulkStatusRecords = 100
 
 func main() {
-	configFile, err := os.Open("config.json")
+	var configFilePath string
+	flag.StringVar(&configFilePath, "f", "", "")
+	flag.Parse()
+
+	if configFilePath == "" {
+		myDir, err := os.Getwd()
+		if err != nil {
+			panic(err)
+		}
+		configFilePath = fmt.Sprintf("%s/%s", myDir, "config.json")
+	}
+
+	configFile, err := os.Open(configFilePath)
 	if err != nil {
 		panic(err)
 	}
