@@ -30,16 +30,24 @@ Options:
  -f         configuration file path
 `
 
+var version string
+
 func main() {
 	var configFilePath string
-	var help bool
+	var showHelp bool
+	var showVersion bool
 
 	flag.StringVar(&configFilePath, "f", "", "")
-	flag.BoolVar(&help, "h", false, "")
+	flag.BoolVar(&showHelp, "h", false, "")
+	flag.BoolVar(&showVersion, "v", false, "")
 	flag.Parse()
 
-	if help {
+	if showHelp {
 		fmt.Println(usage)
+		os.Exit(0)
+	}
+	if showVersion {
+		fmt.Println("Version:", version)
 		os.Exit(0)
 	}
 
