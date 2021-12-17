@@ -7,6 +7,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 
@@ -28,7 +29,7 @@ func main() {
 		},
 	})
 
-	newWebhook, err := client.CreateWebhook(workspaceID, &clickup.CreateWebhookRequest{
+	newWebhook, err := client.CreateWebhook(context.Background(), workspaceID, &clickup.CreateWebhookRequest{
 		Endpoint: "https://your-webhook.site/myhook",
 		Events: []clickup.WebhookEvent{
 			clickup.EventTaskUpdated,
@@ -42,7 +43,7 @@ func main() {
 	fmt.Println("New Webhook ID: ", newWebhook.ID)
 	fmt.Println("Health: ", newWebhook.Webhook.Health.FailCount, newWebhook.Webhook.Health.Status)
 
-	webhooks, err := client.WebhooksFor(workspaceID)
+	webhooks, err := client.WebhooksFor(context.Background(), workspaceID)
 	if err != nil {
 		panic(err)
 	}
@@ -53,7 +54,7 @@ func main() {
 		fmt.Println("Status:", v.Health.Status, v.Health.FailCount)
 
 		fmt.Println("deleting webhook for:", v.ID)
-		if err := client.DeleteWebhook(v.ID); err != nil {
+		if err := client.DeleteWebhook(context.Background(), v.ID); err != nil {
 			panic(err)
 		}
 	}

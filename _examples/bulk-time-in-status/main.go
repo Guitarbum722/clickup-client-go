@@ -7,6 +7,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"strconv"
@@ -31,7 +32,7 @@ func main() {
 		},
 	})
 
-	bulkTimeInStatusResponse, err := client.BulkTaskTimeInStatus(taskIDs, workspaceID, true)
+	bulkTimeInStatusResponse, err := client.BulkTaskTimeInStatus(context.Background(), taskIDs, workspaceID, true)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

@@ -7,6 +7,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 
@@ -27,7 +28,7 @@ func main() {
 		},
 	})
 
-	spaces, err := client.SpacesForWorkspace(teamID, false)
+	spaces, err := client.SpacesForWorkspace(context.Background(), teamID, false)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -37,7 +38,7 @@ func main() {
 		fmt.Printf("Space ID: %s\nName: %s\n\n", space.ID, space.Name)
 	}
 
-	singleSpace, err := client.SpaceByID("14865529")
+	singleSpace, err := client.SpaceByID(context.Background(), "14865529")
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

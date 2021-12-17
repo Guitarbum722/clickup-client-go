@@ -7,6 +7,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 
@@ -26,7 +27,7 @@ func main() {
 		Name: "Awesome",
 	}
 
-	newTask, err := client.CreateTask(os.Args[2], task)
+	newTask, err := client.CreateTask(context.Background(), os.Args[2], task)
 	if err != nil {
 		panic(err)
 	}

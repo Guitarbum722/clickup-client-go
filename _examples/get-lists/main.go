@@ -7,6 +7,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 
@@ -27,7 +28,7 @@ func main() {
 		},
 	})
 
-	lists, err := client.ListsForFolder(folderID, false)
+	lists, err := client.ListsForFolder(context.Background(), folderID, false)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -37,7 +38,7 @@ func main() {
 		fmt.Printf("List ID: %s\nName: %s\n\n", folder.ID, folder.Name)
 	}
 
-	list, err := client.ListByID(os.Args[3])
+	list, err := client.ListByID(context.Background(), os.Args[3])
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
