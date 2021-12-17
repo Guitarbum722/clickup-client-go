@@ -7,6 +7,7 @@
 package clickup
 
 import (
+	"context"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -113,7 +114,7 @@ func TestClient_SpacesForWorkspace(t *testing.T) {
 				authenticator: &APITokenAuthenticator{},
 				baseURL:       tt.fields.baseURL,
 			}
-			_, err := c.SpacesForWorkspace(tt.args.teamID, tt.args.includeArchived)
+			_, err := c.SpacesForWorkspace(context.Background(), tt.args.teamID, tt.args.includeArchived)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.SpacesForWorkspace() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -217,7 +218,7 @@ func TestClient_SpaceByID(t *testing.T) {
 				authenticator: &APITokenAuthenticator{},
 				baseURL:       tt.fields.baseURL,
 			}
-			_, err := c.SpaceByID(tt.args.spaceID)
+			_, err := c.SpaceByID(context.Background(), tt.args.spaceID)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.SpaceByID() error = %v, wantErr %v", err, tt.wantErr)
 				return

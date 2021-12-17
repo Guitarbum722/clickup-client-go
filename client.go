@@ -7,6 +7,7 @@
 package clickup
 
 import (
+	"context"
 	"net/http"
 	"time"
 )
@@ -15,7 +16,7 @@ type APITokenAuthenticator struct {
 	APIToken string
 }
 
-func (d *APITokenAuthenticator) AuthenticateFor(req *http.Request) error {
+func (d *APITokenAuthenticator) AuthenticateFor(ctx context.Context, req *http.Request) error {
 	req.Header.Add("Authorization", d.APIToken)
 	return nil
 }
@@ -32,8 +33,8 @@ type Client struct {
 }
 
 // wrapper for internal authenticator for convenience <shrug>.
-func (c *Client) AuthenticateFor(req *http.Request) error {
-	return c.authenticator.AuthenticateFor(req)
+func (c *Client) AuthenticateFor(ctx context.Context, req *http.Request) error {
+	return c.authenticator.AuthenticateFor(ctx, req)
 }
 
 const basePath = "https://api.clickup.com/api/v2"

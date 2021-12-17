@@ -6,8 +6,11 @@
 
 package clickup
 
-import "net/http"
+import (
+	"context"
+	"net/http"
+)
 
 type Authenticator interface {
-	AuthenticateFor(req *http.Request) error
+	AuthenticateFor(context.Context, *http.Request) error
 }

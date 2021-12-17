@@ -7,6 +7,7 @@
 package clickup
 
 import (
+	"context"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -117,7 +118,7 @@ func TestClient_TaskTimeInStatus(t *testing.T) {
 				authenticator: &APITokenAuthenticator{},
 				baseURL:       tt.fields.baseURL,
 			}
-			_, err := c.TaskTimeInStatus(tt.args.taskID, tt.args.workspaceID, tt.args.useCustomTaskIDs)
+			_, err := c.TaskTimeInStatus(context.Background(), tt.args.taskID, tt.args.workspaceID, tt.args.useCustomTaskIDs)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.TaskTimeInStatus() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -250,7 +251,7 @@ func TestClient_BulkTaskTimeInStatus(t *testing.T) {
 				authenticator: &APITokenAuthenticator{},
 				baseURL:       tt.fields.baseURL,
 			}
-			_, err := c.BulkTaskTimeInStatus(tt.args.taskIDs, tt.args.workspaceID, tt.args.useCustomTaskIDs)
+			_, err := c.BulkTaskTimeInStatus(context.Background(), tt.args.taskIDs, tt.args.workspaceID, tt.args.useCustomTaskIDs)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.BulkTaskTimeInStatus() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -350,7 +351,7 @@ func TestClient_TasksForList(t *testing.T) {
 				authenticator: &APITokenAuthenticator{},
 				baseURL:       tt.fields.baseURL,
 			}
-			_, err := c.TasksForList(tt.args.listID, &tt.args.queryOpts)
+			_, err := c.TasksForList(context.Background(), tt.args.listID, &tt.args.queryOpts)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.TasksForList() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -464,7 +465,7 @@ func TestClient_TaskByID(t *testing.T) {
 				authenticator: &APITokenAuthenticator{},
 				baseURL:       tt.fields.baseURL,
 			}
-			_, err := c.TaskByID(tt.args.taskID, tt.args.workspaceID, tt.args.useCustomTaskIDs, tt.args.includeSubtasks)
+			_, err := c.TaskByID(context.Background(), tt.args.taskID, tt.args.workspaceID, tt.args.useCustomTaskIDs, tt.args.includeSubtasks)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.TaskByID() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -538,7 +539,7 @@ func TestClient_CreateTask(t *testing.T) {
 				authenticator: &APITokenAuthenticator{},
 				baseURL:       tt.fields.baseURL,
 			}
-			_, err := c.CreateTask(tt.args.listID, tt.args.task)
+			_, err := c.CreateTask(context.Background(), tt.args.listID, tt.args.task)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.CreateTask() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -655,7 +656,7 @@ func TestClient_UpdateTask(t *testing.T) {
 				authenticator: &APITokenAuthenticator{},
 				baseURL:       tt.fields.baseURL,
 			}
-			_, err := c.UpdateTask(tt.args.task, tt.args.workspaceID, tt.args.useCustomTaskIDs)
+			_, err := c.UpdateTask(context.Background(), tt.args.task, tt.args.workspaceID, tt.args.useCustomTaskIDs)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.UpdateTask() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -716,7 +717,7 @@ func TestClient_DeleteTask(t *testing.T) {
 				authenticator: &APITokenAuthenticator{},
 				baseURL:       tt.fields.baseURL,
 			}
-			if err := c.DeleteTask(tt.args.taskID, tt.args.workspaceID, tt.args.useCustomTaskIDs); (err != nil) != tt.wantErr {
+			if err := c.DeleteTask(context.Background(), tt.args.taskID, tt.args.workspaceID, tt.args.useCustomTaskIDs); (err != nil) != tt.wantErr {
 				t.Errorf("Client.DeleteTask() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

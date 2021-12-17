@@ -7,6 +7,7 @@
 package clickup
 
 import (
+	"context"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -38,7 +39,7 @@ func TestClient_TagsForSpace(t *testing.T) {
 				authenticator: &APITokenAuthenticator{},
 				baseURL:       tt.fields.baseURL,
 			}
-			_, err := c.TagsForSpace(tt.args.spaceID)
+			_, err := c.TagsForSpace(context.Background(), tt.args.spaceID)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.TagsForSpace() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -122,7 +123,7 @@ func TestClient_CreateSpaceTag(t *testing.T) {
 				authenticator: &APITokenAuthenticator{},
 				baseURL:       tt.fields.baseURL,
 			}
-			if err := c.CreateSpaceTag(tt.args.spaceID, tt.args.tag); (err != nil) != tt.wantErr {
+			if err := c.CreateSpaceTag(context.Background(), tt.args.spaceID, tt.args.tag); (err != nil) != tt.wantErr {
 				t.Errorf("Client.CreateSpaceTag() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})
@@ -154,7 +155,7 @@ func TestClient_UpdateSpaceTag(t *testing.T) {
 				authenticator: tt.fields.authenticator,
 				baseURL:       tt.fields.baseURL,
 			}
-			if err := c.UpdateSpaceTag(tt.args.spacID, tt.args.tag); (err != nil) != tt.wantErr {
+			if err := c.UpdateSpaceTag(context.Background(), tt.args.spacID, tt.args.tag); (err != nil) != tt.wantErr {
 				t.Errorf("Client.UpdateSpaceTag() error = %v, wantErr %v", err, tt.wantErr)
 			}
 		})

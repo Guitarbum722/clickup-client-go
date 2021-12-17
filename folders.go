@@ -7,6 +7,7 @@
 package clickup
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -65,18 +66,18 @@ type FoldersResponse struct {
 	Folders []SingleFolder `json:"folders"`
 }
 
-func (c *Client) FoldersForSpace(spaceID string, includeArchived bool) (*FoldersResponse, error) {
+func (c *Client) FoldersForSpace(ctx context.Context, spaceID string, includeArchived bool) (*FoldersResponse, error) {
 
 	urlValues := url.Values{}
 	urlValues.Set("archived", strconv.FormatBool(includeArchived))
 
 	endpoint := fmt.Sprintf("%s/space/%s/folder/?%s", c.baseURL, spaceID, urlValues.Encode())
 
-	req, err := http.NewRequest(http.MethodGet, endpoint, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
 	if err != nil {
 		return nil, fmt.Errorf("folder by space request failed: %w", err)
 	}
-	if err := c.AuthenticateFor(req); err != nil {
+	if err := c.AuthenticateFor(ctx, req); err != nil {
 		return nil, fmt.Errorf("failed to authenticate client: %w", err)
 	}
 
@@ -101,14 +102,14 @@ func (c *Client) FoldersForSpace(spaceID string, includeArchived bool) (*Folders
 	return &folders, nil
 }
 
-func (c *Client) FolderByID(folderID string) (*SingleFolder, error) {
+func (c *Client) FolderByID(ctx context.Context, folderID string) (*SingleFolder, error) {
 	endpoint := fmt.Sprintf("%s/folder/%s", c.baseURL, folderID)
 
-	req, err := http.NewRequest(http.MethodGet, endpoint, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
 	if err != nil {
 		return nil, fmt.Errorf("folder request failed: %w", err)
 	}
-	if err := c.AuthenticateFor(req); err != nil {
+	if err := c.AuthenticateFor(ctx, req); err != nil {
 		return nil, fmt.Errorf("failed to authenticate client: %w", err)
 	}
 

@@ -7,6 +7,7 @@
 package clickup
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -49,18 +50,18 @@ type ListsResponse struct {
 	Lists []SingleList `json:"lists"`
 }
 
-func (c *Client) ListsForFolder(folderID string, includeArchived bool) (*ListsResponse, error) {
+func (c *Client) ListsForFolder(ctx context.Context, folderID string, includeArchived bool) (*ListsResponse, error) {
 
 	urlValues := url.Values{}
 	urlValues.Set("archived", strconv.FormatBool(includeArchived))
 
 	endpoint := fmt.Sprintf("%s/folder/%s/list/?%s", c.baseURL, folderID, urlValues.Encode())
 
-	req, err := http.NewRequest(http.MethodGet, endpoint, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
 	if err != nil {
 		return nil, fmt.Errorf("lists for folder request failed: %w", err)
 	}
-	if err := c.AuthenticateFor(req); err != nil {
+	if err := c.AuthenticateFor(ctx, req); err != nil {
 		return nil, fmt.Errorf("failed to authenticate client: %w", err)
 	}
 
@@ -85,15 +86,15 @@ func (c *Client) ListsForFolder(folderID string, includeArchived bool) (*ListsRe
 	return &lists, nil
 }
 
-func (c *Client) ListByID(listID string) (*SingleList, error) {
+func (c *Client) ListByID(ctx context.Context, listID string) (*SingleList, error) {
 
 	endpoint := fmt.Sprintf("%s/list/%s", c.baseURL, listID)
 
-	req, err := http.NewRequest(http.MethodGet, endpoint, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
 	if err != nil {
 		return nil, fmt.Errorf("list request failed: %w", err)
 	}
-	if err := c.AuthenticateFor(req); err != nil {
+	if err := c.AuthenticateFor(ctx, req); err != nil {
 		return nil, fmt.Errorf("failed to authenticate client: %w", err)
 	}
 

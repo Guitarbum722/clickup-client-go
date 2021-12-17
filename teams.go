@@ -7,6 +7,7 @@
 package clickup
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -42,14 +43,14 @@ type TeamMember struct {
 	InvitedBy TeamUser `json:"invited_by"`
 }
 
-func (c *Client) Teams() (*TeamsResponse, error) {
+func (c *Client) Teams(ctx context.Context) (*TeamsResponse, error) {
 	endpoint := fmt.Sprintf("%s/team", c.baseURL)
 
-	req, err := http.NewRequest(http.MethodGet, endpoint, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
 	if err != nil {
 		return nil, fmt.Errorf("get teams request failed: %w", err)
 	}
-	if err := c.AuthenticateFor(req); err != nil {
+	if err := c.AuthenticateFor(ctx, req); err != nil {
 		return nil, fmt.Errorf("failed to authenticate client: %w", err)
 	}
 
