@@ -8,6 +8,7 @@ package clickup
 
 import (
 	"bytes"
+	"context"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -100,7 +101,7 @@ func TestClient_CreateTaskAttachment(t *testing.T) {
 				authenticator: &APITokenAuthenticator{},
 				baseURL:       tt.fields.baseURL,
 			}
-			_, err := c.CreateTaskAttachment(tt.args.taskID, tt.args.workspaceID, tt.args.useCustomTaskIDs, tt.args.params)
+			_, err := c.CreateTaskAttachment(context.Background(), tt.args.taskID, tt.args.workspaceID, tt.args.useCustomTaskIDs, tt.args.params)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.CreateTaskAttachment() error = %v, wantErr %v", err, tt.wantErr)
 				return

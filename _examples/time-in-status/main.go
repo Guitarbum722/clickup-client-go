@@ -7,6 +7,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"strconv"
@@ -30,7 +31,7 @@ func main() {
 		},
 	})
 
-	timeInStatusResponse, err := client.TaskTimeInStatus(taskID, workspaceID, true)
+	timeInStatusResponse, err := client.TaskTimeInStatus(context.Background(), taskID, workspaceID, true)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

@@ -7,6 +7,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 	"strconv"
@@ -29,7 +30,7 @@ func main() {
 	}
 
 	for {
-		tasks, err := client.TasksForList(os.Args[2], queryOpts)
+		tasks, err := client.TasksForList(context.Background(), os.Args[2], queryOpts)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)

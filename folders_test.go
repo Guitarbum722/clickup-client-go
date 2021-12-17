@@ -7,6 +7,7 @@
 package clickup
 
 import (
+	"context"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -105,7 +106,7 @@ func TestClient_FoldersForSpace(t *testing.T) {
 				authenticator: &APITokenAuthenticator{},
 				baseURL:       tt.fields.baseURL,
 			}
-			_, err := c.FoldersForSpace(tt.args.spaceID, tt.args.includeArchived)
+			_, err := c.FoldersForSpace(context.Background(), tt.args.spaceID, tt.args.includeArchived)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.FoldersForSpace() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -204,7 +205,7 @@ func TestClient_FolderByID(t *testing.T) {
 				authenticator: &APITokenAuthenticator{},
 				baseURL:       tt.fields.baseURL,
 			}
-			_, err := c.FolderByID(tt.args.folderID)
+			_, err := c.FolderByID(context.Background(), tt.args.folderID)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.FolderByID() error = %v, wantErr %v", err, tt.wantErr)
 				return

@@ -7,6 +7,7 @@
 package clickup
 
 import (
+	"context"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -104,7 +105,7 @@ func TestClient_ListsForFolder(t *testing.T) {
 				authenticator: &APITokenAuthenticator{},
 				baseURL:       tt.fields.baseURL,
 			}
-			_, err := c.ListsForFolder(tt.args.folderID, tt.args.includeArchived)
+			_, err := c.ListsForFolder(context.Background(), tt.args.folderID, tt.args.includeArchived)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.ListsForFolder() error = %v, wantErr %v", err, tt.wantErr)
 				return
@@ -206,7 +207,7 @@ func TestClient_ListByID(t *testing.T) {
 				authenticator: &APITokenAuthenticator{},
 				baseURL:       tt.fields.baseURL,
 			}
-			_, err := c.ListByID(tt.args.listID)
+			_, err := c.ListByID(context.Background(), tt.args.listID)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.ListByID() error = %v, wantErr %v", err, tt.wantErr)
 				return

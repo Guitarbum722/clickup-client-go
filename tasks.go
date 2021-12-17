@@ -8,6 +8,7 @@ package clickup
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -230,7 +231,7 @@ func queryParamsFor(opts *TaskQueryOptions) *url.Values {
 	return urlValues
 }
 
-func (c *Client) TaskTimeInStatus(taskID, workspaceID string, useCustomTaskIDs bool) (*TaskTimeInStatusResponse, error) {
+func (c *Client) TaskTimeInStatus(ctx context.Context, taskID, workspaceID string, useCustomTaskIDs bool) (*TaskTimeInStatusResponse, error) {
 	if useCustomTaskIDs && workspaceID == "" {
 		return nil, fmt.Errorf("workspaceID must be provided if querying by custom task id: %w", ErrValidation)
 	}
@@ -242,7 +243,7 @@ func (c *Client) TaskTimeInStatus(taskID, workspaceID string, useCustomTaskIDs b
 
 	endpoint := fmt.Sprintf("%s/task/%s/time_in_status/?%s", c.baseURL, taskID, urlValues.Encode())
 
-	req, err := http.NewRequest(http.MethodGet, endpoint, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
 	if err != nil {
 		return nil, fmt.Errorf("time in status request failed: %w", err)
 	}
@@ -271,7 +272,7 @@ func (c *Client) TaskTimeInStatus(taskID, workspaceID string, useCustomTaskIDs b
 	return &taskTimeInStatus, nil
 }
 
-func (c *Client) BulkTaskTimeInStatus(taskIDs []string, workspaceID string, useCustomTaskIDs bool) (map[string]TaskTimeInStatusResponse, error) {
+func (c *Client) BulkTaskTimeInStatus(ctx context.Context, taskIDs []string, workspaceID string, useCustomTaskIDs bool) (map[string]TaskTimeInStatusResponse, error) {
 	if useCustomTaskIDs && workspaceID == "" {
 		return nil, fmt.Errorf("workspaceID must be provided if querying by custom task id: %w", ErrValidation)
 	}
@@ -289,7 +290,7 @@ func (c *Client) BulkTaskTimeInStatus(taskIDs []string, workspaceID string, useC
 
 	endpoint := fmt.Sprintf("%s/task/bulk_time_in_status/task_ids/?%s", c.baseURL, urlValues.Encode())
 
-	req, err := http.NewRequest(http.MethodGet, endpoint, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
 	if err != nil {
 		return nil, fmt.Errorf("bulk time in status request failed: %w", err)
 	}
@@ -321,11 +322,11 @@ func (c *Client) BulkTaskTimeInStatus(taskIDs []string, workspaceID string, useC
 // Clickup has some rather informal paging, so the caller is responsible for inspecting the count of tasks returned, and incrementing
 // the Page in queryOpts if the number of tasks is 100.
 // ie. if the current page returns 100 tasks (the maximum page size), then another query should be made to get the next page.
-func (c *Client) TasksForList(listID string, queryOpts *TaskQueryOptions) (*GetTasksResponse, error) {
+func (c *Client) TasksForList(ctx context.Context, listID string, queryOpts *TaskQueryOptions) (*GetTasksResponse, error) {
 
 	endpoint := fmt.Sprintf("%s/list/%s/task/?%s", c.baseURL, listID, queryParamsFor(queryOpts).Encode())
 
-	req, err := http.NewRequest(http.MethodGet, endpoint, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
 	if err != nil {
 		return nil, fmt.Errorf("tasks by list request failed: %w", err)
 	}
@@ -354,7 +355,7 @@ func (c *Client) TasksForList(listID string, queryOpts *TaskQueryOptions) (*GetT
 	return &tasks, nil
 }
 
-func (c *Client) TaskByID(taskID, workspaceID string, useCustomTaskIDs, includeSubtasks bool) (*SingleTask, error) {
+func (c *Client) TaskByID(ctx context.Context, taskID, workspaceID string, useCustomTaskIDs, includeSubtasks bool) (*SingleTask, error) {
 	if useCustomTaskIDs && workspaceID == "" {
 		return nil, fmt.Errorf("workspaceID must be provided if querying by custom task id: %w", ErrValidation)
 	}
@@ -366,7 +367,7 @@ func (c *Client) TaskByID(taskID, workspaceID string, useCustomTaskIDs, includeS
 
 	endpoint := fmt.Sprintf("%s/task/%s/?%s", c.baseURL, taskID, urlValues.Encode())
 
-	req, err := http.NewRequest(http.MethodGet, endpoint, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
 	if err != nil {
 		return nil, fmt.Errorf("task by id request failed: %w", err)
 	}
@@ -407,7 +408,7 @@ type TaskRequest struct {
 	StartDateTime bool     `json:"start_date_time,omitempty"`
 }
 
-func (c *Client) CreateTask(listID string, task TaskRequest) (*SingleTask, error) {
+func (c *Client) CreateTask(ctx context.Context, listID string, task TaskRequest) (*SingleTask, error) {
 	if listID == "" {
 		return nil, fmt.Errorf("must provide a list id to create a task: %w", ErrValidation)
 	}
@@ -423,7 +424,7 @@ func (c *Client) CreateTask(listID string, task TaskRequest) (*SingleTask, error
 
 	endpoint := fmt.Sprintf("%s/list/%s/task", c.baseURL, listID)
 
-	req, err := http.NewRequest(http.MethodPost, endpoint, buf)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, buf)
 	if err != nil {
 		return nil, fmt.Errorf("create task request failed: %w", err)
 	}
@@ -465,7 +466,7 @@ type TaskUpdateRequest struct {
 	StartDateTime bool     `json:"start_date_time,omitempty"`
 }
 
-func (c *Client) UpdateTask(task *TaskUpdateRequest, workspaceID string, useCustomTaskIDs bool) (*SingleTask, error) {
+func (c *Client) UpdateTask(ctx context.Context, task *TaskUpdateRequest, workspaceID string, useCustomTaskIDs bool) (*SingleTask, error) {
 	if useCustomTaskIDs && workspaceID == "" {
 		return nil, fmt.Errorf("workspaceID must be provided if updating by custom task id: %w", ErrValidation)
 	}
@@ -485,7 +486,7 @@ func (c *Client) UpdateTask(task *TaskUpdateRequest, workspaceID string, useCust
 
 	endpoint := fmt.Sprintf("%s/task/%s/?%s", c.baseURL, task.ID, urlValues.Encode())
 
-	req, err := http.NewRequest(http.MethodPost, endpoint, buf)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, buf)
 	if err != nil {
 		return nil, fmt.Errorf("create task request failed: %w", err)
 	}
@@ -515,7 +516,7 @@ func (c *Client) UpdateTask(task *TaskUpdateRequest, workspaceID string, useCust
 	return &updatedTask, nil
 }
 
-func (c *Client) DeleteTask(taskID, workspaceID string, useCustomTaskIDs bool) error {
+func (c *Client) DeleteTask(ctx context.Context, taskID, workspaceID string, useCustomTaskIDs bool) error {
 	if useCustomTaskIDs && workspaceID == "" {
 		return fmt.Errorf("workspaceID must be provided if deleting by custom task id: %w", ErrValidation)
 	}
@@ -525,7 +526,7 @@ func (c *Client) DeleteTask(taskID, workspaceID string, useCustomTaskIDs bool) e
 	urlValues.Add("team_id", workspaceID)
 
 	endpoint := fmt.Sprintf("%s/task/%s/?%s", c.baseURL, taskID, urlValues.Encode())
-	req, err := http.NewRequest(http.MethodPost, endpoint, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, nil)
 	if err != nil {
 		return fmt.Errorf("delete task request failed: %w", err)
 	}

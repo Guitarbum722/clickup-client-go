@@ -7,6 +7,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 
@@ -27,7 +28,7 @@ func main() {
 		},
 	})
 
-	folders, err := client.FoldersForSpace(spaceID, false)
+	folders, err := client.FoldersForSpace(context.Background(), spaceID, false)
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)
@@ -37,7 +38,7 @@ func main() {
 		fmt.Printf("Folder ID: %s\nName: %s\n\n", folder.ID, folder.Name)
 	}
 
-	folder, err := client.FolderByID(os.Args[3])
+	folder, err := client.FolderByID(context.Background(), os.Args[3])
 	if err != nil {
 		fmt.Println(err)
 		os.Exit(1)

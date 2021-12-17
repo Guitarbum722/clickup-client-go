@@ -7,6 +7,7 @@
 package clickup
 
 import (
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -92,13 +93,13 @@ type SpacesResponse struct {
 	Spaces []SingleSpace `json:"spaces"`
 }
 
-func (c *Client) SpacesForWorkspace(teamID string, includeArchived bool) (*SpacesResponse, error) {
+func (c *Client) SpacesForWorkspace(ctx context.Context, teamID string, includeArchived bool) (*SpacesResponse, error) {
 	urlValues := url.Values{}
 	urlValues.Set("archived", strconv.FormatBool(includeArchived))
 
 	endpoint := fmt.Sprintf("%s/team/%s/space/?%s", c.baseURL, teamID, urlValues.Encode())
 
-	req, err := http.NewRequest(http.MethodGet, endpoint, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
 	if err != nil {
 		return nil, fmt.Errorf("spaces request failed: %w", err)
 	}
@@ -127,11 +128,11 @@ func (c *Client) SpacesForWorkspace(teamID string, includeArchived bool) (*Space
 	return &spacesResponse, nil
 }
 
-func (c *Client) SpaceByID(spaceID string) (*SingleSpace, error) {
+func (c *Client) SpaceByID(ctx context.Context, spaceID string) (*SingleSpace, error) {
 
 	endpoint := fmt.Sprintf("%s/space/%s", c.baseURL, spaceID)
 
-	req, err := http.NewRequest(http.MethodGet, endpoint, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
 	if err != nil {
 		return nil, fmt.Errorf("space request failed: %w", err)
 	}

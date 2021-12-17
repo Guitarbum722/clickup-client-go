@@ -8,6 +8,7 @@ package clickup
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"net/http"
@@ -101,7 +102,7 @@ type CreateWebhookRequest struct {
 	FolderID string         `json:"folder_id,omitempty"`
 }
 
-func (c *Client) CreateWebhook(workspaceID string, webhook *CreateWebhookRequest) (*CreateWebhookResponse, error) {
+func (c *Client) CreateWebhook(ctx context.Context, workspaceID string, webhook *CreateWebhookRequest) (*CreateWebhookResponse, error) {
 
 	b, err := json.Marshal(webhook)
 	if err != nil {
@@ -111,7 +112,7 @@ func (c *Client) CreateWebhook(workspaceID string, webhook *CreateWebhookRequest
 
 	endpoint := fmt.Sprintf("%s/team/%s/webhook", c.baseURL, workspaceID)
 
-	req, err := http.NewRequest(http.MethodPost, endpoint, buf)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, buf)
 	if err != nil {
 		return nil, fmt.Errorf("create task request failed: %w", err)
 	}
@@ -151,7 +152,7 @@ type UpdateWebhookRequest struct {
 	Status   string         `json:"status,omitempty"`
 }
 
-func (c *Client) UpdateWebhook(webhook *UpdateWebhookRequest) (*UpdateWebhookResponse, error) {
+func (c *Client) UpdateWebhook(ctx context.Context, webhook *UpdateWebhookRequest) (*UpdateWebhookResponse, error) {
 	if webhook.ID == "" {
 		return nil, fmt.Errorf("must provide a webhook id: %w", ErrValidation)
 	}
@@ -164,7 +165,7 @@ func (c *Client) UpdateWebhook(webhook *UpdateWebhookRequest) (*UpdateWebhookRes
 
 	endpoint := fmt.Sprintf("%s/webhook/%s", c.baseURL, webhook.ID)
 
-	req, err := http.NewRequest(http.MethodPost, endpoint, buf)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, buf)
 	if err != nil {
 		return nil, fmt.Errorf("create task request failed: %w", err)
 	}
@@ -194,10 +195,10 @@ func (c *Client) UpdateWebhook(webhook *UpdateWebhookRequest) (*UpdateWebhookRes
 	return &updatedWebhook, nil
 }
 
-func (c *Client) DeleteWebhook(id string) error {
+func (c *Client) DeleteWebhook(ctx context.Context, id string) error {
 	endpoint := fmt.Sprintf("%s/webhook/%s", c.baseURL, id)
 
-	req, err := http.NewRequest(http.MethodDelete, endpoint, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, endpoint, nil)
 	if err != nil {
 		return fmt.Errorf("webhooks delete request failed: %w", err)
 	}
@@ -220,11 +221,11 @@ func (c *Client) DeleteWebhook(id string) error {
 	return nil
 }
 
-func (c *Client) WebhooksFor(workspaceID string) (*WebhooksQueryResponse, error) {
+func (c *Client) WebhooksFor(ctx context.Context, workspaceID string) (*WebhooksQueryResponse, error) {
 
 	endpoint := fmt.Sprintf("%s/team/%s/webhook", c.baseURL, workspaceID)
 
-	req, err := http.NewRequest(http.MethodGet, endpoint, nil)
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
 	if err != nil {
 		return nil, fmt.Errorf("webhooks request failed: %w", err)
 	}

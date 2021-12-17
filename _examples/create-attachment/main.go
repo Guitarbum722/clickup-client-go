@@ -7,6 +7,7 @@
 package main
 
 import (
+	"context"
 	"fmt"
 	"os"
 
@@ -32,7 +33,7 @@ func main() {
 		Reader:   f,
 	}
 
-	attachment, err := client.CreateTaskAttachment(os.Args[2], os.Args[3], true, &params)
+	attachment, err := client.CreateTaskAttachment(context.Background(), os.Args[2], os.Args[3], true, &params)
 	if err != nil {
 		panic(err)
 	}

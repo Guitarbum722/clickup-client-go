@@ -8,6 +8,7 @@ package clickup
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"fmt"
 	"io"
@@ -35,7 +36,7 @@ type AttachmentParams struct {
 	Reader   io.Reader
 }
 
-func (c *Client) CreateTaskAttachment(taskID, workspaceID string, useCustomTaskIDs bool, params *AttachmentParams) (*CreateAttachmentResponse, error) {
+func (c *Client) CreateTaskAttachment(ctx context.Context, taskID, workspaceID string, useCustomTaskIDs bool, params *AttachmentParams) (*CreateAttachmentResponse, error) {
 	if useCustomTaskIDs && workspaceID == "" {
 		return nil, fmt.Errorf("workspaceID must be provided if querying by custom task id: %w", ErrValidation)
 	}
@@ -63,7 +64,7 @@ func (c *Client) CreateTaskAttachment(taskID, workspaceID string, useCustomTaskI
 
 	endpoint := fmt.Sprintf("%s/task/%s/attachment/?%s", c.baseURL, taskID, urlValues.Encode())
 
-	req, err := http.NewRequest(http.MethodPost, endpoint, &body)
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, &body)
 	if err != nil {
 		return nil, fmt.Errorf("create attachment request failed: %w", err)
 	}

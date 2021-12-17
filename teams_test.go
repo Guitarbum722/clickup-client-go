@@ -7,6 +7,7 @@
 package clickup
 
 import (
+	"context"
 	"io/ioutil"
 	"net/http"
 	"strings"
@@ -59,7 +60,7 @@ func TestClient_Teams(t *testing.T) {
 				authenticator: &APITokenAuthenticator{},
 				baseURL:       tt.fields.baseURL,
 			}
-			_, err := c.Teams()
+			_, err := c.Teams(context.Background())
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.Teams() error = %v, wantErr %v", err, tt.wantErr)
 				return
