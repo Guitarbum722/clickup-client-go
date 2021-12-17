@@ -103,7 +103,7 @@ func (c *Client) SpacesForWorkspace(ctx context.Context, teamID string, includeA
 	if err != nil {
 		return nil, fmt.Errorf("spaces request failed: %w", err)
 	}
-	if err := c.AuthenticateFor(ctx, req); err != nil {
+	if err := c.AuthenticateFor(req); err != nil {
 		return nil, fmt.Errorf("failed to authenticate client: %w", err)
 	}
 
@@ -136,7 +136,7 @@ func (c *Client) SpaceByID(ctx context.Context, spaceID string) (*SingleSpace, e
 	if err != nil {
 		return nil, fmt.Errorf("space request failed: %w", err)
 	}
-	if err := c.AuthenticateFor(ctx, req); err != nil {
+	if err := c.AuthenticateFor(req); err != nil {
 		return nil, fmt.Errorf("failed to authenticate client: %w", err)
 	}
 

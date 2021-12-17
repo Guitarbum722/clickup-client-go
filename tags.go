@@ -32,7 +32,7 @@ func (c *Client) TagsForSpace(ctx context.Context, spaceID string) (*TagsQueryRe
 	if err != nil {
 		return nil, fmt.Errorf("tags for space request failed: %w", err)
 	}
-	if err := c.AuthenticateFor(ctx, req); err != nil {
+	if err := c.AuthenticateFor(req); err != nil {
 		return nil, fmt.Errorf("failed to authenticate client: %w", err)
 	}
 
@@ -72,7 +72,7 @@ func (c *Client) CreateSpaceTag(ctx context.Context, spaceID string, tag Tag) er
 	if err != nil {
 		return fmt.Errorf("create tag request failed: %w", err)
 	}
-	if err := c.AuthenticateFor(ctx, req); err != nil {
+	if err := c.AuthenticateFor(req); err != nil {
 		return fmt.Errorf("failed to authenticate client: %w", err)
 	}
 

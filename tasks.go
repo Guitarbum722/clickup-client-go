@@ -247,7 +247,7 @@ func (c *Client) TaskTimeInStatus(ctx context.Context, taskID, workspaceID strin
 	if err != nil {
 		return nil, fmt.Errorf("time in status request failed: %w", err)
 	}
-	if err := c.AuthenticateFor(ctx, req); err != nil {
+	if err := c.AuthenticateFor(req); err != nil {
 		return nil, fmt.Errorf("failed to authenticate client: %w", err)
 	}
 
@@ -294,7 +294,7 @@ func (c *Client) BulkTaskTimeInStatus(ctx context.Context, taskIDs []string, wor
 	if err != nil {
 		return nil, fmt.Errorf("bulk time in status request failed: %w", err)
 	}
-	if err := c.AuthenticateFor(ctx, req); err != nil {
+	if err := c.AuthenticateFor(req); err != nil {
 		return nil, fmt.Errorf("failed to authenticate client: %w", err)
 	}
 
@@ -330,7 +330,7 @@ func (c *Client) TasksForList(ctx context.Context, listID string, queryOpts *Tas
 	if err != nil {
 		return nil, fmt.Errorf("tasks by list request failed: %w", err)
 	}
-	if err := c.AuthenticateFor(ctx, req); err != nil {
+	if err := c.AuthenticateFor(req); err != nil {
 		return nil, fmt.Errorf("failed to authenticate client: %w", err)
 	}
 
@@ -371,7 +371,7 @@ func (c *Client) TaskByID(ctx context.Context, taskID, workspaceID string, useCu
 	if err != nil {
 		return nil, fmt.Errorf("task by id request failed: %w", err)
 	}
-	if err := c.AuthenticateFor(ctx, req); err != nil {
+	if err := c.AuthenticateFor(req); err != nil {
 		return nil, fmt.Errorf("failed to authenticate client: %w", err)
 	}
 
@@ -428,7 +428,7 @@ func (c *Client) CreateTask(ctx context.Context, listID string, task TaskRequest
 	if err != nil {
 		return nil, fmt.Errorf("create task request failed: %w", err)
 	}
-	if err := c.AuthenticateFor(ctx, req); err != nil {
+	if err := c.AuthenticateFor(req); err != nil {
 		return nil, fmt.Errorf("failed to authenticate client: %w", err)
 	}
 	req.Header.Add("Content-type", "application/json")
@@ -490,7 +490,7 @@ func (c *Client) UpdateTask(ctx context.Context, task *TaskUpdateRequest, worksp
 	if err != nil {
 		return nil, fmt.Errorf("create task request failed: %w", err)
 	}
-	if err := c.AuthenticateFor(ctx, req); err != nil {
+	if err := c.AuthenticateFor(req); err != nil {
 		return nil, fmt.Errorf("failed to authenticate client: %w", err)
 	}
 	req.Header.Add("Content-type", "application/json")
@@ -530,7 +530,7 @@ func (c *Client) DeleteTask(ctx context.Context, taskID, workspaceID string, use
 	if err != nil {
 		return fmt.Errorf("delete task request failed: %w", err)
 	}
-	if err := c.AuthenticateFor(ctx, req); err != nil {
+	if err := c.AuthenticateFor(req); err != nil {
 		return fmt.Errorf("failed to authenticate client: %w", err)
 	}
 

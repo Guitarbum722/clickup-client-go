@@ -50,7 +50,7 @@ func (c *Client) Teams(ctx context.Context) (*TeamsResponse, error) {
 	if err != nil {
 		return nil, fmt.Errorf("get teams request failed: %w", err)
 	}
-	if err := c.AuthenticateFor(ctx, req); err != nil {
+	if err := c.AuthenticateFor(req); err != nil {
 		return nil, fmt.Errorf("failed to authenticate client: %w", err)
 	}
 

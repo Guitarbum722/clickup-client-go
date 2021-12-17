@@ -7,10 +7,9 @@
 package clickup
 
 import (
-	"context"
 	"net/http"
 )
 
 type Authenticator interface {
-	AuthenticateFor(context.Context, *http.Request) error
+	AuthenticateFor(*http.Request) error
 }

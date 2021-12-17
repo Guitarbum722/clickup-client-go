@@ -61,7 +61,7 @@ func (c *Client) ListsForFolder(ctx context.Context, folderID string, includeArc
 	if err != nil {
 		return nil, fmt.Errorf("lists for folder request failed: %w", err)
 	}
-	if err := c.AuthenticateFor(ctx, req); err != nil {
+	if err := c.AuthenticateFor(req); err != nil {
 		return nil, fmt.Errorf("failed to authenticate client: %w", err)
 	}
 
@@ -94,7 +94,7 @@ func (c *Client) ListByID(ctx context.Context, listID string) (*SingleList, erro
 	if err != nil {
 		return nil, fmt.Errorf("list request failed: %w", err)
 	}
-	if err := c.AuthenticateFor(ctx, req); err != nil {
+	if err := c.AuthenticateFor(req); err != nil {
 		return nil, fmt.Errorf("failed to authenticate client: %w", err)
 	}
 

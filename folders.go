@@ -77,7 +77,7 @@ func (c *Client) FoldersForSpace(ctx context.Context, spaceID string, includeArc
 	if err != nil {
 		return nil, fmt.Errorf("folder by space request failed: %w", err)
 	}
-	if err := c.AuthenticateFor(ctx, req); err != nil {
+	if err := c.AuthenticateFor(req); err != nil {
 		return nil, fmt.Errorf("failed to authenticate client: %w", err)
 	}
 
@@ -109,7 +109,7 @@ func (c *Client) FolderByID(ctx context.Context, folderID string) (*SingleFolder
 	if err != nil {
 		return nil, fmt.Errorf("folder request failed: %w", err)
 	}
-	if err := c.AuthenticateFor(ctx, req); err != nil {
+	if err := c.AuthenticateFor(req); err != nil {
 		return nil, fmt.Errorf("failed to authenticate client: %w", err)
 	}
 
