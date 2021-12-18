@@ -25,9 +25,8 @@ type SingleFolder struct {
 		ID   string `json:"id"`
 		Name string `json:"name"`
 	} `json:"space"`
-	TaskCount string        `json:"task_count"`
-	Archived  bool          `json:"archived"`
-	Statuses  []interface{} `json:"statuses"`
+	TaskCount string `json:"task_count"`
+	Archived  bool   `json:"archived"`
 	Lists     []struct {
 		ID         string `json:"id"`
 		Name       string `json:"name"`

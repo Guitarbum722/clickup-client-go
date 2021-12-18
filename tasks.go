@@ -16,84 +16,102 @@ import (
 	"strconv"
 )
 
+type Status struct {
+	ID         string `json:"id"`
+	Status     string `json:"status"`
+	Color      string `json:"color"`
+	Orderindex int    `json:"orderindex"`
+	Type       string `json:"type"`
+}
+
 type SingleTask struct {
-	ID          string `json:"id"`
-	CustomID    string `json:"custom_id"`
-	Name        string `json:"name"`
-	TextContent string `json:"text_content"`
-	Description string `json:"description"`
-	Status      struct {
-		ID         string `json:"id"`
-		Status     string `json:"status"`
-		Color      string `json:"color"`
-		Orderindex int    `json:"orderindex"`
-		Type       string `json:"type"`
-	} `json:"status"`
-	Orderindex  string      `json:"orderindex"`
-	DateCreated string      `json:"date_created"`
-	DateUpdated string      `json:"date_updated"`
-	DateClosed  interface{} `json:"date_closed"`
-	Archived    bool        `json:"archived"`
-	Creator     struct {
-		ID             int         `json:"id"`
-		Username       string      `json:"username"`
-		Color          string      `json:"color"`
-		Email          string      `json:"email"`
-		ProfilePicture interface{} `json:"profilePicture"`
-	} `json:"creator"`
-	Assignees []struct {
-		ID             int    `json:"id"`
-		Username       string `json:"username"`
-		Color          string `json:"color"`
-		Initials       string `json:"initials"`
-		Email          string `json:"email"`
-		ProfilePicture string `json:"profilePicture"`
-	} `json:"assignees"`
-	Watchers []struct {
-		ID             int         `json:"id"`
-		Username       string      `json:"username"`
-		Color          string      `json:"color"`
-		Initials       string      `json:"initials"`
-		Email          string      `json:"email"`
-		ProfilePicture interface{} `json:"profilePicture"`
-	} `json:"watchers"`
-	Checklists []interface{} `json:"checklists"`
-	Tags       []interface{} `json:"tags"`
-	Parent     string        `json:"parent"`
-	Priority   struct {
+	ID          string     `json:"id"`
+	CustomID    string     `json:"custom_id"`
+	Name        string     `json:"name"`
+	TextContent string     `json:"text_content"`
+	Description string     `json:"description"`
+	Status      Status     `json:"status"`
+	Orderindex  string     `json:"orderindex"`
+	DateCreated string     `json:"date_created"`
+	DateUpdated string     `json:"date_updated"`
+	DateClosed  string     `json:"date_closed"`
+	Archived    bool       `json:"archived"`
+	Creator     TeamUser   `json:"creator"`
+	Assignees   []TeamUser `json:"assignees"`
+	Watchers    []TeamUser `json:"watchers"`
+	Checklists  []struct {
+		ID          string `json:"id"`
+		TaskID      string `json:"task_id"`
+		Name        string `json:"name"`
+		DateCreated string `json:"date_created"`
+		Orderindex  int    `json:"orderindex"`
+		Creator     int    `json:"creator"`
+		Resolved    int    `json:"resolved"`
+		Unresolved  int    `json:"unresolved"`
+		Items       []struct {
+			ID         string `json:"id"`
+			Name       string `json:"name"`
+			Orderindex int    `json:"orderindex"`
+			Assignee   struct {
+				ID             int    `json:"id"`
+				Username       string `json:"username"`
+				Email          string `json:"email"`
+				Color          string `json:"color"`
+				Initials       string `json:"initials"`
+				ProfilePicture string `json:"profilePicture"`
+			} `json:"assignee"`
+			Resolved    bool   `json:"resolved"`
+			DateCreated string `json:"date_created"`
+		} `json:"items"`
+	} `json:"checklists"`
+	Tags     []Tag  `json:"tags"`
+	Parent   string `json:"parent"`
+	Priority struct {
 		ID         string `json:"id"`
 		Priority   string `json:"priority"`
 		Color      string `json:"color"`
 		Orderindex string `json:"orderindex"`
 	} `json:"priority"`
-	DueDate      interface{} `json:"due_date"`
-	StartDate    interface{} `json:"start_date"`
-	Points       interface{} `json:"points"`
-	TimeEstimate interface{} `json:"time_estimate"`
-	TimeSpent    int         `json:"time_spent"`
+	DueDate      string `json:"due_date"`
+	StartDate    string `json:"start_date"`
+	Points       int    `json:"points"`
+	TimeEstimate int    `json:"time_estimate"`
+	TimeSpent    int    `json:"time_spent"`
 	CustomFields []struct {
 		ID         string `json:"id"`
 		Name       string `json:"name"`
 		Type       string `json:"type"`
 		TypeConfig struct {
-			Default     int         `json:"default"`
-			Placeholder interface{} `json:"placeholder"`
+			Default     int    `json:"default"`
+			Placeholder string `json:"placeholder"`
 			Options     []struct {
-				ID         string      `json:"id"`
-				Name       string      `json:"name"`
-				Color      interface{} `json:"color"`
-				Orderindex int         `json:"orderindex"`
+				ID         string `json:"id"`
+				Name       string `json:"name"`
+				Color      string `json:"color"`
+				Orderindex int    `json:"orderindex"`
 			} `json:"options"`
 		} `json:"type_config"`
-		DateCreated    string `json:"date_created"`
-		HideFromGuests bool   `json:"hide_from_guests"`
-		Required       bool   `json:"required"`
+		DateCreated    string      `json:"date_created"`
+		HideFromGuests bool        `json:"hide_from_guests"`
+		Required       bool        `json:"required"`
+		Value          interface{} `json:"value"`
 	} `json:"custom_fields"`
-	Dependencies    []interface{} `json:"dependencies"`
-	LinkedTasks     []interface{} `json:"linked_tasks"`
-	TeamID          string        `json:"team_id"`
-	URL             string        `json:"url"`
-	PermissionLevel string        `json:"permission_level"`
+	Dependencies []struct {
+		TaskID      string `json:"task_id"`
+		DependsOn   string `json:"depends_on"`
+		Type        int    `json:"type"`
+		DateCreated string `json:"date_created"`
+		Userid      string `json:"userid"`
+	} `json:"dependencies"`
+	LinkedTasks []struct {
+		TaskID      string `json:"task_id"`
+		LinkID      string `json:"link_id"`
+		DateCreated string `json:"date_created"`
+		Userid      string `json:"userid"`
+	} `json:"linked_tasks"`
+	TeamID          string `json:"team_id"`
+	URL             string `json:"url"`
+	PermissionLevel string `json:"permission_level"`
 	List            struct {
 		ID     string `json:"id"`
 		Name   string `json:"name"`
@@ -114,8 +132,8 @@ type SingleTask struct {
 	Space struct {
 		ID string `json:"id"`
 	} `json:"space"`
-	Subtasks    []SingleTask  `json:"subtasks"`
-	Attachments []interface{} `json:"attachments"`
+	Subtasks    []SingleTask `json:"subtasks"`
+	Attachments []struct{}   `json:"attachments"`
 }
 
 type GetTasksResponse struct {
@@ -174,7 +192,6 @@ type TaskQueryOptions struct {
 	// CustomFields map[string]interface{}
 }
 
-// TODO: need to figure out paging!
 func queryParamsFor(opts *TaskQueryOptions) *url.Values {
 	urlValues := &url.Values{}
 
