@@ -3,6 +3,7 @@ package clickup
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 )
@@ -114,12 +115,40 @@ func (c *Client) ViewByID(ctx context.Context, viewID string) (*GetViewResponse,
 	return &view, nil
 }
 
-func (c *Client) ViewsForTeam(ctx context.Context, teamID string) (*GetViewsResponse, error) {
-	endpoint := fmt.Sprintf("%s/team/%s/view", c.baseURL, teamID)
+type ViewListType int
+
+const (
+	TypeTeam ViewListType = iota
+	TypeSpace
+	TypeFolder
+	TypeList
+)
+
+func (v ViewListType) String() string {
+	switch v {
+	case TypeTeam:
+		return "team"
+	case TypeSpace:
+		return "space"
+	case TypeFolder:
+		return "folder"
+	case TypeList:
+		return "list"
+	default:
+		return "UNKNOWN_VIEW_LIST_TYPE"
+	}
+}
+func (c *Client) ViewsFor(ctx context.Context, viewListType ViewListType, id string) (*GetViewsResponse, error) {
+	viewsType := viewListType.String()
+	if viewsType == "UNKNOWN_VIEW_LIST_TYPE" {
+		return nil, errors.New("invalid ViewListType")
+	}
+
+	endpoint := fmt.Sprintf("%s/%s/%s/view", c.baseURL, viewsType, id)
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
 	if err != nil {
-		return nil, fmt.Errorf("view for team request failed: %w", err)
+		return nil, fmt.Errorf("view request request failed: %w", err)
 	}
 	if err := c.AuthenticateFor(req); err != nil {
 		return nil, fmt.Errorf("failed to authenticate client: %w", err)
@@ -127,7 +156,7 @@ func (c *Client) ViewsForTeam(ctx context.Context, teamID string) (*GetViewsResp
 
 	res, err := c.doer.Do(req)
 	if err != nil {
-		return nil, fmt.Errorf("failed to make views for team request: %w", err)
+		return nil, fmt.Errorf("failed to make views request: %w", err)
 	}
 	defer res.Body.Close()
 
@@ -141,110 +170,11 @@ func (c *Client) ViewsForTeam(ctx context.Context, teamID string) (*GetViewsResp
 
 	if err := decoder.Decode(&views); err != nil {
 		return nil, fmt.Errorf("failed to parse views: %w", err)
-
 	}
 
 	return &views, nil
 }
 
-func (c *Client) ViewsForSpace(ctx context.Context, workspaceID string) (*GetViewsResponse, error) {
-	endpoint := fmt.Sprintf("%s/space/%s/view", c.baseURL, workspaceID)
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
-	if err != nil {
-		return nil, fmt.Errorf("view for space request failed: %w", err)
-	}
-	if err := c.AuthenticateFor(req); err != nil {
-		return nil, fmt.Errorf("failed to authenticate client: %w", err)
-	}
-
-	res, err := c.doer.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to make views for space request: %w", err)
-	}
-	defer res.Body.Close()
-
-	decoder := json.NewDecoder(res.Body)
-
-	if res.StatusCode != http.StatusOK {
-		return nil, errorFromResponse(res, decoder)
-	}
-
-	var views GetViewsResponse
-
-	if err := decoder.Decode(&views); err != nil {
-		return nil, fmt.Errorf("failed to parse views: %w", err)
-
-	}
-
-	return &views, nil
-}
-
-func (c *Client) ViewsForFolder(ctx context.Context, folderID string) (*GetViewsResponse, error) {
-	endpoint := fmt.Sprintf("%s/folder/%s/view", c.baseURL, folderID)
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
-	if err != nil {
-		return nil, fmt.Errorf("views for folder request failed: %w", err)
-	}
-	if err := c.AuthenticateFor(req); err != nil {
-		return nil, fmt.Errorf("failed to authenticate client: %w", err)
-	}
-
-	res, err := c.doer.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to make views for folder request: %w", err)
-	}
-	defer res.Body.Close()
-
-	decoder := json.NewDecoder(res.Body)
-
-	if res.StatusCode != http.StatusOK {
-		return nil, errorFromResponse(res, decoder)
-	}
-
-	var views GetViewsResponse
-
-	if err := decoder.Decode(&views); err != nil {
-		return nil, fmt.Errorf("failed to parse views: %w", err)
-
-	}
-
-	return &views, nil
-}
-
-func (c *Client) ViewsForList(ctx context.Context, listID string) (*GetViewsResponse, error) {
-	endpoint := fmt.Sprintf("%s/folder/%s/view", c.baseURL, listID)
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
-	if err != nil {
-		return nil, fmt.Errorf("views for list request failed: %w", err)
-	}
-	if err := c.AuthenticateFor(req); err != nil {
-		return nil, fmt.Errorf("failed to authenticate client: %w", err)
-	}
-
-	res, err := c.doer.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to make views for list request: %w", err)
-	}
-	defer res.Body.Close()
-
-	decoder := json.NewDecoder(res.Body)
-
-	if res.StatusCode != http.StatusOK {
-		return nil, errorFromResponse(res, decoder)
-	}
-
-	var views GetViewsResponse
-
-	if err := decoder.Decode(&views); err != nil {
-		return nil, fmt.Errorf("failed to parse views: %w", err)
-
-	}
-
-	return &views, nil
-}
 func (c *Client) DeleteView(ctx context.Context, viewID string) error {
 	endpoint := fmt.Sprintf("%s/view/%s", c.baseURL, viewID)
 
@@ -274,6 +204,6 @@ func (c *Client) DeleteView(ctx context.Context, viewID string) error {
 // TasksForView requires possible pagination.  Clickup documents that a page will have a
 // maximum of 30 tasks per page, defaulting to page 0.  This endpoint returns a boolean
 // specifying whether or not the response consists of the last page (TasksForViewResponse.LastPage = true/false).
-func (c *Client) TasksForView(ctx context.Context, viewID string, page int) (*TasksForViewResponse, error) {
-	panic("TODO: not implemented")
-}
+// func (c *Client) TasksForView(ctx context.Context, viewID string, page int) (*TasksForViewResponse, error) {
+// 	panic("TODO: not implemented")
+// }
