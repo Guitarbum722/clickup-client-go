@@ -38,4 +38,13 @@ func main() {
 	for _, v := range views.Views {
 		fmt.Println(v.Name)
 	}
+
+	tasks, err := client.TasksForView(context.Background(), os.Getenv("CLICKUP_VIEW_ID"), 0)
+	if err != nil {
+		panic(err)
+	}
+
+	for _, v := range tasks.Tasks {
+		fmt.Println(v.Name)
+	}
 }
