@@ -6,6 +6,8 @@ import (
 	"errors"
 	"fmt"
 	"net/http"
+	"net/url"
+	"strconv"
 )
 
 type SingleView struct {
@@ -204,6 +206,37 @@ func (c *Client) DeleteView(ctx context.Context, viewID string) error {
 // TasksForView requires possible pagination.  Clickup documents that a page will have a
 // maximum of 30 tasks per page, defaulting to page 0.  This endpoint returns a boolean
 // specifying whether or not the response consists of the last page (TasksForViewResponse.LastPage = true/false).
-// func (c *Client) TasksForView(ctx context.Context, viewID string, page int) (*TasksForViewResponse, error) {
-// 	panic("TODO: not implemented")
-// }
+func (c *Client) TasksForView(ctx context.Context, viewID string, page int) (*TasksForViewResponse, error) {
+	urlValues := url.Values{}
+	urlValues.Set("page", strconv.Itoa(page))
+
+	endpoint := fmt.Sprintf("%s/view/%s/task/?%s", c.baseURL, viewID, urlValues.Encode())
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
+	if err != nil {
+		return nil, fmt.Errorf("tasks for view request failed: %w", err)
+	}
+	if err := c.AuthenticateFor(req); err != nil {
+		return nil, fmt.Errorf("failed to authenticate client: %w", err)
+	}
+
+	res, err := c.doer.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to make tasks for view request: %w", err)
+	}
+	defer res.Body.Close()
+
+	decoder := json.NewDecoder(res.Body)
+
+	if res.StatusCode != http.StatusOK {
+		return nil, errorFromResponse(res, decoder)
+	}
+
+	var tasks TasksForViewResponse
+
+	if err := decoder.Decode(&tasks); err != nil {
+		return nil, fmt.Errorf("failed to parse tasks: %w", err)
+	}
+
+	return &tasks, nil
+}
