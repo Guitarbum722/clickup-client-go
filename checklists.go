@@ -58,6 +58,13 @@ type UpdateChecklistItemRequest struct {
 }
 
 func (c *Client) CreateChecklist(ctx context.Context, request *CreateChecklistRequest) (*ChecklistResponse, error) {
+	if request.TaskID == "" {
+		return nil, fmt.Errorf("must provide task id: %w", ErrValidation)
+	}
+	if request.WorkspaceID == "" {
+		return nil, fmt.Errorf("must provide workspace id: %w", ErrValidation)
+	}
+
 	b, err := json.Marshal(request)
 	if err != nil {
 		return nil, fmt.Errorf("unable to serialize checklist request: %w", err)
@@ -100,6 +107,10 @@ func (c *Client) CreateChecklist(ctx context.Context, request *CreateChecklistRe
 }
 
 func (c *Client) UpdateChecklist(ctx context.Context, request *UpdateChecklistRequest) (*ChecklistResponse, error) {
+	if request.ChecklistID == "" {
+		return nil, fmt.Errorf("must provide checklist id: %w", ErrValidation)
+	}
+
 	b, err := json.Marshal(request)
 	if err != nil {
 		return nil, fmt.Errorf("unable to serialize checklist request: %w", err)
@@ -139,6 +150,10 @@ func (c *Client) UpdateChecklist(ctx context.Context, request *UpdateChecklistRe
 }
 
 func (c *Client) DeleteChecklist(ctx context.Context, checklistID string) error {
+	if checklistID == "" {
+		return fmt.Errorf("must provide checklistID: %w", ErrValidation)
+	}
+
 	endpoint := fmt.Sprintf("%s/checklist/%s", c.baseURL, checklistID)
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, endpoint, nil)
@@ -165,6 +180,10 @@ func (c *Client) DeleteChecklist(ctx context.Context, checklistID string) error 
 }
 
 func (c *Client) CreateChecklistItem(ctx context.Context, request *CreateChecklistItemRequest) (*ChecklistResponse, error) {
+	if request.ChecklistID == "" {
+		return nil, fmt.Errorf("must provide a checklist id: %w", ErrValidation)
+	}
+
 	b, err := json.Marshal(request)
 	if err != nil {
 		return nil, fmt.Errorf("unable to serialize checklist request: %w", err)
@@ -204,6 +223,13 @@ func (c *Client) CreateChecklistItem(ctx context.Context, request *CreateCheckli
 }
 
 func (c *Client) UpdateChecklistItem(ctx context.Context, request *UpdateChecklistItemRequest) (*ChecklistResponse, error) {
+	if request.ChecklistID == "" {
+		return nil, fmt.Errorf("must provide checklist id: %w", ErrValidation)
+	}
+	if request.ChecklistItemID == "" {
+		return nil, fmt.Errorf("must provide checklist item id: %w", ErrValidation)
+	}
+
 	b, err := json.Marshal(request)
 	if err != nil {
 		return nil, fmt.Errorf("unable to serialize checklist item request: %w", err)
@@ -243,6 +269,13 @@ func (c *Client) UpdateChecklistItem(ctx context.Context, request *UpdateCheckli
 }
 
 func (c *Client) DeleteChecklistItem(ctx context.Context, checklistID, checklistItemID string) error {
+	if checklistID == "" {
+		return fmt.Errorf("must provide a checklist id: %w", ErrValidation)
+	}
+	if checklistItemID == "" {
+		return fmt.Errorf("must provide a checklist item id: %w", ErrValidation)
+	}
+
 	endpoint := fmt.Sprintf("%s/checklist/%s/checklist_item/%s", c.baseURL, checklistID, checklistItemID)
 
 	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, endpoint, nil)
