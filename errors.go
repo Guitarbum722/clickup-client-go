@@ -15,6 +15,22 @@ import (
 
 var ErrValidation = errors.New("invalid input provided")
 
+type RateLimitError struct {
+	msg       string
+	limit     string
+	remaining string
+	resetAt   string
+	cause     error
+}
+
+func (r *RateLimitError) Error() string {
+	return fmt.Sprintf("%s - limit: %s, remaining: %s, reset at: %s", r.msg, r.limit, r.remaining, r.resetAt)
+}
+
+func (r *RateLimitError) Unwrap() error {
+	return r.cause
+}
+
 type HTTPError struct {
 	Status     string
 	StatusCode int
@@ -37,6 +53,15 @@ func (e *ErrClickupResponse) Error() string {
 }
 
 func errorFromResponse(res *http.Response, decoder *json.Decoder) error {
+	if res.StatusCode == http.StatusTooManyRequests {
+		return &RateLimitError{
+			msg:       "rate limit exceeded",
+			limit:     res.Header.Get("x-ratelimit-limit"),
+			remaining: res.Header.Get("x-ratelimit-remaining"),
+			resetAt:   res.Header.Get("x-ratelimit-reset"),
+		}
+	}
+
 	var errResponse ErrClickupResponse
 	if err := decoder.Decode(&errResponse); err != nil {
 		return &HTTPError{
