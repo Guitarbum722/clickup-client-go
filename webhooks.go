@@ -9,10 +9,50 @@ package clickup
 import (
 	"bytes"
 	"context"
+	"crypto/hmac"
+	"crypto/sha256"
+	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"io/ioutil"
 	"net/http"
 )
+
+type WebhookEventMessage struct {
+	Event        WebhookEvent `json:"event"`
+	HistoryItems []struct {
+		ID       string `json:"id"`
+		Type     int    `json:"type"`
+		Date     string `json:"date"`
+		Field    string `json:"field"`
+		ParentID string `json:"parent_id"`
+		Data     struct {
+			StatusType string `json:"status_type"`
+		} `json:"data"`
+		User struct {
+			ID             int    `json:"id"`
+			Username       string `json:"username"`
+			Email          string `json:"email"`
+			Color          string `json:"color"`
+			Initials       string `json:"initials"`
+			ProfilePicture string `json:"profilePicture"`
+		} `json:"user"`
+		Before struct {
+			Status     string `json:"status"`
+			Color      string `json:"color"`
+			Orderindex int    `json:"orderindex"`
+			Type       string `json:"type"`
+		} `json:"before"`
+		After struct {
+			Status     string `json:"status"`
+			Color      string `json:"color"`
+			Orderindex int    `json:"orderindex"`
+			Type       string `json:"type"`
+		} `json:"after"`
+	} `json:"history_items"`
+	TaskID    string `json:"task_id"`
+	WebhookID string `json:"webhook_id"`
+}
 
 type WebhookEvent string
 
@@ -100,6 +140,47 @@ type CreateWebhookRequest struct {
 	TaskID   string         `json:"task_id,omitempty"`
 	ListID   string         `json:"list_id,omitempty"`
 	FolderID string         `json:"folder_id,omitempty"`
+}
+
+type webhookVerifyResult struct {
+	validSignature       bool
+	signatureFromClickup string
+	signatureGenerated   string
+}
+
+// VerifyWebhookSignature compares a generated signature using secret that
+// is returned with the webhook CRUD operations with the x-signature http header
+// that is sent with the http request to the webhook endpoint.
+// It should be noted that err will be nil even if the signature is not valid,
+// thus the WebhookVerifyResult.ValidSignature() should be called.
+func VerifyWebhookSignature(webhookRequest *http.Request, secret string) (*webhookVerifyResult, error) {
+	h := hmac.New(sha256.New, []byte(secret))
+	b, err := ioutil.ReadAll(webhookRequest.Body)
+	if err != nil {
+		return nil, err
+	}
+	h.Write(b)
+	sha := hex.EncodeToString(h.Sum(nil))
+
+	sigHeader := webhookRequest.Header.Get("X-Signature")
+
+	return &webhookVerifyResult{
+		validSignature:       sigHeader == sha,
+		signatureFromClickup: sigHeader,
+		signatureGenerated:   sha,
+	}, nil
+}
+
+func (w *webhookVerifyResult) Valid() bool {
+	return w.validSignature
+}
+
+func (w *webhookVerifyResult) SignatureFromClickup() string {
+	return w.signatureFromClickup
+}
+
+func (w *webhookVerifyResult) SignatureGenerated() string {
+	return w.signatureGenerated
 }
 
 func (c *Client) CreateWebhook(ctx context.Context, workspaceID string, webhook *CreateWebhookRequest) (*CreateWebhookResponse, error) {
