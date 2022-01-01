@@ -8,25 +8,105 @@ package clickup
 
 import "context"
 
+type List struct {
+	List string `json:"list"`
+}
+
+type CodeBlock struct {
+	CodeBlock string `json:"code-block"`
+}
+
+type Attributes struct {
+	Bold      bool       `json:"bold"`
+	Italic    bool       `json:"italic"`
+	Code      bool       `json:"code"`
+	CodeBlock *CodeBlock `json:"code-block,omitempty"`
+	List      *List      `json:"list"`
+}
+
+type Emoticon struct {
+	Code string `json:"code"`
+}
+
+type ComplexComment struct {
+	Text       string      `json:"text"`
+	Type       string      `json:"type"`
+	Attributes *Attributes `json:"attributes"`
+	Emoticon   *Emoticon   `json:"emoticon"`
+}
+
 type CreateCommentRequest struct {
-	CommentText string `json:"comment_text"` // plain text
-	Comment     []struct {
-		Text       string `json:"text"`
-		Type       string `json:"type"`
-		Attributes struct {
-			Bold      bool `json:"bold"`
-			Italic    bool `json:"italic"`
-			Code      bool `json:"code"`
-			CodeBlock struct {
-				CodeBlock string `json:"code-block"`
-			} `json:"code-block,omitempty"`
-		} `json:"attributes"`
-		Emoticon struct {
-			Code string `json:"code"`
-		} `json:"emoticon"`
-	} `json:"comment"`
-	Assignee  int  `json:"assignee"`
-	NotifyAll bool `json:"notify_all"`
+	CommentText string           `json:"comment_text"` // plain text
+	Comment     []ComplexComment `json:"comment"`
+	Assignee    int              `json:"assignee"`
+	NotifyAll   bool             `json:"notify_all"`
+}
+
+func (c *CreateCommentRequest) BulletedListItem(text string) {
+	if c.Comment == nil {
+		c.Comment = make([]ComplexComment, 0, 2)
+	}
+	comment := []ComplexComment{
+		{
+			Text:       text,
+			Attributes: nil,
+		},
+		{
+			Text: "\n",
+			Attributes: &Attributes{
+				List: &List{
+					List: "bullet",
+				},
+			},
+		},
+	}
+	c.Comment = append(c.Comment, comment...)
+}
+
+func (c *CreateCommentRequest) NumberedListItem(text string) {
+	if c.Comment == nil {
+		c.Comment = make([]ComplexComment, 0, 2)
+	}
+	comment := []ComplexComment{
+		{
+			Text:       text,
+			Attributes: nil,
+		},
+		{
+			Text: "\n",
+			Attributes: &Attributes{
+				List: &List{
+					List: "ordered",
+				},
+			},
+		},
+	}
+	c.Comment = append(c.Comment, comment...)
+}
+
+func (c *CreateCommentRequest) ChecklistItem(text string, checked bool) {
+	if c.Comment == nil {
+		c.Comment = make([]ComplexComment, 0, 2)
+	}
+	isCheckedVal := "unchecked"
+	if checked {
+		isCheckedVal = "checked"
+	}
+	comment := []ComplexComment{
+		{
+			Text:       text,
+			Attributes: nil,
+		},
+		{
+			Text: "\n",
+			Attributes: &Attributes{
+				List: &List{
+					List: isCheckedVal,
+				},
+			},
+		},
+	}
+	c.Comment = append(c.Comment, comment...)
 }
 
 type CreateTaskCommentRequest struct {
@@ -78,19 +158,12 @@ func (c *Client) CreateListComment(ctx context.Context, commen CreateListComment
 
 type CommentsResponse struct {
 	Comments []struct {
-		ID      string `json:"id"`
-		Comment []struct {
-			Text       string `json:"text"`
-			Attributes struct {
-				CodeBlock struct {
-					CodeBlock string `json:"code-block"`
-				} `json:"code-block"`
-			} `json:"attributes,omitempty"`
-		} `json:"comment"`
-		CommentText string   `json:"comment_text"`
-		User        TeamUser `json:"user"`
-		Assignee    TeamUser `json:"assignee"`
-		AssignedBy  TeamUser `json:"assigned_by"`
+		ID          string           `json:"id"`
+		Comment     []ComplexComment `json:"comment"`
+		CommentText string           `json:"comment_text"`
+		User        *TeamUser        `json:"user"`
+		Assignee    *TeamUser        `json:"assignee"`
+		AssignedBy  *TeamUser        `json:"assigned_by"`
 		Reactions   []struct {
 			Reaction string   `json:"reaction"`
 			Date     string   `json:"date"`
