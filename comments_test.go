@@ -152,8 +152,8 @@ func TestCreateCommentRequest_BulletedListItem(t *testing.T) {
 				Assignee:    tt.fields.Assignee,
 				NotifyAll:   tt.fields.NotifyAll,
 			}
-			if got := c.BulletedListItem(tt.args.text, tt.args.attributes); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("CreateCommentRequest.BulletedListItem() = %v, want %v", got, tt.want)
+			if c.BulletedListItem(tt.args.text, tt.args.attributes); !reflect.DeepEqual(c, tt.want) {
+				t.Errorf("CreateCommentRequest.BulletedListItem() = %v, want %v", c, tt.want)
 			}
 		})
 	}
@@ -300,8 +300,8 @@ func TestCreateCommentRequest_NumberedListItem(t *testing.T) {
 				Assignee:    tt.fields.Assignee,
 				NotifyAll:   tt.fields.NotifyAll,
 			}
-			if got := c.NumberedListItem(tt.args.text, tt.args.attributes); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("CreateCommentRequest.NumberedListItem() = %v, want %v", got, tt.want)
+			if c.NumberedListItem(tt.args.text, tt.args.attributes); !reflect.DeepEqual(c, tt.want) {
+				t.Errorf("CreateCommentRequest.NumberedListItem() = %v, want %v", c, tt.want)
 			}
 		})
 	}
@@ -452,8 +452,8 @@ func TestCreateCommentRequest_ChecklistItem(t *testing.T) {
 				Assignee:    tt.fields.Assignee,
 				NotifyAll:   tt.fields.NotifyAll,
 			}
-			if got := c.ChecklistItem(tt.args.text, tt.args.checked, tt.args.attributes); !reflect.DeepEqual(got, tt.want) {
-				t.Errorf("CreateCommentRequest.ChecklistItem() = %v, want %v", got, tt.want)
+			if c.ChecklistItem(tt.args.text, tt.args.checked, tt.args.attributes); !reflect.DeepEqual(c, tt.want) {
+				t.Errorf("CreateCommentRequest.ChecklistItem() = %v, want %v", c, tt.want)
 			}
 		})
 	}

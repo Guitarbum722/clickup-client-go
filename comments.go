@@ -6,7 +6,15 @@
 
 package clickup
 
-import "context"
+import (
+	"bytes"
+	"context"
+	"encoding/json"
+	"fmt"
+	"net/http"
+	"net/url"
+	"strconv"
+)
 
 type List struct {
 	List string `json:"list"`
@@ -30,19 +38,19 @@ type Emoticon struct {
 
 type ComplexComment struct {
 	Text       string      `json:"text"`
-	Type       string      `json:"type"`
-	Attributes *Attributes `json:"attributes"`
-	Emoticon   *Emoticon   `json:"emoticon"`
+	Type       string      `json:"type,omitempty"`
+	Attributes *Attributes `json:"attributes,omitempty"`
+	Emoticon   *Emoticon   `json:"emoticon,omitempty"`
 }
 
 type CreateCommentRequest struct {
-	CommentText string           `json:"comment_text"` // plain text
+	CommentText string           `json:"comment_text,omitempty"` // plain text
 	Comment     []ComplexComment `json:"comment,omitempty"`
 	Assignee    int              `json:"assignee,omitempty"`
 	NotifyAll   bool             `json:"notify_all,omitempty"`
 }
 
-func (c *CreateCommentRequest) BulletedListItem(text string, attributes *Attributes) *CreateCommentRequest {
+func (c *CreateCommentRequest) BulletedListItem(text string, attributes *Attributes) {
 	if c.Comment == nil {
 		c.Comment = make([]ComplexComment, 0, 2)
 	}
@@ -61,11 +69,9 @@ func (c *CreateCommentRequest) BulletedListItem(text string, attributes *Attribu
 		},
 	}
 	c.Comment = append(c.Comment, comment...)
-
-	return c
 }
 
-func (c *CreateCommentRequest) NumberedListItem(text string, attributes *Attributes) *CreateCommentRequest {
+func (c *CreateCommentRequest) NumberedListItem(text string, attributes *Attributes) {
 	if c.Comment == nil {
 		c.Comment = make([]ComplexComment, 0, 2)
 	}
@@ -84,11 +90,9 @@ func (c *CreateCommentRequest) NumberedListItem(text string, attributes *Attribu
 		},
 	}
 	c.Comment = append(c.Comment, comment...)
-
-	return c
 }
 
-func (c *CreateCommentRequest) ChecklistItem(text string, checked bool, attributes *Attributes) *CreateCommentRequest {
+func (c *CreateCommentRequest) ChecklistItem(text string, checked bool, attributes *Attributes) {
 	if c.Comment == nil {
 		c.Comment = make([]ComplexComment, 0, 2)
 	}
@@ -111,19 +115,25 @@ func (c *CreateCommentRequest) ChecklistItem(text string, checked bool, attribut
 		},
 	}
 	c.Comment = append(c.Comment, comment...)
-
-	return c
 }
 
 type CreateTaskCommentRequest struct {
 	CreateCommentRequest
-	TaskID           string
-	UseCustomTaskIDs bool
-	WorkspaceID      string
+	TaskID           string `json:"-"`
+	UseCustomTaskIDs bool   `json:"-"`
+	WorkspaceID      string `json:"-"`
+}
+
+func NewCreateTaskCommentRequest(taskID string, useCustomTaskIDs bool, workspaceID string) *CreateTaskCommentRequest {
+	return &CreateTaskCommentRequest{
+		TaskID:           taskID,
+		UseCustomTaskIDs: useCustomTaskIDs,
+		WorkspaceID:      workspaceID,
+	}
 }
 
 type CreateCommentResponse struct {
-	ID        string `json:"id"`
+	ID        int    `json:"id"`
 	HistoryID string `json:"hist_id"`
 	Date      int    `json:"date"`
 }
@@ -133,12 +143,65 @@ type CreateTaskCommentResponse struct {
 }
 
 func (c *Client) CreateTaskComment(ctx context.Context, comment CreateTaskCommentRequest) (*CreateTaskCommentResponse, error) {
-	panic("TODO")
+	if comment.TaskID == "" {
+		return nil, fmt.Errorf("must provide a task id to create a task comment: %w", ErrValidation)
+	}
+	if comment.UseCustomTaskIDs && comment.WorkspaceID == "" {
+		return nil, fmt.Errorf("must provide a workspace id for a new task comment if using custom task ID: %w", ErrValidation)
+	}
+
+	b, err := json.Marshal(comment)
+	if err != nil {
+		return nil, fmt.Errorf("unable to serialize new task comment: %w", err)
+	}
+
+	buf := bytes.NewBuffer(b)
+
+	urlValues := url.Values{}
+	urlValues.Set("custom_task_ids", strconv.FormatBool(comment.UseCustomTaskIDs))
+	urlValues.Add("team_id", comment.WorkspaceID)
+
+	endpoint := fmt.Sprintf("%s/task/%s/comment/?%s", c.baseURL, comment.TaskID, urlValues.Encode())
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, buf)
+	if err != nil {
+		return nil, fmt.Errorf("create task comment request failed: %w", err)
+	}
+	if err := c.AuthenticateFor(req); err != nil {
+		return nil, fmt.Errorf("failed to authenticate client: %w", err)
+	}
+	req.Header.Add("Content-type", "application/json")
+
+	res, err := c.doer.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to make create task comment request: %w", err)
+	}
+	defer res.Body.Close()
+
+	decoder := json.NewDecoder(res.Body)
+
+	if res.StatusCode != http.StatusOK {
+		return nil, errorFromResponse(res, decoder)
+	}
+
+	var commentResponse CreateTaskCommentResponse
+
+	if err := decoder.Decode(&commentResponse); err != nil {
+		return nil, fmt.Errorf("failed to parse new task comment response: %w", err)
+	}
+
+	return &commentResponse, nil
 }
 
 type CreateChatViewCommentRequest struct {
 	CreateCommentRequest
-	ViewID string
+	ViewID string `json:"-"`
+}
+
+func NewCreateChatViewCommentRequest(viewID string) *CreateChatViewCommentRequest {
+	return &CreateChatViewCommentRequest{
+		ViewID: viewID,
+	}
 }
 
 type CreateChatViewCommentResponse struct {
@@ -146,20 +209,106 @@ type CreateChatViewCommentResponse struct {
 }
 
 func (c *Client) CreateChatViewComment(ctx context.Context, comment CreateChatViewCommentRequest) (*CreateChatViewCommentResponse, error) {
-	panic("TODO")
+	if comment.ViewID == "" {
+		return nil, fmt.Errorf("must provide a view id to create a view comment: %w", ErrValidation)
+	}
+
+	b, err := json.Marshal(comment)
+	if err != nil {
+		return nil, fmt.Errorf("unable to serialize new comment: %w", err)
+	}
+
+	buf := bytes.NewBuffer(b)
+
+	endpoint := fmt.Sprintf("%s/view/%s/comment", c.baseURL, comment.ViewID)
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, buf)
+	if err != nil {
+		return nil, fmt.Errorf("create view comment request failed: %w", err)
+	}
+	if err := c.AuthenticateFor(req); err != nil {
+		return nil, fmt.Errorf("failed to authenticate client: %w", err)
+	}
+	req.Header.Add("Content-type", "application/json")
+
+	res, err := c.doer.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to make create view comment request: %w", err)
+	}
+	defer res.Body.Close()
+
+	decoder := json.NewDecoder(res.Body)
+
+	if res.StatusCode != http.StatusOK {
+		return nil, errorFromResponse(res, decoder)
+	}
+
+	var commentResponse CreateChatViewCommentResponse
+
+	if err := decoder.Decode(&commentResponse); err != nil {
+		return nil, fmt.Errorf("failed to parse new view comment response: %w", err)
+	}
+
+	return &commentResponse, nil
 }
 
 type CreateListCommentRequest struct {
 	CreateCommentRequest
-	ListID string
+	ListID string `json:"-"`
+}
+
+func NewCreateListCommentRequest(listID string) *CreateListCommentRequest {
+	return &CreateListCommentRequest{
+		ListID: listID,
+	}
 }
 
 type CreateListCommentResponse struct {
 	CreateCommentResponse
 }
 
-func (c *Client) CreateListComment(ctx context.Context, commen CreateListCommentRequest) (*CreateListCommentResponse, error) {
-	panic("TODO")
+func (c *Client) CreateListComment(ctx context.Context, comment CreateListCommentRequest) (*CreateListCommentResponse, error) {
+	if comment.ListID == "" {
+		return nil, fmt.Errorf("must provide a list id to create a view comment: %w", ErrValidation)
+	}
+
+	b, err := json.Marshal(comment)
+	if err != nil {
+		return nil, fmt.Errorf("unable to serialize new comment: %w", err)
+	}
+
+	buf := bytes.NewBuffer(b)
+
+	endpoint := fmt.Sprintf("%s/list/%s/comment", c.baseURL, comment.ListID)
+
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, buf)
+	if err != nil {
+		return nil, fmt.Errorf("create list comment request failed: %w", err)
+	}
+	if err := c.AuthenticateFor(req); err != nil {
+		return nil, fmt.Errorf("failed to authenticate client: %w", err)
+	}
+	req.Header.Add("Content-type", "application/json")
+
+	res, err := c.doer.Do(req)
+	if err != nil {
+		return nil, fmt.Errorf("failed to make create list comment request: %w", err)
+	}
+	defer res.Body.Close()
+
+	decoder := json.NewDecoder(res.Body)
+
+	if res.StatusCode != http.StatusOK {
+		return nil, errorFromResponse(res, decoder)
+	}
+
+	var commentResponse CreateListCommentResponse
+
+	if err := decoder.Decode(&commentResponse); err != nil {
+		return nil, fmt.Errorf("failed to parse new list comment response: %w", err)
+	}
+
+	return &commentResponse, nil
 }
 
 type CommentsResponse struct {
