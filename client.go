@@ -7,6 +7,10 @@
 package clickup
 
 import (
+	"bytes"
+	"encoding/json"
+	"errors"
+	"fmt"
 	"net/http"
 	"time"
 )
@@ -54,4 +58,57 @@ func NewClient(opts *ClientOpts) *Client {
 		authenticator: opts.Authenticator,
 		baseURL:       basePath,
 	}
+}
+
+func (c *Client) call(method, uri string, data *bytes.Buffer, result interface{}) error {
+	var req *http.Request
+	var err error
+
+	endpoint := fmt.Sprintf("%s%s", c.baseURL, uri)
+
+	switch method {
+	case http.MethodGet:
+		req, err = http.NewRequest(method, endpoint, nil)
+		if err != nil {
+			return err
+		}
+
+	case http.MethodPost:
+		req, err = http.NewRequest(method, endpoint, data)
+		req.Header.Add("Content-Type", "application/json")
+		if err != nil {
+			return err
+		}
+	case http.MethodPut:
+		req, err = http.NewRequest(method, endpoint, data)
+		req.Header.Add("Content-Type", "application/json")
+		if err != nil {
+			return err
+		}
+	case http.MethodDelete:
+		req, err = http.NewRequest(method, endpoint, nil)
+		if err != nil {
+			return err
+		}
+	default:
+		return errors.New("unsupported http method")
+	}
+
+	res, err := c.doer.Do(req)
+	if err != nil {
+		return err
+	}
+	defer res.Body.Close()
+
+	decoder := json.NewDecoder(res.Body)
+
+	if res.StatusCode != http.StatusOK {
+		return errorFromResponse(res, decoder)
+	}
+
+	if err := decoder.Decode(result); err != nil {
+		return fmt.Errorf("failed to parse response: %w", err)
+	}
+
+	return nil
 }
