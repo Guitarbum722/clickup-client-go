@@ -37,19 +37,19 @@ type ComplexComment struct {
 
 type CreateCommentRequest struct {
 	CommentText string           `json:"comment_text"` // plain text
-	Comment     []ComplexComment `json:"comment"`
-	Assignee    int              `json:"assignee"`
-	NotifyAll   bool             `json:"notify_all"`
+	Comment     []ComplexComment `json:"comment,omitempty"`
+	Assignee    int              `json:"assignee,omitempty"`
+	NotifyAll   bool             `json:"notify_all,omitempty"`
 }
 
-func (c *CreateCommentRequest) BulletedListItem(text string) {
+func (c *CreateCommentRequest) BulletedListItem(text string, attributes *Attributes) *CreateCommentRequest {
 	if c.Comment == nil {
 		c.Comment = make([]ComplexComment, 0, 2)
 	}
 	comment := []ComplexComment{
 		{
 			Text:       text,
-			Attributes: nil,
+			Attributes: attributes,
 		},
 		{
 			Text: "\n",
@@ -61,16 +61,18 @@ func (c *CreateCommentRequest) BulletedListItem(text string) {
 		},
 	}
 	c.Comment = append(c.Comment, comment...)
+
+	return c
 }
 
-func (c *CreateCommentRequest) NumberedListItem(text string) {
+func (c *CreateCommentRequest) NumberedListItem(text string, attributes *Attributes) *CreateCommentRequest {
 	if c.Comment == nil {
 		c.Comment = make([]ComplexComment, 0, 2)
 	}
 	comment := []ComplexComment{
 		{
 			Text:       text,
-			Attributes: nil,
+			Attributes: attributes,
 		},
 		{
 			Text: "\n",
@@ -82,9 +84,11 @@ func (c *CreateCommentRequest) NumberedListItem(text string) {
 		},
 	}
 	c.Comment = append(c.Comment, comment...)
+
+	return c
 }
 
-func (c *CreateCommentRequest) ChecklistItem(text string, checked bool) {
+func (c *CreateCommentRequest) ChecklistItem(text string, checked bool, attributes *Attributes) *CreateCommentRequest {
 	if c.Comment == nil {
 		c.Comment = make([]ComplexComment, 0, 2)
 	}
@@ -95,7 +99,7 @@ func (c *CreateCommentRequest) ChecklistItem(text string, checked bool) {
 	comment := []ComplexComment{
 		{
 			Text:       text,
-			Attributes: nil,
+			Attributes: attributes,
 		},
 		{
 			Text: "\n",
@@ -107,6 +111,8 @@ func (c *CreateCommentRequest) ChecklistItem(text string, checked bool) {
 		},
 	}
 	c.Comment = append(c.Comment, comment...)
+
+	return c
 }
 
 type CreateTaskCommentRequest struct {
