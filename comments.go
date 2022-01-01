@@ -131,3 +131,33 @@ type CommentsForListQuery struct {
 func (c *Client) ListComments(ctx context.Context, query CommentsForListQuery) (CommentsResponse, error) {
 	panic("TODO")
 }
+
+type UpdateCommentRequest struct {
+	CommentText string `json:"comment_text"` // plain text
+	Comment     []struct {
+		Text       string `json:"text"`
+		Type       string `json:"type"`
+		Attributes struct {
+			Bold      bool `json:"bold"`
+			Italic    bool `json:"italic"`
+			Code      bool `json:"code"`
+			CodeBlock struct {
+				CodeBlock string `json:"code-block"`
+			} `json:"code-block,omitempty"`
+		} `json:"attributes"`
+		Emoticon struct {
+			Code string `json:"code"`
+		} `json:"emoticon"`
+	} `json:"comment"`
+	Assignee  int  `json:"assignee"`
+	NotifyAll bool `json:"notify_all"`
+	Resolved  bool `json:"resolved"`
+}
+
+func (c *Client) UpdateComment(ctx context.Context, comment UpdateCommentRequest) error {
+	panic("TODO")
+}
+
+func (c *Client) DeleteComment(ctx context.Context, commentID string) error {
+	panic("TODO")
+}
