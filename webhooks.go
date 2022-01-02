@@ -1,4 +1,4 @@
-// Copyright (c) 2021, John Moore
+// Copyright (c) 2022, John Moore
 // All rights reserved.
 
 // This source code is licensed under the BSD-style license found in the
@@ -110,33 +110,12 @@ func (c *Client) CreateWebhook(ctx context.Context, workspaceID string, webhook 
 	}
 	buf := bytes.NewBuffer(b)
 
-	endpoint := fmt.Sprintf("%s/team/%s/webhook", c.baseURL, workspaceID)
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, buf)
-	if err != nil {
-		return nil, fmt.Errorf("create task request failed: %w", err)
-	}
-	if err := c.AuthenticateFor(req); err != nil {
-		return nil, fmt.Errorf("failed to authenticate client: %w", err)
-	}
-	req.Header.Add("Content-type", "application/json")
-
-	res, err := c.doer.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to make create webhook request: %w", err)
-	}
-	defer res.Body.Close()
-
-	decoder := json.NewDecoder(res.Body)
-
-	if res.StatusCode != http.StatusOK {
-		return nil, errorFromResponse(res, decoder)
-	}
+	endpoint := fmt.Sprintf("/team/%s/webhook", workspaceID)
 
 	var newWebhook CreateWebhookResponse
 
-	if err := decoder.Decode(&newWebhook); err != nil {
-		return nil, fmt.Errorf("failed to parse new webhook - WARNING! WEBHOOK MIGHT HAVE BEEN CREATED: %w", err)
+	if err := c.call(ctx, http.MethodPost, endpoint, buf, &newWebhook); err != nil {
+		return nil, ErrCall
 	}
 
 	return &newWebhook, nil
@@ -163,92 +142,29 @@ func (c *Client) UpdateWebhook(ctx context.Context, webhook *UpdateWebhookReques
 	}
 	buf := bytes.NewBuffer(b)
 
-	endpoint := fmt.Sprintf("%s/webhook/%s", c.baseURL, webhook.ID)
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, buf)
-	if err != nil {
-		return nil, fmt.Errorf("create task request failed: %w", err)
-	}
-	if err := c.AuthenticateFor(req); err != nil {
-		return nil, fmt.Errorf("failed to authenticate client: %w", err)
-	}
-	req.Header.Add("Content-type", "application/json")
-
-	res, err := c.doer.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to make update webhook request: %w", err)
-	}
-	defer res.Body.Close()
-
-	decoder := json.NewDecoder(res.Body)
-
-	if res.StatusCode != http.StatusOK {
-		return nil, errorFromResponse(res, decoder)
-	}
+	endpoint := fmt.Sprintf("/webhook/%s", webhook.ID)
 
 	var updatedWebhook UpdateWebhookResponse
 
-	if err := decoder.Decode(&updatedWebhook); err != nil {
-		return nil, fmt.Errorf("failed to parse webhook: %w", err)
+	if err := c.call(ctx, http.MethodPut, endpoint, buf, &updatedWebhook); err != nil {
+		return nil, ErrCall
 	}
 
 	return &updatedWebhook, nil
 }
 
 func (c *Client) DeleteWebhook(ctx context.Context, id string) error {
-	endpoint := fmt.Sprintf("%s/webhook/%s", c.baseURL, id)
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, endpoint, nil)
-	if err != nil {
-		return fmt.Errorf("webhooks delete request failed: %w", err)
-	}
-	if err := c.AuthenticateFor(req); err != nil {
-		return fmt.Errorf("failed to authenticate client: %w", err)
-	}
-
-	res, err := c.doer.Do(req)
-	if err != nil {
-		return fmt.Errorf("failed to make delete webhooks request: %w", err)
-	}
-	defer res.Body.Close()
-
-	decoder := json.NewDecoder(res.Body)
-
-	if res.StatusCode != http.StatusOK {
-		return errorFromResponse(res, decoder)
-	}
-
-	return nil
+	return c.call(ctx, http.MethodGet, fmt.Sprintf("/webhook/%s", id), nil, &struct{}{})
 }
 
 func (c *Client) WebhooksFor(ctx context.Context, workspaceID string) (*WebhooksQueryResponse, error) {
 
-	endpoint := fmt.Sprintf("%s/team/%s/webhook", c.baseURL, workspaceID)
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
-	if err != nil {
-		return nil, fmt.Errorf("webhooks request failed: %w", err)
-	}
-	if err := c.AuthenticateFor(req); err != nil {
-		return nil, fmt.Errorf("failed to authenticate client: %w", err)
-	}
-
-	res, err := c.doer.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to make get webhooks request: %w", err)
-	}
-	defer res.Body.Close()
-
-	decoder := json.NewDecoder(res.Body)
-
-	if res.StatusCode != http.StatusOK {
-		return nil, errorFromResponse(res, decoder)
-	}
+	endpoint := fmt.Sprintf("/team/%s/webhook", workspaceID)
 
 	var webhooks WebhooksQueryResponse
 
-	if err := decoder.Decode(&webhooks); err != nil {
-		return nil, fmt.Errorf("failed to parse webhooks: %w", err)
+	if err := c.call(ctx, http.MethodGet, endpoint, nil, &webhooks); err != nil {
+		return nil, ErrCall
 	}
 
 	return &webhooks, nil

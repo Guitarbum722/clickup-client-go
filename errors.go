@@ -1,4 +1,4 @@
-// Copyright (c) 2021, John Moore
+// Copyright (c) 2022, John Moore
 // All rights reserved.
 
 // This source code is licensed under the BSD-style license found in the
@@ -14,6 +14,7 @@ import (
 )
 
 var ErrValidation = errors.New("invalid input provided")
+var ErrCall = errors.New("failed to make request")
 
 type RateLimitError struct {
 	msg       string

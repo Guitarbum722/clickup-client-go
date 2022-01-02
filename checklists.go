@@ -74,33 +74,13 @@ func (c *Client) CreateChecklist(ctx context.Context, request *CreateChecklistRe
 	urlValues := url.Values{}
 	urlValues.Set("custom_task_ids", strconv.FormatBool(request.UseCustomTaskIDs))
 	urlValues.Add("team_id", request.WorkspaceID)
-	endpoint := fmt.Sprintf("%s/task/%s/checklist/?%s", c.baseURL, request.TaskID, urlValues.Encode())
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, buf)
-	if err != nil {
-		return nil, fmt.Errorf("create checklist request failed: %w", err)
-	}
-	if err := c.AuthenticateFor(req); err != nil {
-		return nil, fmt.Errorf("failed to authenticate client: %w", err)
-	}
-	req.Header.Add("Content-type", "application/json")
-
-	res, err := c.doer.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to make create checklist request: %w", err)
-	}
-	defer res.Body.Close()
-
-	decoder := json.NewDecoder(res.Body)
-
-	if res.StatusCode != http.StatusOK {
-		return nil, errorFromResponse(res, decoder)
-	}
+	endpoint := fmt.Sprintf("/task/%s/checklist/?%s", request.TaskID, urlValues.Encode())
 
 	var checklist ChecklistResponse
 
-	if err := decoder.Decode(&checklist); err != nil {
-		return nil, fmt.Errorf("failed to parse new checklist: %w", err)
+	if err := c.call(ctx, http.MethodPost, endpoint, buf, &checklist); err != nil {
+		return nil, ErrCall
 	}
 
 	return &checklist, nil
@@ -117,33 +97,12 @@ func (c *Client) UpdateChecklist(ctx context.Context, request *UpdateChecklistRe
 	}
 	buf := bytes.NewBuffer(b)
 
-	endpoint := fmt.Sprintf("%s/checklist/%s", c.baseURL, request.ChecklistID)
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodPut, endpoint, buf)
-	if err != nil {
-		return nil, fmt.Errorf("update checklist request failed: %w", err)
-	}
-	if err := c.AuthenticateFor(req); err != nil {
-		return nil, fmt.Errorf("failed to authenticate client: %w", err)
-	}
-	req.Header.Add("Content-type", "application/json")
-
-	res, err := c.doer.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to make update checklist request: %w", err)
-	}
-	defer res.Body.Close()
-
-	decoder := json.NewDecoder(res.Body)
-
-	if res.StatusCode != http.StatusOK {
-		return nil, errorFromResponse(res, decoder)
-	}
+	endpoint := fmt.Sprintf("checklist/%s", request.ChecklistID)
 
 	var checklist ChecklistResponse
 
-	if err := decoder.Decode(&checklist); err != nil {
-		return nil, fmt.Errorf("failed to parse updated checklist: %w", err)
+	if err := c.call(ctx, http.MethodPut, endpoint, buf, &checklist); err != nil {
+		return nil, ErrCall
 	}
 
 	return &checklist, nil
@@ -154,29 +113,9 @@ func (c *Client) DeleteChecklist(ctx context.Context, checklistID string) error 
 		return fmt.Errorf("must provide checklistID: %w", ErrValidation)
 	}
 
-	endpoint := fmt.Sprintf("%s/checklist/%s", c.baseURL, checklistID)
+	endpoint := fmt.Sprintf("/checklist/%s", checklistID)
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, endpoint, nil)
-	if err != nil {
-		return fmt.Errorf("delete checklist request failed: %w", err)
-	}
-	if err := c.AuthenticateFor(req); err != nil {
-		return fmt.Errorf("failed to authenticate client: %w", err)
-	}
-
-	res, err := c.doer.Do(req)
-	if err != nil {
-		return fmt.Errorf("failed to make delete checklist request: %w", err)
-	}
-	defer res.Body.Close()
-
-	decoder := json.NewDecoder(res.Body)
-
-	if res.StatusCode != http.StatusOK {
-		return errorFromResponse(res, decoder)
-	}
-
-	return nil
+	return c.call(ctx, http.MethodDelete, endpoint, nil, &struct{}{})
 }
 
 func (c *Client) CreateChecklistItem(ctx context.Context, request *CreateChecklistItemRequest) (*ChecklistResponse, error) {
@@ -190,33 +129,12 @@ func (c *Client) CreateChecklistItem(ctx context.Context, request *CreateCheckli
 	}
 	buf := bytes.NewBuffer(b)
 
-	endpoint := fmt.Sprintf("%s/checklist/%s", c.baseURL, request.ChecklistID)
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, buf)
-	if err != nil {
-		return nil, fmt.Errorf("create checklist item request failed: %w", err)
-	}
-	if err := c.AuthenticateFor(req); err != nil {
-		return nil, fmt.Errorf("failed to authenticate client: %w", err)
-	}
-	req.Header.Add("Content-type", "application/json")
-
-	res, err := c.doer.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to make create checklist item request: %w", err)
-	}
-	defer res.Body.Close()
-
-	decoder := json.NewDecoder(res.Body)
-
-	if res.StatusCode != http.StatusOK {
-		return nil, errorFromResponse(res, decoder)
-	}
+	endpoint := fmt.Sprintf("/checklist/%s", request.ChecklistID)
 
 	var checklist ChecklistResponse
 
-	if err := decoder.Decode(&checklist); err != nil {
-		return nil, fmt.Errorf("failed to parse new checklist: %w", err)
+	if err := c.call(ctx, http.MethodPost, endpoint, buf, &checklist); err != nil {
+		return nil, ErrCall
 	}
 
 	return &checklist, nil
@@ -236,33 +154,12 @@ func (c *Client) UpdateChecklistItem(ctx context.Context, request *UpdateCheckli
 	}
 	buf := bytes.NewBuffer(b)
 
-	endpoint := fmt.Sprintf("%s/checklist/%s/checklist_item/%s", c.baseURL, request.ChecklistID, request.ChecklistItemID)
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodPut, endpoint, buf)
-	if err != nil {
-		return nil, fmt.Errorf("update checklist item request failed: %w", err)
-	}
-	if err := c.AuthenticateFor(req); err != nil {
-		return nil, fmt.Errorf("failed to authenticate client: %w", err)
-	}
-	req.Header.Add("Content-type", "application/json")
-
-	res, err := c.doer.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to make update checklist request: %w", err)
-	}
-	defer res.Body.Close()
-
-	decoder := json.NewDecoder(res.Body)
-
-	if res.StatusCode != http.StatusOK {
-		return nil, errorFromResponse(res, decoder)
-	}
+	endpoint := fmt.Sprintf("/checklist/%s/checklist_item/%s", request.ChecklistID, request.ChecklistItemID)
 
 	var checklist ChecklistResponse
 
-	if err := decoder.Decode(&checklist); err != nil {
-		return nil, fmt.Errorf("failed to parse updated checklist: %w", err)
+	if err := c.call(ctx, http.MethodPut, endpoint, buf, &checklist); err != nil {
+		return nil, ErrCall
 	}
 
 	return &checklist, nil
@@ -276,27 +173,7 @@ func (c *Client) DeleteChecklistItem(ctx context.Context, checklistID, checklist
 		return fmt.Errorf("must provide a checklist item id: %w", ErrValidation)
 	}
 
-	endpoint := fmt.Sprintf("%s/checklist/%s/checklist_item/%s", c.baseURL, checklistID, checklistItemID)
+	endpoint := fmt.Sprintf("/checklist/%s/checklist_item/%s", checklistID, checklistItemID)
 
-	req, err := http.NewRequestWithContext(ctx, http.MethodDelete, endpoint, nil)
-	if err != nil {
-		return fmt.Errorf("delete checklist item request failed: %w", err)
-	}
-	if err := c.AuthenticateFor(req); err != nil {
-		return fmt.Errorf("failed to authenticate client: %w", err)
-	}
-
-	res, err := c.doer.Do(req)
-	if err != nil {
-		return fmt.Errorf("failed to make delete checklist item request: %w", err)
-	}
-	defer res.Body.Close()
-
-	decoder := json.NewDecoder(res.Body)
-
-	if res.StatusCode != http.StatusOK {
-		return errorFromResponse(res, decoder)
-	}
-
-	return nil
+	return c.call(ctx, http.MethodDelete, endpoint, nil, &struct{}{})
 }

@@ -1,4 +1,4 @@
-// Copyright (c) 2021, John Moore
+// Copyright (c) 2022, John Moore
 // All rights reserved.
 
 // This source code is licensed under the BSD-style license found in the
@@ -8,7 +8,6 @@ package clickup
 
 import (
 	"context"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"net/http"
@@ -91,33 +90,12 @@ type TasksForViewResponse struct {
 }
 
 func (c *Client) ViewByID(ctx context.Context, viewID string) (*GetViewResponse, error) {
-	endpoint := fmt.Sprintf("%s/view/%s", c.baseURL, viewID)
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
-	if err != nil {
-		return nil, fmt.Errorf("view by id request failed: %w", err)
-	}
-	if err := c.AuthenticateFor(req); err != nil {
-		return nil, fmt.Errorf("failed to authenticate client: %w", err)
-	}
-
-	res, err := c.doer.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to make view by id request: %w", err)
-	}
-	defer res.Body.Close()
-
-	decoder := json.NewDecoder(res.Body)
-
-	if res.StatusCode != http.StatusOK {
-		return nil, errorFromResponse(res, decoder)
-	}
+	endpoint := fmt.Sprintf("/view/%s", viewID)
 
 	var view GetViewResponse
 
-	if err := decoder.Decode(&view); err != nil {
-		return nil, fmt.Errorf("failed to parse view: %w", err)
-
+	if err := c.call(ctx, http.MethodGet, endpoint, nil, &view); err != nil {
+		return nil, ErrCall
 	}
 
 	return &view, nil
@@ -152,61 +130,19 @@ func (c *Client) ViewsFor(ctx context.Context, viewListType ViewListType, id str
 		return nil, errors.New("invalid ViewListType")
 	}
 
-	endpoint := fmt.Sprintf("%s/%s/%s/view", c.baseURL, viewsType, id)
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
-	if err != nil {
-		return nil, fmt.Errorf("view request request failed: %w", err)
-	}
-	if err := c.AuthenticateFor(req); err != nil {
-		return nil, fmt.Errorf("failed to authenticate client: %w", err)
-	}
-
-	res, err := c.doer.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to make views request: %w", err)
-	}
-	defer res.Body.Close()
-
-	decoder := json.NewDecoder(res.Body)
-
-	if res.StatusCode != http.StatusOK {
-		return nil, errorFromResponse(res, decoder)
-	}
+	endpoint := fmt.Sprintf("/%s/%s/view", viewsType, id)
 
 	var views GetViewsResponse
 
-	if err := decoder.Decode(&views); err != nil {
-		return nil, fmt.Errorf("failed to parse views: %w", err)
+	if err := c.call(ctx, http.MethodGet, endpoint, nil, &views); err != nil {
+		return nil, ErrCall
 	}
 
 	return &views, nil
 }
 
 func (c *Client) DeleteView(ctx context.Context, viewID string) error {
-	endpoint := fmt.Sprintf("%s/view/%s", c.baseURL, viewID)
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, nil)
-	if err != nil {
-		return fmt.Errorf("delete view request failed: %w", err)
-	}
-	if err := c.AuthenticateFor(req); err != nil {
-		return fmt.Errorf("failed to authenticate client: %w", err)
-	}
-
-	res, err := c.doer.Do(req)
-	if err != nil {
-		return fmt.Errorf("failed to make delete view request: %w", err)
-	}
-	defer res.Body.Close()
-
-	decoder := json.NewDecoder(res.Body)
-
-	if res.StatusCode != http.StatusOK {
-		return errorFromResponse(res, decoder)
-	}
-
-	return nil
+	return c.call(ctx, http.MethodPost, fmt.Sprintf("/view/%s", viewID), nil, &struct{}{})
 }
 
 // TasksForView requires possible pagination.  Clickup documents that a page will have a
@@ -216,32 +152,12 @@ func (c *Client) TasksForView(ctx context.Context, viewID string, page int) (*Ta
 	urlValues := url.Values{}
 	urlValues.Set("page", strconv.Itoa(page))
 
-	endpoint := fmt.Sprintf("%s/view/%s/task/?%s", c.baseURL, viewID, urlValues.Encode())
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
-	if err != nil {
-		return nil, fmt.Errorf("tasks for view request failed: %w", err)
-	}
-	if err := c.AuthenticateFor(req); err != nil {
-		return nil, fmt.Errorf("failed to authenticate client: %w", err)
-	}
-
-	res, err := c.doer.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to make tasks for view request: %w", err)
-	}
-	defer res.Body.Close()
-
-	decoder := json.NewDecoder(res.Body)
-
-	if res.StatusCode != http.StatusOK {
-		return nil, errorFromResponse(res, decoder)
-	}
+	endpoint := fmt.Sprintf("/view/%s/task/?%s", viewID, urlValues.Encode())
 
 	var tasks TasksForViewResponse
 
-	if err := decoder.Decode(&tasks); err != nil {
-		return nil, fmt.Errorf("failed to parse tasks: %w", err)
+	if err := c.call(ctx, http.MethodGet, endpoint, nil, &tasks); err != nil {
+		return nil, ErrCall
 	}
 
 	return &tasks, nil

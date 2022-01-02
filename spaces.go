@@ -1,4 +1,4 @@
-// Copyright (c) 2021, John Moore
+// Copyright (c) 2022, John Moore
 // All rights reserved.
 
 // This source code is licensed under the BSD-style license found in the
@@ -8,7 +8,6 @@ package clickup
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -97,32 +96,12 @@ func (c *Client) SpacesForWorkspace(ctx context.Context, teamID string, includeA
 	urlValues := url.Values{}
 	urlValues.Set("archived", strconv.FormatBool(includeArchived))
 
-	endpoint := fmt.Sprintf("%s/team/%s/space/?%s", c.baseURL, teamID, urlValues.Encode())
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
-	if err != nil {
-		return nil, fmt.Errorf("spaces request failed: %w", err)
-	}
-	if err := c.AuthenticateFor(req); err != nil {
-		return nil, fmt.Errorf("failed to authenticate client: %w", err)
-	}
-
-	res, err := c.doer.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to make spaces request: %w", err)
-	}
-	defer res.Body.Close()
-
-	decoder := json.NewDecoder(res.Body)
-
-	if res.StatusCode != http.StatusOK {
-		return nil, errorFromResponse(res, decoder)
-	}
+	endpoint := fmt.Sprintf("/team/%s/space/?%s", teamID, urlValues.Encode())
 
 	var spacesResponse SpacesResponse
 
-	if err := decoder.Decode(&spacesResponse); err != nil {
-		return nil, fmt.Errorf("failed parse to spaces: %w", err)
+	if err := c.call(ctx, http.MethodGet, endpoint, nil, &spacesResponse); err != nil {
+		return nil, ErrCall
 	}
 
 	return &spacesResponse, nil
@@ -130,32 +109,12 @@ func (c *Client) SpacesForWorkspace(ctx context.Context, teamID string, includeA
 
 func (c *Client) SpaceByID(ctx context.Context, spaceID string) (*SingleSpace, error) {
 
-	endpoint := fmt.Sprintf("%s/space/%s", c.baseURL, spaceID)
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
-	if err != nil {
-		return nil, fmt.Errorf("space request failed: %w", err)
-	}
-	if err := c.AuthenticateFor(req); err != nil {
-		return nil, fmt.Errorf("failed to authenticate client: %w", err)
-	}
-
-	res, err := c.doer.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to make space request: %w", err)
-	}
-	defer res.Body.Close()
-
-	decoder := json.NewDecoder(res.Body)
-
-	if res.StatusCode != http.StatusOK {
-		return nil, errorFromResponse(res, decoder)
-	}
+	endpoint := fmt.Sprintf("/space/%s", spaceID)
 
 	var spaceResponse SingleSpace
 
-	if err := decoder.Decode(&spaceResponse); err != nil {
-		return nil, fmt.Errorf("failed parse to space: %w", err)
+	if err := c.call(ctx, http.MethodGet, endpoint, nil, &spaceResponse); err != nil {
+		return nil, ErrCall
 	}
 
 	return &spaceResponse, nil
