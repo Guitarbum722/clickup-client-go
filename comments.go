@@ -161,33 +161,12 @@ func (c *Client) CreateTaskComment(ctx context.Context, comment CreateTaskCommen
 	urlValues.Set("custom_task_ids", strconv.FormatBool(comment.UseCustomTaskIDs))
 	urlValues.Add("team_id", comment.WorkspaceID)
 
-	endpoint := fmt.Sprintf("%s/task/%s/comment/?%s", c.baseURL, comment.TaskID, urlValues.Encode())
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, buf)
-	if err != nil {
-		return nil, fmt.Errorf("create task comment request failed: %w", err)
-	}
-	if err := c.AuthenticateFor(req); err != nil {
-		return nil, fmt.Errorf("failed to authenticate client: %w", err)
-	}
-	req.Header.Add("Content-type", "application/json")
-
-	res, err := c.doer.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to make create task comment request: %w", err)
-	}
-	defer res.Body.Close()
-
-	decoder := json.NewDecoder(res.Body)
-
-	if res.StatusCode != http.StatusOK {
-		return nil, errorFromResponse(res, decoder)
-	}
+	endpoint := fmt.Sprintf("/task/%s/comment/?%s", comment.TaskID, urlValues.Encode())
 
 	var commentResponse CreateTaskCommentResponse
 
-	if err := decoder.Decode(&commentResponse); err != nil {
-		return nil, fmt.Errorf("failed to parse new task comment response: %w", err)
+	if err := c.call(ctx, http.MethodPost, endpoint, buf, &commentResponse); err != nil {
+		return nil, ErrCall
 	}
 
 	return &commentResponse, nil
@@ -220,36 +199,16 @@ func (c *Client) CreateChatViewComment(ctx context.Context, comment CreateChatVi
 
 	buf := bytes.NewBuffer(b)
 
-	endpoint := fmt.Sprintf("%s/view/%s/comment", c.baseURL, comment.ViewID)
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, buf)
-	if err != nil {
-		return nil, fmt.Errorf("create view comment request failed: %w", err)
-	}
-	if err := c.AuthenticateFor(req); err != nil {
-		return nil, fmt.Errorf("failed to authenticate client: %w", err)
-	}
-	req.Header.Add("Content-type", "application/json")
-
-	res, err := c.doer.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to make create view comment request: %w", err)
-	}
-	defer res.Body.Close()
-
-	decoder := json.NewDecoder(res.Body)
-
-	if res.StatusCode != http.StatusOK {
-		return nil, errorFromResponse(res, decoder)
-	}
+	endpoint := fmt.Sprintf("/view/%s/comment", comment.ViewID)
 
 	var commentResponse CreateChatViewCommentResponse
 
-	if err := decoder.Decode(&commentResponse); err != nil {
-		return nil, fmt.Errorf("failed to parse new view comment response: %w", err)
+	if err := c.call(ctx, http.MethodPost, endpoint, buf, &commentResponse); err != nil {
+		return nil, ErrCall
 	}
 
 	return &commentResponse, nil
+
 }
 
 type CreateListCommentRequest struct {
@@ -279,33 +238,12 @@ func (c *Client) CreateListComment(ctx context.Context, comment CreateListCommen
 
 	buf := bytes.NewBuffer(b)
 
-	endpoint := fmt.Sprintf("%s/list/%s/comment", c.baseURL, comment.ListID)
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, buf)
-	if err != nil {
-		return nil, fmt.Errorf("create list comment request failed: %w", err)
-	}
-	if err := c.AuthenticateFor(req); err != nil {
-		return nil, fmt.Errorf("failed to authenticate client: %w", err)
-	}
-	req.Header.Add("Content-type", "application/json")
-
-	res, err := c.doer.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to make create list comment request: %w", err)
-	}
-	defer res.Body.Close()
-
-	decoder := json.NewDecoder(res.Body)
-
-	if res.StatusCode != http.StatusOK {
-		return nil, errorFromResponse(res, decoder)
-	}
+	endpoint := fmt.Sprintf("/list/%s/comment", comment.ListID)
 
 	var commentResponse CreateListCommentResponse
 
-	if err := decoder.Decode(&commentResponse); err != nil {
-		return nil, fmt.Errorf("failed to parse new list comment response: %w", err)
+	if err := c.call(ctx, http.MethodPost, endpoint, buf, &commentResponse); err != nil {
+		return nil, ErrCall
 	}
 
 	return &commentResponse, nil

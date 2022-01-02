@@ -28,7 +28,7 @@ func main() {
 		true,
 		os.Getenv("CLICKUP_WORKSPACE_ID"),
 	)
-	comment.BulletedListItem("Bullet Item 4", nil)
+	comment.BulletedListItem("Bullet Item 4asdf", nil)
 	comment.BulletedListItem("Bullet Item 5", nil)
 	comment.BulletedListItem("Bullet Item 6", &clickup.Attributes{Italic: true})
 	comment.NumberedListItem("Numbered Item 1", nil)

@@ -8,6 +8,7 @@ package clickup
 
 import (
 	"bytes"
+	"context"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -60,7 +61,7 @@ func NewClient(opts *ClientOpts) *Client {
 	}
 }
 
-func (c *Client) call(method, uri string, data *bytes.Buffer, result interface{}) error {
+func (c *Client) call(ctx context.Context, method, uri string, data *bytes.Buffer, result interface{}) error {
 	var req *http.Request
 	var err error
 
@@ -68,30 +69,34 @@ func (c *Client) call(method, uri string, data *bytes.Buffer, result interface{}
 
 	switch method {
 	case http.MethodGet:
-		req, err = http.NewRequest(method, endpoint, nil)
+		req, err = http.NewRequestWithContext(ctx, method, endpoint, nil)
 		if err != nil {
 			return err
 		}
 
 	case http.MethodPost:
-		req, err = http.NewRequest(method, endpoint, data)
+		req, err = http.NewRequestWithContext(ctx, method, endpoint, data)
 		req.Header.Add("Content-Type", "application/json")
 		if err != nil {
 			return err
 		}
 	case http.MethodPut:
-		req, err = http.NewRequest(method, endpoint, data)
+		req, err = http.NewRequestWithContext(ctx, method, endpoint, data)
 		req.Header.Add("Content-Type", "application/json")
 		if err != nil {
 			return err
 		}
 	case http.MethodDelete:
-		req, err = http.NewRequest(method, endpoint, nil)
+		req, err = http.NewRequestWithContext(ctx, method, endpoint, nil)
 		if err != nil {
 			return err
 		}
 	default:
 		return errors.New("unsupported http method")
+	}
+
+	if err := c.AuthenticateFor(req); err != nil {
+		return fmt.Errorf("failed to authenticate client: %w", err)
 	}
 
 	res, err := c.doer.Do(req)

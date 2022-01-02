@@ -14,6 +14,7 @@ import (
 )
 
 var ErrValidation = errors.New("invalid input provided")
+var ErrCall = errors.New("failed to make request")
 
 type RateLimitError struct {
 	msg       string

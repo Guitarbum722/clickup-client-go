@@ -8,7 +8,6 @@ package clickup
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 )
@@ -44,32 +43,12 @@ type TeamMember struct {
 }
 
 func (c *Client) Teams(ctx context.Context) (*TeamsResponse, error) {
-	endpoint := fmt.Sprintf("%s/team", c.baseURL)
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
-	if err != nil {
-		return nil, fmt.Errorf("get teams request failed: %w", err)
-	}
-	if err := c.AuthenticateFor(req); err != nil {
-		return nil, fmt.Errorf("failed to authenticate client: %w", err)
-	}
-
-	res, err := c.doer.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to make teams request: %w", err)
-	}
-	defer res.Body.Close()
-
-	decoder := json.NewDecoder(res.Body)
-
-	if res.StatusCode != http.StatusOK {
-		return nil, errorFromResponse(res, decoder)
-	}
+	endpoint := fmt.Sprintf("/team")
 
 	var teamsResponse TeamsResponse
 
-	if err := decoder.Decode(&teamsResponse); err != nil {
-		return nil, fmt.Errorf("failed parse to teams response: %w", err)
+	if err := c.call(ctx, http.MethodGet, endpoint, nil, &teamsResponse); err != nil {
+		return nil, ErrCall
 	}
 
 	return &teamsResponse, nil

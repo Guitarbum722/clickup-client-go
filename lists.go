@@ -8,7 +8,6 @@ package clickup
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -55,32 +54,12 @@ func (c *Client) ListsForFolder(ctx context.Context, folderID string, includeArc
 	urlValues := url.Values{}
 	urlValues.Set("archived", strconv.FormatBool(includeArchived))
 
-	endpoint := fmt.Sprintf("%s/folder/%s/list/?%s", c.baseURL, folderID, urlValues.Encode())
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
-	if err != nil {
-		return nil, fmt.Errorf("lists for folder request failed: %w", err)
-	}
-	if err := c.AuthenticateFor(req); err != nil {
-		return nil, fmt.Errorf("failed to authenticate client: %w", err)
-	}
-
-	res, err := c.doer.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to make lists request: %w", err)
-	}
-	defer res.Body.Close()
-
-	decoder := json.NewDecoder(res.Body)
-
-	if res.StatusCode != http.StatusOK {
-		return nil, errorFromResponse(res, decoder)
-	}
+	endpoint := fmt.Sprintf("/folder/%s/list/?%s", folderID, urlValues.Encode())
 
 	var lists ListsResponse
 
-	if err := decoder.Decode(&lists); err != nil {
-		return nil, fmt.Errorf("failed to parse lists: %w", err)
+	if err := c.call(ctx, http.MethodGet, endpoint, nil, &lists); err != nil {
+		return nil, ErrCall
 	}
 
 	return &lists, nil
@@ -88,32 +67,12 @@ func (c *Client) ListsForFolder(ctx context.Context, folderID string, includeArc
 
 func (c *Client) ListByID(ctx context.Context, listID string) (*SingleList, error) {
 
-	endpoint := fmt.Sprintf("%s/list/%s", c.baseURL, listID)
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
-	if err != nil {
-		return nil, fmt.Errorf("list request failed: %w", err)
-	}
-	if err := c.AuthenticateFor(req); err != nil {
-		return nil, fmt.Errorf("failed to authenticate client: %w", err)
-	}
-
-	res, err := c.doer.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to make list request: %w", err)
-	}
-	defer res.Body.Close()
-
-	decoder := json.NewDecoder(res.Body)
-
-	if res.StatusCode != http.StatusOK {
-		return nil, errorFromResponse(res, decoder)
-	}
+	endpoint := fmt.Sprintf("/list/%s", listID)
 
 	var list SingleList
 
-	if err := decoder.Decode(&list); err != nil {
-		return nil, fmt.Errorf("failed parse to list: %w", err)
+	if err := c.call(ctx, http.MethodGet, endpoint, nil, &list); err != nil {
+		return nil, ErrCall
 	}
 
 	return &list, nil

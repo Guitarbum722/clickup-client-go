@@ -258,32 +258,12 @@ func (c *Client) TaskTimeInStatus(ctx context.Context, taskID, workspaceID strin
 	urlValues.Add("custom_task_ids", strconv.FormatBool(useCustomTaskIDs))
 	urlValues.Add("team_id", workspaceID)
 
-	endpoint := fmt.Sprintf("%s/task/%s/time_in_status/?%s", c.baseURL, taskID, urlValues.Encode())
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
-	if err != nil {
-		return nil, fmt.Errorf("time in status request failed: %w", err)
-	}
-	if err := c.AuthenticateFor(req); err != nil {
-		return nil, fmt.Errorf("failed to authenticate client: %w", err)
-	}
-
-	res, err := c.doer.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to make time in status request: %w", err)
-	}
-	defer res.Body.Close()
-
-	decoder := json.NewDecoder(res.Body)
-
-	if res.StatusCode != http.StatusOK {
-		return nil, errorFromResponse(res, decoder)
-	}
+	endpoint := fmt.Sprintf("/task/%s/time_in_status/?%s", taskID, urlValues.Encode())
 
 	var taskTimeInStatus TaskTimeInStatusResponse
 
-	if err := decoder.Decode(&taskTimeInStatus); err != nil {
-		return nil, fmt.Errorf("failed to parse time in status: %w", err)
+	if err := c.call(ctx, http.MethodGet, endpoint, nil, &taskTimeInStatus); err != nil {
+		return nil, ErrCall
 	}
 
 	return &taskTimeInStatus, nil
@@ -305,31 +285,12 @@ func (c *Client) BulkTaskTimeInStatus(ctx context.Context, taskIDs []string, wor
 		urlValues.Add("task_ids", v)
 	}
 
-	endpoint := fmt.Sprintf("%s/task/bulk_time_in_status/task_ids/?%s", c.baseURL, urlValues.Encode())
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
-	if err != nil {
-		return nil, fmt.Errorf("bulk time in status request failed: %w", err)
-	}
-	if err := c.AuthenticateFor(req); err != nil {
-		return nil, fmt.Errorf("failed to authenticate client: %w", err)
-	}
-
-	res, err := c.doer.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to make bulk time in status request: %w", err)
-	}
-	defer res.Body.Close()
-
-	decoder := json.NewDecoder(res.Body)
-
-	if res.StatusCode != http.StatusOK {
-		return nil, errorFromResponse(res, decoder)
-	}
+	endpoint := fmt.Sprintf("/task/bulk_time_in_status/task_ids/?%s", urlValues.Encode())
 
 	var bulkTaskTimeInStatus map[string]TaskTimeInStatusResponse
-	if err := decoder.Decode(&bulkTaskTimeInStatus); err != nil {
-		return nil, fmt.Errorf("failed to parse bulk time in status: %w", err)
+
+	if err := c.call(ctx, http.MethodGet, endpoint, nil, &bulkTaskTimeInStatus); err != nil {
+		return nil, ErrCall
 	}
 
 	return bulkTaskTimeInStatus, nil
@@ -341,32 +302,12 @@ func (c *Client) BulkTaskTimeInStatus(ctx context.Context, taskIDs []string, wor
 // ie. if the current page returns 100 tasks (the maximum page size), then another query should be made to get the next page.
 func (c *Client) TasksForList(ctx context.Context, listID string, queryOpts *TaskQueryOptions) (*GetTasksResponse, error) {
 
-	endpoint := fmt.Sprintf("%s/list/%s/task/?%s", c.baseURL, listID, queryParamsFor(queryOpts).Encode())
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
-	if err != nil {
-		return nil, fmt.Errorf("tasks by list request failed: %w", err)
-	}
-	if err := c.AuthenticateFor(req); err != nil {
-		return nil, fmt.Errorf("failed to authenticate client: %w", err)
-	}
-
-	res, err := c.doer.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to make tasks by list request: %w", err)
-	}
-	defer res.Body.Close()
-
-	decoder := json.NewDecoder(res.Body)
-
-	if res.StatusCode != http.StatusOK {
-		return nil, errorFromResponse(res, decoder)
-	}
+	endpoint := fmt.Sprintf("/list/%s/task/?%s", listID, queryParamsFor(queryOpts).Encode())
 
 	var tasks GetTasksResponse
 
-	if err := decoder.Decode(&tasks); err != nil {
-		return nil, fmt.Errorf("failed to parse tasks: %w", err)
+	if err := c.call(ctx, http.MethodGet, endpoint, nil, &tasks); err != nil {
+		return nil, ErrCall
 	}
 
 	return &tasks, nil
@@ -382,33 +323,12 @@ func (c *Client) TaskByID(ctx context.Context, taskID, workspaceID string, useCu
 	urlValues.Add("include_subtasks", strconv.FormatBool(includeSubtasks))
 	urlValues.Add("team_id", workspaceID)
 
-	endpoint := fmt.Sprintf("%s/task/%s/?%s", c.baseURL, taskID, urlValues.Encode())
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
-	if err != nil {
-		return nil, fmt.Errorf("task by id request failed: %w", err)
-	}
-	if err := c.AuthenticateFor(req); err != nil {
-		return nil, fmt.Errorf("failed to authenticate client: %w", err)
-	}
-
-	res, err := c.doer.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to make task by id request: %w", err)
-	}
-	defer res.Body.Close()
-
-	decoder := json.NewDecoder(res.Body)
-
-	if res.StatusCode != http.StatusOK {
-		return nil, errorFromResponse(res, decoder)
-	}
+	endpoint := fmt.Sprintf("/task/%s/?%s", taskID, urlValues.Encode())
 
 	var task SingleTask
 
-	if err := decoder.Decode(&task); err != nil {
-		return nil, fmt.Errorf("failed to parse task: %w", err)
-
+	if err := c.call(ctx, http.MethodGet, endpoint, nil, &task); err != nil {
+		return nil, ErrCall
 	}
 
 	return &task, nil
@@ -439,33 +359,12 @@ func (c *Client) CreateTask(ctx context.Context, listID string, task TaskRequest
 	}
 	buf := bytes.NewBuffer(b)
 
-	endpoint := fmt.Sprintf("%s/list/%s/task", c.baseURL, listID)
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, buf)
-	if err != nil {
-		return nil, fmt.Errorf("create task request failed: %w", err)
-	}
-	if err := c.AuthenticateFor(req); err != nil {
-		return nil, fmt.Errorf("failed to authenticate client: %w", err)
-	}
-	req.Header.Add("Content-type", "application/json")
-
-	res, err := c.doer.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to make create task request: %w", err)
-	}
-	defer res.Body.Close()
-
-	decoder := json.NewDecoder(res.Body)
-
-	if res.StatusCode != http.StatusOK {
-		return nil, errorFromResponse(res, decoder)
-	}
+	endpoint := fmt.Sprintf("/list/%s/task", listID)
 
 	var newTask SingleTask
 
-	if err := decoder.Decode(&newTask); err != nil {
-		return nil, fmt.Errorf("failed to parse new task: %w", err)
+	if err := c.call(ctx, http.MethodPost, endpoint, buf, &newTask); err != nil {
+		return nil, ErrCall
 	}
 
 	return &newTask, nil
@@ -501,33 +400,12 @@ func (c *Client) UpdateTask(ctx context.Context, task *TaskUpdateRequest, worksp
 	urlValues.Set("custom_task_ids", strconv.FormatBool(useCustomTaskIDs))
 	urlValues.Add("team_id", workspaceID)
 
-	endpoint := fmt.Sprintf("%s/task/%s/?%s", c.baseURL, task.ID, urlValues.Encode())
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, buf)
-	if err != nil {
-		return nil, fmt.Errorf("create task request failed: %w", err)
-	}
-	if err := c.AuthenticateFor(req); err != nil {
-		return nil, fmt.Errorf("failed to authenticate client: %w", err)
-	}
-	req.Header.Add("Content-type", "application/json")
-
-	res, err := c.doer.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to make update task request: %w", err)
-	}
-	defer res.Body.Close()
-
-	decoder := json.NewDecoder(res.Body)
-
-	if res.StatusCode != http.StatusOK {
-		return nil, errorFromResponse(res, decoder)
-	}
+	endpoint := fmt.Sprintf("/task/%s/?%s", task.ID, urlValues.Encode())
 
 	var updatedTask SingleTask
 
-	if err := decoder.Decode(&updatedTask); err != nil {
-		return nil, fmt.Errorf("failed to parse new task: %w", err)
+	if err := c.call(ctx, http.MethodPut, endpoint, buf, &updatedTask); err != nil {
+		return nil, ErrCall
 	}
 
 	return &updatedTask, nil
@@ -542,26 +420,7 @@ func (c *Client) DeleteTask(ctx context.Context, taskID, workspaceID string, use
 	urlValues.Set("custom_task_ids", strconv.FormatBool(useCustomTaskIDs))
 	urlValues.Add("team_id", workspaceID)
 
-	endpoint := fmt.Sprintf("%s/task/%s/?%s", c.baseURL, taskID, urlValues.Encode())
-	req, err := http.NewRequestWithContext(ctx, http.MethodPost, endpoint, nil)
-	if err != nil {
-		return fmt.Errorf("delete task request failed: %w", err)
-	}
-	if err := c.AuthenticateFor(req); err != nil {
-		return fmt.Errorf("failed to authenticate client: %w", err)
-	}
+	endpoint := fmt.Sprintf("/task/%s/?%s", taskID, urlValues.Encode())
 
-	res, err := c.doer.Do(req)
-	if err != nil {
-		return fmt.Errorf("failed to make delete task request: %w", err)
-	}
-	defer res.Body.Close()
-
-	decoder := json.NewDecoder(res.Body)
-
-	if res.StatusCode != http.StatusOK {
-		return errorFromResponse(res, decoder)
-	}
-
-	return nil
+	return c.call(ctx, http.MethodDelete, endpoint, nil, &struct{}{})
 }

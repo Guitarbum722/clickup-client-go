@@ -8,7 +8,6 @@ package clickup
 
 import (
 	"context"
-	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -70,64 +69,24 @@ func (c *Client) FoldersForSpace(ctx context.Context, spaceID string, includeArc
 	urlValues := url.Values{}
 	urlValues.Set("archived", strconv.FormatBool(includeArchived))
 
-	endpoint := fmt.Sprintf("%s/space/%s/folder/?%s", c.baseURL, spaceID, urlValues.Encode())
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
-	if err != nil {
-		return nil, fmt.Errorf("folder by space request failed: %w", err)
-	}
-	if err := c.AuthenticateFor(req); err != nil {
-		return nil, fmt.Errorf("failed to authenticate client: %w", err)
-	}
-
-	res, err := c.doer.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to make folders by space request: %w", err)
-	}
-	defer res.Body.Close()
-
-	decoder := json.NewDecoder(res.Body)
-
-	if res.StatusCode != http.StatusOK {
-		return nil, errorFromResponse(res, decoder)
-	}
+	endpoint := fmt.Sprintf("/space/%s/folder/?%s", spaceID, urlValues.Encode())
 
 	var folders FoldersResponse
 
-	if err := decoder.Decode(&folders); err != nil {
-		return nil, fmt.Errorf("failed to parse folders: %w", err)
+	if err := c.call(ctx, http.MethodGet, endpoint, nil, &folders); err != nil {
+		return nil, ErrCall
 	}
 
 	return &folders, nil
 }
 
 func (c *Client) FolderByID(ctx context.Context, folderID string) (*SingleFolder, error) {
-	endpoint := fmt.Sprintf("%s/folder/%s", c.baseURL, folderID)
-
-	req, err := http.NewRequestWithContext(ctx, http.MethodGet, endpoint, nil)
-	if err != nil {
-		return nil, fmt.Errorf("folder request failed: %w", err)
-	}
-	if err := c.AuthenticateFor(req); err != nil {
-		return nil, fmt.Errorf("failed to authenticate client: %w", err)
-	}
-
-	res, err := c.doer.Do(req)
-	if err != nil {
-		return nil, fmt.Errorf("failed to make folder request: %w", err)
-	}
-	defer res.Body.Close()
-
-	decoder := json.NewDecoder(res.Body)
-
-	if res.StatusCode != http.StatusOK {
-		return nil, errorFromResponse(res, decoder)
-	}
+	endpoint := fmt.Sprintf("/folder/%s", folderID)
 
 	var folder SingleFolder
 
-	if err := decoder.Decode(&folder); err != nil {
-		return nil, fmt.Errorf("failed to parse folder: %w", err)
+	if err := c.call(ctx, http.MethodGet, endpoint, nil, &folder); err != nil {
+		return nil, ErrCall
 	}
 
 	return &folder, nil
