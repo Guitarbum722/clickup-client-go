@@ -73,7 +73,8 @@ func TestClient_CreateSpaceTag(t *testing.T) {
 						Body:       ioutil.NopCloser(strings.NewReader(body)),
 						Request:    req,
 					}, nil
-				})},
+				}),
+			},
 			args: args{
 				spaceID: "fakeSpaceID",
 				tag: Tag{

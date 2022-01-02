@@ -80,7 +80,7 @@ func (c *Client) CreateChecklist(ctx context.Context, request *CreateChecklistRe
 	var checklist ChecklistResponse
 
 	if err := c.call(ctx, http.MethodPost, endpoint, buf, &checklist); err != nil {
-		return nil, ErrCall
+		return nil, fmt.Errorf("failed to make clickup request: %w", err)
 	}
 
 	return &checklist, nil
@@ -102,7 +102,7 @@ func (c *Client) UpdateChecklist(ctx context.Context, request *UpdateChecklistRe
 	var checklist ChecklistResponse
 
 	if err := c.call(ctx, http.MethodPut, endpoint, buf, &checklist); err != nil {
-		return nil, ErrCall
+		return nil, fmt.Errorf("failed to make clickup request: %w", err)
 	}
 
 	return &checklist, nil
@@ -134,7 +134,7 @@ func (c *Client) CreateChecklistItem(ctx context.Context, request *CreateCheckli
 	var checklist ChecklistResponse
 
 	if err := c.call(ctx, http.MethodPost, endpoint, buf, &checklist); err != nil {
-		return nil, ErrCall
+		return nil, fmt.Errorf("failed to make clickup request: %w", err)
 	}
 
 	return &checklist, nil
@@ -159,7 +159,7 @@ func (c *Client) UpdateChecklistItem(ctx context.Context, request *UpdateCheckli
 	var checklist ChecklistResponse
 
 	if err := c.call(ctx, http.MethodPut, endpoint, buf, &checklist); err != nil {
-		return nil, ErrCall
+		return nil, fmt.Errorf("failed to make clickup request: %w", err)
 	}
 
 	return &checklist, nil

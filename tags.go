@@ -31,7 +31,7 @@ func (c *Client) TagsForSpace(ctx context.Context, spaceID string) (*TagsQueryRe
 	var tagsResponse TagsQueryResponse
 
 	if err := c.call(ctx, http.MethodGet, endpoint, nil, &tagsResponse); err != nil {
-		return nil, ErrCall
+		return nil, fmt.Errorf("failed to make clickup request: %w", err)
 	}
 
 	return &tagsResponse, nil

@@ -263,7 +263,7 @@ func (c *Client) TaskTimeInStatus(ctx context.Context, taskID, workspaceID strin
 	var taskTimeInStatus TaskTimeInStatusResponse
 
 	if err := c.call(ctx, http.MethodGet, endpoint, nil, &taskTimeInStatus); err != nil {
-		return nil, ErrCall
+		return nil, fmt.Errorf("failed to make clickup request: %w", err)
 	}
 
 	return &taskTimeInStatus, nil
@@ -290,7 +290,7 @@ func (c *Client) BulkTaskTimeInStatus(ctx context.Context, taskIDs []string, wor
 	var bulkTaskTimeInStatus map[string]TaskTimeInStatusResponse
 
 	if err := c.call(ctx, http.MethodGet, endpoint, nil, &bulkTaskTimeInStatus); err != nil {
-		return nil, ErrCall
+		return nil, fmt.Errorf("failed to make clickup request: %w", err)
 	}
 
 	return bulkTaskTimeInStatus, nil
@@ -307,7 +307,7 @@ func (c *Client) TasksForList(ctx context.Context, listID string, queryOpts *Tas
 	var tasks GetTasksResponse
 
 	if err := c.call(ctx, http.MethodGet, endpoint, nil, &tasks); err != nil {
-		return nil, ErrCall
+		return nil, fmt.Errorf("failed to make clickup request: %w", err)
 	}
 
 	return &tasks, nil
@@ -328,7 +328,7 @@ func (c *Client) TaskByID(ctx context.Context, taskID, workspaceID string, useCu
 	var task SingleTask
 
 	if err := c.call(ctx, http.MethodGet, endpoint, nil, &task); err != nil {
-		return nil, ErrCall
+		return nil, fmt.Errorf("failed to make clickup request: %w", err)
 	}
 
 	return &task, nil
@@ -364,7 +364,7 @@ func (c *Client) CreateTask(ctx context.Context, listID string, task TaskRequest
 	var newTask SingleTask
 
 	if err := c.call(ctx, http.MethodPost, endpoint, buf, &newTask); err != nil {
-		return nil, ErrCall
+		return nil, fmt.Errorf("failed to make clickup request: %w", err)
 	}
 
 	return &newTask, nil
@@ -405,7 +405,7 @@ func (c *Client) UpdateTask(ctx context.Context, task *TaskUpdateRequest, worksp
 	var updatedTask SingleTask
 
 	if err := c.call(ctx, http.MethodPut, endpoint, buf, &updatedTask); err != nil {
-		return nil, ErrCall
+		return nil, fmt.Errorf("failed to make clickup request: %w", err)
 	}
 
 	return &updatedTask, nil

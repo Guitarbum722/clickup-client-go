@@ -95,7 +95,7 @@ func (c *Client) ViewByID(ctx context.Context, viewID string) (*GetViewResponse,
 	var view GetViewResponse
 
 	if err := c.call(ctx, http.MethodGet, endpoint, nil, &view); err != nil {
-		return nil, ErrCall
+		return nil, fmt.Errorf("failed to make clickup request: %w", err)
 	}
 
 	return &view, nil
@@ -135,7 +135,7 @@ func (c *Client) ViewsFor(ctx context.Context, viewListType ViewListType, id str
 	var views GetViewsResponse
 
 	if err := c.call(ctx, http.MethodGet, endpoint, nil, &views); err != nil {
-		return nil, ErrCall
+		return nil, fmt.Errorf("failed to make clickup request: %w", err)
 	}
 
 	return &views, nil
@@ -157,7 +157,7 @@ func (c *Client) TasksForView(ctx context.Context, viewID string, page int) (*Ta
 	var tasks TasksForViewResponse
 
 	if err := c.call(ctx, http.MethodGet, endpoint, nil, &tasks); err != nil {
-		return nil, ErrCall
+		return nil, fmt.Errorf("failed to make clickup request: %w", err)
 	}
 
 	return &tasks, nil

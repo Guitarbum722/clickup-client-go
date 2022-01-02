@@ -196,7 +196,7 @@ func (c *Client) CreateWebhook(ctx context.Context, workspaceID string, webhook 
 	var newWebhook CreateWebhookResponse
 
 	if err := c.call(ctx, http.MethodPost, endpoint, buf, &newWebhook); err != nil {
-		return nil, ErrCall
+		return nil, fmt.Errorf("failed to make clickup request: %w", err)
 	}
 
 	return &newWebhook, nil
@@ -228,7 +228,7 @@ func (c *Client) UpdateWebhook(ctx context.Context, webhook *UpdateWebhookReques
 	var updatedWebhook UpdateWebhookResponse
 
 	if err := c.call(ctx, http.MethodPut, endpoint, buf, &updatedWebhook); err != nil {
-		return nil, ErrCall
+		return nil, fmt.Errorf("failed to make clickup request: %w", err)
 	}
 
 	return &updatedWebhook, nil
@@ -245,7 +245,7 @@ func (c *Client) WebhooksFor(ctx context.Context, workspaceID string) (*Webhooks
 	var webhooks WebhooksQueryResponse
 
 	if err := c.call(ctx, http.MethodGet, endpoint, nil, &webhooks); err != nil {
-		return nil, ErrCall
+		return nil, fmt.Errorf("failed to make clickup request: %w", err)
 	}
 
 	return &webhooks, nil
