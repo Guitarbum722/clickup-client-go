@@ -7,7 +7,9 @@
 package clickup
 
 import (
+	"bytes"
 	"context"
+	"encoding/json"
 	"fmt"
 	"net/http"
 	"net/url"
@@ -118,4 +120,132 @@ func (c *Client) SpaceByID(ctx context.Context, spaceID string) (*SingleSpace, e
 	}
 
 	return &spaceResponse, nil
+}
+
+type TimeTracking struct {
+	Enabled bool `json:"enabled"`
+}
+
+type Features struct {
+	DueDates struct {
+		Enabled            bool `json:"enabled"`
+		StartDate          bool `json:"start_date"`
+		RemapDueDates      bool `json:"remap_due_dates"`
+		RemapClosedDueDate bool `json:"remap_closed_due_date"`
+	} `json:"due_dates"`
+	TimeTracking *TimeTracking `json:"time_tracking,omitempty"`
+	Tags         struct {
+		Enabled bool `json:"enabled"`
+	} `json:"tags"`
+	TimeEstimates struct {
+		Enabled bool `json:"enabled"`
+	} `json:"time_estimates"`
+	Checklists struct {
+		Enabled bool `json:"enabled"`
+	} `json:"checklists"`
+	CustomFields struct {
+		Enabled bool `json:"enabled"`
+	} `json:"custom_fields"`
+	RemapDependencies struct {
+		Enabled bool `json:"enabled"`
+	} `json:"remap_dependencies"`
+	DependencyWarning struct {
+		Enabled bool `json:"enabled"`
+	} `json:"dependency_warning"`
+	Portfolios struct {
+		Enabled bool `json:"enabled"`
+	} `json:"portfolios"`
+}
+
+type CreateSpaceRequest struct {
+	WorkspaceID       string
+	Name              string    `json:"name"`
+	MultipleAssignees bool      `json:"multiple_assignees"`
+	Features          *Features `json:"features,omitempty"`
+}
+
+func (c *Client) CreateSpaceForWorkspace(ctx context.Context, space CreateSpaceRequest) (*SingleSpace, error) {
+	if space.WorkspaceID == "" {
+		return nil, fmt.Errorf("must provide a workspace id: %w", ErrValidation)
+	}
+
+	b, err := json.Marshal(space)
+	if err != nil {
+		return nil, fmt.Errorf("unable to serialize new space: %w", err)
+	}
+	buf := bytes.NewBuffer(b)
+
+	endpoint := fmt.Sprintf("/team/%s/space", space.WorkspaceID)
+
+	var newSpace SingleSpace
+
+	if err := c.call(ctx, http.MethodPost, endpoint, buf, &newSpace); err != nil {
+		return nil, fmt.Errorf("failed to make clickup request: %w", err)
+	}
+
+	return &newSpace, nil
+}
+
+type UpdateSpaceRequest struct {
+	SpaceID           string
+	Name              string `json:"name"`
+	MultipleAssignees bool   `json:"multiple_assignees"`
+	Features          *struct {
+		DueDates *struct {
+			Enabled            bool `json:"enabled"`
+			StartDate          bool `json:"start_date"`
+			RemapDueDates      bool `json:"remap_due_dates"`
+			RemapClosedDueDate bool `json:"remap_closed_due_date"`
+		} `json:"due_dates"`
+		TimeTracking *struct {
+			Enabled bool `json:"enabled"`
+		} `json:"time_tracking,omitempty"`
+		Tags *struct {
+			Enabled bool `json:"enabled"`
+		} `json:"tags"`
+		TimeEstimates *struct {
+			Enabled bool `json:"enabled"`
+		} `json:"time_estimates"`
+		Checklists *struct {
+			Enabled bool `json:"enabled"`
+		} `json:"checklists"`
+		CustomFields *struct {
+			Enabled bool `json:"enabled"`
+		} `json:"custom_fields"`
+		RemapDependencies *struct {
+			Enabled bool `json:"enabled"`
+		} `json:"remap_dependencies"`
+		DependencyWarning *struct {
+			Enabled bool `json:"enabled"`
+		} `json:"dependency_warning"`
+		Portfolios *struct {
+			Enabled bool `json:"enabled"`
+		} `json:"portfolios"`
+	} `json:"features"`
+}
+
+func (c *Client) UpdateSpaceForWorkspace(ctx context.Context, space UpdateSpaceRequest) (*SingleSpace, error) {
+	if space.SpaceID == "" {
+		return nil, fmt.Errorf("must provide a workspace id: %w", ErrValidation)
+	}
+
+	b, err := json.Marshal(space)
+	if err != nil {
+		return nil, fmt.Errorf("unable to serialize new space: %w", err)
+	}
+	buf := bytes.NewBuffer(b)
+
+	endpoint := fmt.Sprintf("/space/%s", space.SpaceID)
+
+	var updatedSpace SingleSpace
+
+	if err := c.call(ctx, http.MethodPut, endpoint, buf, &updatedSpace); err != nil {
+		return nil, fmt.Errorf("failed to make clickup request: %w", err)
+	}
+
+	return &updatedSpace, nil
+}
+
+func (c *Client) DeleteSpace(ctx context.Context, spaceID string) error {
+	return c.call(ctx, http.MethodGet, fmt.Sprintf("/space/%s", spaceID), nil, &struct{}{})
 }
