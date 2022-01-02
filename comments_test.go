@@ -687,3 +687,130 @@ func TestClient_CreateChatViewComment(t *testing.T) {
 		})
 	}
 }
+
+func TestClient_UpdateComment(t *testing.T) {
+	type fields struct {
+		doer          ClientDoer
+		authenticator Authenticator
+		baseURL       string
+	}
+	type args struct {
+		ctx     context.Context
+		comment UpdateCommentRequest
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "Success validated inputs provided",
+			fields: fields{
+				authenticator: &APITokenAuthenticator{},
+				doer: newMockClientDoer(func(req *http.Request) (*http.Response, error) {
+					body := `{}`
+					return &http.Response{
+						StatusCode: http.StatusOK,
+						Body:       ioutil.NopCloser(strings.NewReader(body)),
+						Request:    req,
+					}, nil
+				})},
+			args: args{
+				ctx: context.Background(),
+				comment: UpdateCommentRequest{
+					CommentID:   "123",
+					CommentText: "test comment",
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "Fail missing comment ID",
+			fields: fields{
+				doer:          nil,
+				authenticator: &APITokenAuthenticator{},
+			},
+			args: args{
+				ctx: context.Background(),
+				comment: UpdateCommentRequest{
+					CommentID: "",
+				},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Client{
+				doer:          tt.fields.doer,
+				authenticator: tt.fields.authenticator,
+				baseURL:       tt.fields.baseURL,
+			}
+			if err := c.UpdateComment(tt.args.ctx, tt.args.comment); (err != nil) != tt.wantErr {
+				t.Errorf("Client.UpdateComment() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestClient_DeleteComment(t *testing.T) {
+	type fields struct {
+		doer          ClientDoer
+		authenticator Authenticator
+		baseURL       string
+	}
+	type args struct {
+		ctx       context.Context
+		commentID string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "Success validated inputs provided",
+			fields: fields{
+				authenticator: &APITokenAuthenticator{},
+				doer: newMockClientDoer(func(req *http.Request) (*http.Response, error) {
+					body := `{}`
+					return &http.Response{
+						StatusCode: http.StatusOK,
+						Body:       ioutil.NopCloser(strings.NewReader(body)),
+						Request:    req,
+					}, nil
+				})},
+			args: args{
+				ctx:       context.Background(),
+				commentID: "123",
+			},
+			wantErr: false,
+		},
+		{
+			name: "Fail missing comment ID",
+			fields: fields{
+				doer:          nil,
+				authenticator: &APITokenAuthenticator{},
+			},
+			args: args{
+				ctx:       context.Background(),
+				commentID: "",
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Client{
+				doer:          tt.fields.doer,
+				authenticator: tt.fields.authenticator,
+				baseURL:       tt.fields.baseURL,
+			}
+			if err := c.DeleteComment(tt.args.ctx, tt.args.commentID); (err != nil) != tt.wantErr {
+				t.Errorf("Client.DeleteComment() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}

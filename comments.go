@@ -299,31 +299,42 @@ func (c *Client) ListComments(ctx context.Context, query CommentsForListQuery) (
 }
 
 type UpdateCommentRequest struct {
-	CommentText string `json:"comment_text"` // plain text
-	Comment     []struct {
-		Text       string `json:"text"`
-		Type       string `json:"type"`
-		Attributes struct {
-			Bold      bool `json:"bold"`
-			Italic    bool `json:"italic"`
-			Code      bool `json:"code"`
-			CodeBlock struct {
-				CodeBlock string `json:"code-block"`
-			} `json:"code-block,omitempty"`
-		} `json:"attributes"`
-		Emoticon struct {
-			Code string `json:"code"`
-		} `json:"emoticon"`
-	} `json:"comment"`
-	Assignee  int  `json:"assignee"`
-	NotifyAll bool `json:"notify_all"`
-	Resolved  bool `json:"resolved"`
+	CommentID   string
+	CommentText string           `json:"comment_text"` // plain text
+	Comment     []ComplexComment `json:"comment,omitempty"`
+	Assignee    int              `json:"assignee,omitempty"`
+	NotifyAll   bool             `json:"notify_all,omitempty"`
+	Resolved    bool             `json:"resolved,omitempty"`
 }
 
 func (c *Client) UpdateComment(ctx context.Context, comment UpdateCommentRequest) error {
-	panic("TODO")
+	if comment.CommentID == "" {
+		return fmt.Errorf("must provide a comment id: %w", ErrValidation)
+	}
+	b, err := json.Marshal(comment)
+	if err != nil {
+		return fmt.Errorf("unable to serialize new comment: %w", err)
+	}
+	buf := bytes.NewBuffer(b)
+
+	endpoint := fmt.Sprintf("/comment/%s", comment.CommentID)
+
+	if err := c.call(ctx, http.MethodPut, endpoint, buf, &struct{}{}); err != nil {
+		return fmt.Errorf("failed to make clickup request: %w", err)
+	}
+
+	return nil
 }
 
 func (c *Client) DeleteComment(ctx context.Context, commentID string) error {
-	panic("TODO")
+	if commentID == "" {
+		return fmt.Errorf("must provide a comment id: %w", ErrValidation)
+	}
+	endpoint := fmt.Sprintf("/comment/%s", commentID)
+
+	if err := c.call(ctx, http.MethodDelete, endpoint, nil, &struct{}{}); err != nil {
+		return fmt.Errorf("failed to make clickup request: %w", err)
+	}
+
+	return nil
 }
