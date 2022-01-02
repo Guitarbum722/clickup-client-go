@@ -166,7 +166,7 @@ func (c *Client) CreateTaskComment(ctx context.Context, comment CreateTaskCommen
 	var commentResponse CreateTaskCommentResponse
 
 	if err := c.call(ctx, http.MethodPost, endpoint, buf, &commentResponse); err != nil {
-		return nil, ErrCall
+		return nil, fmt.Errorf("failed to make clickup request: %w", err)
 	}
 
 	return &commentResponse, nil
@@ -204,7 +204,7 @@ func (c *Client) CreateChatViewComment(ctx context.Context, comment CreateChatVi
 	var commentResponse CreateChatViewCommentResponse
 
 	if err := c.call(ctx, http.MethodPost, endpoint, buf, &commentResponse); err != nil {
-		return nil, ErrCall
+		return nil, fmt.Errorf("failed to make clickup request: %w", err)
 	}
 
 	return &commentResponse, nil
@@ -243,7 +243,7 @@ func (c *Client) CreateListComment(ctx context.Context, comment CreateListCommen
 	var commentResponse CreateListCommentResponse
 
 	if err := c.call(ctx, http.MethodPost, endpoint, buf, &commentResponse); err != nil {
-		return nil, ErrCall
+		return nil, fmt.Errorf("failed to make clickup request: %w", err)
 	}
 
 	return &commentResponse, nil

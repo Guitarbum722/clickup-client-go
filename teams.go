@@ -48,7 +48,7 @@ func (c *Client) Teams(ctx context.Context) (*TeamsResponse, error) {
 	var teamsResponse TeamsResponse
 
 	if err := c.call(ctx, http.MethodGet, endpoint, nil, &teamsResponse); err != nil {
-		return nil, ErrCall
+		return nil, fmt.Errorf("failed to make clickup request: %w", err)
 	}
 
 	return &teamsResponse, nil

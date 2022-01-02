@@ -59,7 +59,7 @@ func (c *Client) ListsForFolder(ctx context.Context, folderID string, includeArc
 	var lists ListsResponse
 
 	if err := c.call(ctx, http.MethodGet, endpoint, nil, &lists); err != nil {
-		return nil, ErrCall
+		return nil, fmt.Errorf("failed to make clickup request: %w", err)
 	}
 
 	return &lists, nil
@@ -72,7 +72,7 @@ func (c *Client) ListByID(ctx context.Context, listID string) (*SingleList, erro
 	var list SingleList
 
 	if err := c.call(ctx, http.MethodGet, endpoint, nil, &list); err != nil {
-		return nil, ErrCall
+		return nil, fmt.Errorf("failed to make clickup request: %w", err)
 	}
 
 	return &list, nil

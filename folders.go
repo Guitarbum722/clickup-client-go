@@ -74,7 +74,7 @@ func (c *Client) FoldersForSpace(ctx context.Context, spaceID string, includeArc
 	var folders FoldersResponse
 
 	if err := c.call(ctx, http.MethodGet, endpoint, nil, &folders); err != nil {
-		return nil, ErrCall
+		return nil, fmt.Errorf("failed to make clickup request: %w", err)
 	}
 
 	return &folders, nil
@@ -86,7 +86,7 @@ func (c *Client) FolderByID(ctx context.Context, folderID string) (*SingleFolder
 	var folder SingleFolder
 
 	if err := c.call(ctx, http.MethodGet, endpoint, nil, &folder); err != nil {
-		return nil, ErrCall
+		return nil, fmt.Errorf("failed to make clickup request: %w", err)
 	}
 
 	return &folder, nil

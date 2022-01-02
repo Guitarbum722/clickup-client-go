@@ -7,7 +7,11 @@
 package clickup
 
 import (
+	"context"
+	"io/ioutil"
+	"net/http"
 	"reflect"
+	"strings"
 	"testing"
 )
 
@@ -454,6 +458,231 @@ func TestCreateCommentRequest_ChecklistItem(t *testing.T) {
 			}
 			if c.ChecklistItem(tt.args.text, tt.args.checked, tt.args.attributes); !reflect.DeepEqual(c, tt.want) {
 				t.Errorf("CreateCommentRequest.ChecklistItem() = %v, want %v", c, tt.want)
+			}
+		})
+	}
+}
+
+func TestClient_CreateTaskComment(t *testing.T) {
+	type fields struct {
+		doer          ClientDoer
+		authenticator Authenticator
+		baseURL       string
+	}
+	type args struct {
+		ctx     context.Context
+		comment CreateTaskCommentRequest
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "Success validated inputs provided",
+			fields: fields{
+				authenticator: &APITokenAuthenticator{},
+				doer: newMockClientDoer(func(req *http.Request) (*http.Response, error) {
+					body := `{"id":458,"hist_id":"26508","date":1568036964079}`
+					return &http.Response{
+						StatusCode: http.StatusOK,
+						Body:       ioutil.NopCloser(strings.NewReader(body)),
+						Request:    req,
+					}, nil
+				})},
+			args: args{
+				ctx: context.Background(),
+				comment: CreateTaskCommentRequest{
+					TaskID:           "123",
+					UseCustomTaskIDs: false,
+					WorkspaceID:      "444",
+					CreateCommentRequest: CreateCommentRequest{
+						CommentText: "test data",
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "Fail missing task ID",
+			fields: fields{
+				authenticator: &APITokenAuthenticator{},
+				doer: newMockClientDoer(func(req *http.Request) (*http.Response, error) {
+					body := `{"id":458,"hist_id":"26508","date":1568036964079}`
+					return &http.Response{
+						StatusCode: http.StatusOK,
+						Body:       ioutil.NopCloser(strings.NewReader(body)),
+						Request:    req,
+					}, nil
+				})},
+			args: args{
+				ctx: context.Background(),
+				comment: CreateTaskCommentRequest{
+					TaskID:           "",
+					UseCustomTaskIDs: false,
+					WorkspaceID:      "444",
+					CreateCommentRequest: CreateCommentRequest{
+						CommentText: "test data",
+					},
+				},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Client{
+				doer:          tt.fields.doer,
+				authenticator: tt.fields.authenticator,
+				baseURL:       tt.fields.baseURL,
+			}
+			_, err := c.CreateTaskComment(tt.args.ctx, tt.args.comment)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Client.CreateTaskComment() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+		})
+	}
+}
+
+func TestClient_CreateListComment(t *testing.T) {
+	type fields struct {
+		doer          ClientDoer
+		authenticator Authenticator
+		baseURL       string
+	}
+	type args struct {
+		ctx     context.Context
+		comment CreateListCommentRequest
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "Success validated inputs provided",
+			fields: fields{
+				authenticator: &APITokenAuthenticator{},
+				doer: newMockClientDoer(func(req *http.Request) (*http.Response, error) {
+					body := `{"id":458,"hist_id":"26508","date":1568036964079}`
+					return &http.Response{
+						StatusCode: http.StatusOK,
+						Body:       ioutil.NopCloser(strings.NewReader(body)),
+						Request:    req,
+					}, nil
+				})},
+			args: args{
+				ctx: context.Background(),
+				comment: CreateListCommentRequest{
+					ListID: "123",
+					CreateCommentRequest: CreateCommentRequest{
+						CommentText: "test data",
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "Fail missing list ID",
+			fields: fields{
+				doer:          nil,
+				authenticator: &APITokenAuthenticator{},
+			},
+			args: args{
+				ctx: context.Background(),
+				comment: CreateListCommentRequest{
+					ListID:               "",
+					CreateCommentRequest: CreateCommentRequest{},
+				},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Client{
+				doer:          tt.fields.doer,
+				authenticator: tt.fields.authenticator,
+				baseURL:       tt.fields.baseURL,
+			}
+			_, err := c.CreateListComment(tt.args.ctx, tt.args.comment)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Client.CreateListComment() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+		})
+	}
+}
+
+func TestClient_CreateChatViewComment(t *testing.T) {
+	type fields struct {
+		doer          ClientDoer
+		authenticator Authenticator
+		baseURL       string
+	}
+	type args struct {
+		ctx     context.Context
+		comment CreateChatViewCommentRequest
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "Success validated inputs provided",
+			fields: fields{
+				authenticator: &APITokenAuthenticator{},
+				doer: newMockClientDoer(func(req *http.Request) (*http.Response, error) {
+					body := `{"id":458,"hist_id":"26508","date":1568036964079}`
+					return &http.Response{
+						StatusCode: http.StatusOK,
+						Body:       ioutil.NopCloser(strings.NewReader(body)),
+						Request:    req,
+					}, nil
+				})},
+			args: args{
+				ctx: context.Background(),
+				comment: CreateChatViewCommentRequest{
+					ViewID: "123",
+					CreateCommentRequest: CreateCommentRequest{
+						CommentText: "test data",
+					},
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "Fail missing view ID",
+			fields: fields{
+				doer:          nil,
+				authenticator: &APITokenAuthenticator{},
+			},
+			args: args{
+				ctx: context.Background(),
+				comment: CreateChatViewCommentRequest{
+					ViewID:               "",
+					CreateCommentRequest: CreateCommentRequest{},
+				},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Client{
+				doer:          tt.fields.doer,
+				authenticator: tt.fields.authenticator,
+				baseURL:       tt.fields.baseURL,
+			}
+			_, err := c.CreateChatViewComment(tt.args.ctx, tt.args.comment)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Client.CreateChatViewComment() error = %v, wantErr %v", err, tt.wantErr)
+				return
 			}
 		})
 	}

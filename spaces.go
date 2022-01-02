@@ -101,7 +101,7 @@ func (c *Client) SpacesForWorkspace(ctx context.Context, teamID string, includeA
 	var spacesResponse SpacesResponse
 
 	if err := c.call(ctx, http.MethodGet, endpoint, nil, &spacesResponse); err != nil {
-		return nil, ErrCall
+		return nil, fmt.Errorf("failed to make clickup request: %w", err)
 	}
 
 	return &spacesResponse, nil
@@ -114,7 +114,7 @@ func (c *Client) SpaceByID(ctx context.Context, spaceID string) (*SingleSpace, e
 	var spaceResponse SingleSpace
 
 	if err := c.call(ctx, http.MethodGet, endpoint, nil, &spaceResponse); err != nil {
-		return nil, ErrCall
+		return nil, fmt.Errorf("failed to make clickup request: %w", err)
 	}
 
 	return &spaceResponse, nil
