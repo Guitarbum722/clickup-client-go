@@ -126,35 +126,51 @@ type TimeTracking struct {
 	Enabled bool `json:"enabled"`
 }
 
+type DueDates struct {
+	Enabled            bool `json:"enabled"`
+	StartDate          bool `json:"start_date"`
+	RemapDueDates      bool `json:"remap_due_dates"`
+	RemapClosedDueDate bool `json:"remap_closed_due_date"`
+}
+
+type Tags struct {
+	Enabled bool `json:"enabled,omitempty"`
+}
+
+type TimeEstimates struct {
+	Enabled bool `json:"enabled,omitempty"`
+}
+
+type Checklists struct {
+	Enabled bool `json:"enabled,omitempty"`
+}
+
+type CustomFields struct {
+	Enabled bool `json:"enabled,omitempty"`
+}
+
+type RemapDependencies struct {
+	Enabled bool `json:"enabled,omitempty"`
+}
+
+type DependencyWarning struct {
+	Enabled bool `json:"enabled,omitempty"`
+}
+
+type Portfolios struct {
+	Enabled bool `json:"enabled,omitempty"`
+}
+
 type Features struct {
-	DueDates struct {
-		Enabled            bool `json:"enabled"`
-		StartDate          bool `json:"start_date"`
-		RemapDueDates      bool `json:"remap_due_dates"`
-		RemapClosedDueDate bool `json:"remap_closed_due_date"`
-	} `json:"due_dates"`
-	TimeTracking *TimeTracking `json:"time_tracking,omitempty"`
-	Tags         struct {
-		Enabled bool `json:"enabled"`
-	} `json:"tags"`
-	TimeEstimates struct {
-		Enabled bool `json:"enabled"`
-	} `json:"time_estimates"`
-	Checklists struct {
-		Enabled bool `json:"enabled"`
-	} `json:"checklists"`
-	CustomFields struct {
-		Enabled bool `json:"enabled"`
-	} `json:"custom_fields"`
-	RemapDependencies struct {
-		Enabled bool `json:"enabled"`
-	} `json:"remap_dependencies"`
-	DependencyWarning struct {
-		Enabled bool `json:"enabled"`
-	} `json:"dependency_warning"`
-	Portfolios struct {
-		Enabled bool `json:"enabled"`
-	} `json:"portfolios"`
+	DueDates          *DueDates          `json:"due_dates,omitempty"`
+	TimeTracking      *TimeTracking      `json:"time_tracking,omitempty"`
+	Tags              *Tags              `json:"tags,omitempty"`
+	TimeEstimates     *TimeEstimates     `json:"time_estimates,omitempty"`
+	Checklists        *Checklists        `json:"checklists,omitempty"`
+	CustomFields      *CustomFields      `json:"custom_fields,omitempty"`
+	RemapDependencies *RemapDependencies `json:"remap_dependencies,omitempty"`
+	DependencyWarning *DependencyWarning `json:"dependency_warning,omitempty"`
+	Portfolios        *Portfolios        `json:"portfolios,omitempty"`
 }
 
 type CreateSpaceRequest struct {
@@ -186,65 +202,39 @@ func (c *Client) CreateSpaceForWorkspace(ctx context.Context, space CreateSpaceR
 	return &newSpace, nil
 }
 
-type UpdateSpaceRequest struct {
-	SpaceID           string
-	Name              string `json:"name"`
-	MultipleAssignees bool   `json:"multiple_assignees"`
-	Features          *struct {
-		DueDates *struct {
-			Enabled            bool `json:"enabled"`
-			StartDate          bool `json:"start_date"`
-			RemapDueDates      bool `json:"remap_due_dates"`
-			RemapClosedDueDate bool `json:"remap_closed_due_date"`
-		} `json:"due_dates"`
-		TimeTracking *struct {
-			Enabled bool `json:"enabled"`
-		} `json:"time_tracking,omitempty"`
-		Tags *struct {
-			Enabled bool `json:"enabled"`
-		} `json:"tags"`
-		TimeEstimates *struct {
-			Enabled bool `json:"enabled"`
-		} `json:"time_estimates"`
-		Checklists *struct {
-			Enabled bool `json:"enabled"`
-		} `json:"checklists"`
-		CustomFields *struct {
-			Enabled bool `json:"enabled"`
-		} `json:"custom_fields"`
-		RemapDependencies *struct {
-			Enabled bool `json:"enabled"`
-		} `json:"remap_dependencies"`
-		DependencyWarning *struct {
-			Enabled bool `json:"enabled"`
-		} `json:"dependency_warning"`
-		Portfolios *struct {
-			Enabled bool `json:"enabled"`
-		} `json:"portfolios"`
-	} `json:"features"`
-}
+// type UpdateSpaceRequest struct {
+// 	SpaceID           string
+// 	Name              string    `json:"name,omitempty"`
+// 	MultipleAssignees bool      `json:"multiple_assignees,omitempty"`
+// 	Features          *Features `json:"features,omitempty"`
+// }
 
-func (c *Client) UpdateSpaceForWorkspace(ctx context.Context, space UpdateSpaceRequest) (*SingleSpace, error) {
-	if space.SpaceID == "" {
-		return nil, fmt.Errorf("must provide a workspace id: %w", ErrValidation)
-	}
+// func (c *Client) UpdateSpaceForWorkspace(ctx context.Context, space UpdateSpaceRequest) (*SingleSpace, error) {
+// 	// Choosing not to implement at this time.  The update behavior is not documented at this time.
+// 	// For instance, sending nulls for certain values have no impact (assumed to be desired).  Yet,
+// 	// omitting the Name field on the Space if it's empty ("") still sets the space name to empty.
+// 	panic("NOT IMPLEMENTED")
+// 	// if space.SpaceID == "" {
+// 	// 	return nil, fmt.Errorf("must provide a workspace id: %w", ErrValidation)
+// 	// }
 
-	b, err := json.Marshal(space)
-	if err != nil {
-		return nil, fmt.Errorf("unable to serialize new space: %w", err)
-	}
-	buf := bytes.NewBuffer(b)
+// 	// b, err := json.Marshal(space)
+// 	// if err != nil {
+// 	// 	return nil, fmt.Errorf("unable to serialize new space: %w", err)
+// 	// }
+// 	// fmt.Println(string(b))
+// 	// buf := bytes.NewBuffer(b)
 
-	endpoint := fmt.Sprintf("/space/%s", space.SpaceID)
+// 	// endpoint := fmt.Sprintf("/space/%s", space.SpaceID)
 
-	var updatedSpace SingleSpace
+// 	// var updatedSpace SingleSpace
 
-	if err := c.call(ctx, http.MethodPut, endpoint, buf, &updatedSpace); err != nil {
-		return nil, fmt.Errorf("failed to make clickup request: %w", err)
-	}
+// 	// if err := c.call(ctx, http.MethodPut, endpoint, buf, &updatedSpace); err != nil {
+// 	// 	return nil, fmt.Errorf("failed to make clickup request: %w", err)
+// 	// }
 
-	return &updatedSpace, nil
-}
+// 	// return &updatedSpace, nil
+// }
 
 func (c *Client) DeleteSpace(ctx context.Context, spaceID string) error {
 	return c.call(ctx, http.MethodGet, fmt.Sprintf("/space/%s", spaceID), nil, &struct{}{})

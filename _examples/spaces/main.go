@@ -25,32 +25,15 @@ func main() {
 		},
 	})
 
-	// spaceReq := clickup.CreateSpaceRequest{
-	// 	WorkspaceID:       workspaceID,
-	// 	Name:              "First API Space",
-	// 	MultipleAssignees: false,
-	// }
-
-	// newSpace, err := client.CreateSpaceForWorkspace(context.TODO(), spaceReq)
-	// if err != nil {
-	// 	panic(err)
-	// }
-	// fmt.Println(newSpace)
-
-	spaceReq := clickup.UpdateSpaceRequest{
-		SpaceID: "43682028",
-		Name:    "Updated API Space",
-		Features: &clickup.Features{
-			TimeTracking: &clickup.TimeTracking{
-				Enabled: true,
-			},
-		},
+	spaceReq := clickup.CreateSpaceRequest{
+		WorkspaceID:       workspaceID,
+		Name:              "First API Space",
+		MultipleAssignees: false,
 	}
 
-	updatedSpace, err := client.UpdateSpaceForWorkspace(context.TODO(), spaceReq)
+	newSpace, err := client.CreateSpaceForWorkspace(context.TODO(), spaceReq)
 	if err != nil {
 		panic(err)
 	}
-
-	fmt.Println(updatedSpace)
+	fmt.Println(newSpace)
 }
