@@ -49,6 +49,7 @@ type CreateGoalResponse struct {
 	} `json:"goal"`
 }
 
+// CreateGoal adds a new goal to the Clickup workspace using goal.WorkspaceID.
 func (c *Client) CreateGoal(ctx context.Context, goal CreateGoalRequest) (*CreateGoalResponse, error) {
 	if goal.WorkspaceID == "" {
 		return nil, fmt.Errorf("must provide a workspace id to create a goal: %w", ErrValidation)
@@ -72,7 +73,7 @@ func (c *Client) CreateGoal(ctx context.Context, goal CreateGoalRequest) (*Creat
 }
 
 type UpdateGoalRequest struct {
-	GoalID         string `json:"-"`
+	ID             string `json:"-"`
 	Name           string `json:"name,omitempty"`
 	DueDate        int    `json:"due_date,omitempty"`
 	Description    string `json:"description,omitempty"`
@@ -104,8 +105,9 @@ type UpdateGoalResponse struct {
 	} `json:"goal"`
 }
 
+// UpdateGoal uses goal.ID to change an existing goal in the workspace.
 func (c *Client) UpdateGoal(ctx context.Context, goal UpdateGoalRequest) (*UpdateGoalResponse, error) {
-	if goal.GoalID == "" {
+	if goal.ID == "" {
 		return nil, fmt.Errorf("must provide a goal id to update a goal: %w", ErrValidation)
 	}
 
@@ -115,7 +117,7 @@ func (c *Client) UpdateGoal(ctx context.Context, goal UpdateGoalRequest) (*Updat
 	}
 	buf := bytes.NewBuffer(b)
 
-	endpoint := fmt.Sprintf("/goal/%s", goal.GoalID)
+	endpoint := fmt.Sprintf("/goal/%s", goal.ID)
 
 	var updatedGoal UpdateGoalResponse
 
@@ -154,6 +156,8 @@ type GetGoalsResponse struct {
 	Goals []GoalResponse `json:"goals"`
 }
 
+// GoalsForWorkspace queries all goals in a workspace using workspaceID.  Completed goals will be returned
+// if includeCompleted is true.
 func (c *Client) GoalsForWorkspace(ctx context.Context, workspaceID string, includeCompleted bool) (*GetGoalsResponse, error) {
 	if workspaceID == "" {
 		return nil, fmt.Errorf("must provide a workspace id to retrieve goals for workspace: %w", ErrValidation)
@@ -172,6 +176,7 @@ func (c *Client) GoalsForWorkspace(ctx context.Context, workspaceID string, incl
 	return &goals, nil
 }
 
+// GoalForWorkSpace returns data about a single goal based on goalID.
 func (c *Client) GoalForWorkSpace(ctx context.Context, goalID string) (*GoalResponse, error) {
 	if goalID == "" {
 		return nil, fmt.Errorf("must provide a goal id to retrieve goal for workspace: %w", ErrValidation)
@@ -187,6 +192,7 @@ func (c *Client) GoalForWorkSpace(ctx context.Context, goalID string) (*GoalResp
 	return &goal, nil
 }
 
+// DeleteGoal removes an existing goal from the workspace based on goalID.
 func (c *Client) DeleteGoal(ctx context.Context, goalID string) error {
 	if goalID == "" {
 		return fmt.Errorf("must provide a goal id to detelet: %w", ErrValidation)
@@ -241,6 +247,7 @@ type CreateKeyResultResponse struct {
 	KeyResult KeyResult `json:"key_result"`
 }
 
+// CreateKeyResultForGoal appends a key result to a goal with keyResult.GoalID.
 func (c *Client) CreateKeyResultForGoal(ctx context.Context, keyResult CreateKeyResultRequest) (*CreateKeyResultResponse, error) {
 	if keyResult.GoalID == "" {
 		return nil, fmt.Errorf("must provide a goal id to create a key result: %w", ErrValidation)
@@ -281,6 +288,7 @@ type UpdateKeyResultResponse struct {
 	KeyResult KeyResult `json:"key_result"`
 }
 
+// UpdateKeyResult changes an existing key result based on keyResult.ID.
 func (c *Client) UpdateKeyResult(ctx context.Context, keyResult UpdateKeyResultRequest) (*UpdateKeyResultResponse, error) {
 	if keyResult.ID == "" {
 		return nil, fmt.Errorf("must provide a key result id to update a goal: %w", ErrValidation)
@@ -303,6 +311,7 @@ func (c *Client) UpdateKeyResult(ctx context.Context, keyResult UpdateKeyResultR
 	return &updatedKeyResult, nil
 }
 
+// DeleteKeyResult removes an existing key result from a goal.
 func (c *Client) DeleteKeyResult(ctx context.Context, keyResultID string) error {
 	if keyResultID == "" {
 		return fmt.Errorf("must provide key result id to delete: %w", ErrValidation)

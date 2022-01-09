@@ -50,6 +50,7 @@ type CreateCommentRequest struct {
 	NotifyAll   bool             `json:"notify_all,omitempty"`
 }
 
+// BulletedListItem appends a bullet list item to c with text and attributes.
 func (c *CreateCommentRequest) BulletedListItem(text string, attributes *Attributes) {
 	if c.Comment == nil {
 		c.Comment = make([]ComplexComment, 0, 2)
@@ -71,6 +72,7 @@ func (c *CreateCommentRequest) BulletedListItem(text string, attributes *Attribu
 	c.Comment = append(c.Comment, comment...)
 }
 
+// NumberedListItem appends an ordered list item to c with text and attributes.
 func (c *CreateCommentRequest) NumberedListItem(text string, attributes *Attributes) {
 	if c.Comment == nil {
 		c.Comment = make([]ComplexComment, 0, 2)
@@ -92,6 +94,8 @@ func (c *CreateCommentRequest) NumberedListItem(text string, attributes *Attribu
 	c.Comment = append(c.Comment, comment...)
 }
 
+// ChecklistItem appends a checklist line item to c with text, attributes, and can be checked
+// or not with checked.
 func (c *CreateCommentRequest) ChecklistItem(text string, checked bool, attributes *Attributes) {
 	if c.Comment == nil {
 		c.Comment = make([]ComplexComment, 0, 2)
@@ -142,6 +146,7 @@ type CreateTaskCommentResponse struct {
 	CreateCommentResponse
 }
 
+// CreateTaskComment appends a new comment to the task specified in comment.
 func (c *Client) CreateTaskComment(ctx context.Context, comment CreateTaskCommentRequest) (*CreateTaskCommentResponse, error) {
 	if comment.TaskID == "" {
 		return nil, fmt.Errorf("must provide a task id to create a task comment: %w", ErrValidation)
@@ -187,6 +192,7 @@ type CreateChatViewCommentResponse struct {
 	CreateCommentResponse
 }
 
+// CreateChatViewComment appends a new comment to a chat that on a view.
 func (c *Client) CreateChatViewComment(ctx context.Context, comment CreateChatViewCommentRequest) (*CreateChatViewCommentResponse, error) {
 	if comment.ViewID == "" {
 		return nil, fmt.Errorf("must provide a view id to create a view comment: %w", ErrValidation)
@@ -226,6 +232,7 @@ type CreateListCommentResponse struct {
 	CreateCommentResponse
 }
 
+// CreateListComment appends a new comment to a List.
 func (c *Client) CreateListComment(ctx context.Context, comment CreateListCommentRequest) (*CreateListCommentResponse, error) {
 	if comment.ListID == "" {
 		return nil, fmt.Errorf("must provide a list id to create a view comment: %w", ErrValidation)
@@ -299,7 +306,7 @@ func (c *Client) ListComments(ctx context.Context, query CommentsForListQuery) (
 }
 
 type UpdateCommentRequest struct {
-	CommentID   string
+	CommentID   string           `json:"-"`
 	CommentText string           `json:"comment_text"` // plain text
 	Comment     []ComplexComment `json:"comment,omitempty"`
 	Assignee    int              `json:"assignee,omitempty"`
@@ -307,6 +314,7 @@ type UpdateCommentRequest struct {
 	Resolved    bool             `json:"resolved,omitempty"`
 }
 
+// UpdateComment changes an existing comment based on comment.CommentID.
 func (c *Client) UpdateComment(ctx context.Context, comment UpdateCommentRequest) error {
 	if comment.CommentID == "" {
 		return fmt.Errorf("must provide a comment id: %w", ErrValidation)
@@ -326,6 +334,7 @@ func (c *Client) UpdateComment(ctx context.Context, comment UpdateCommentRequest
 	return nil
 }
 
+// DeleteComment deletes the existing comment specified with commentID.
 func (c *Client) DeleteComment(ctx context.Context, commentID string) error {
 	if commentID == "" {
 		return fmt.Errorf("must provide a comment id: %w", ErrValidation)

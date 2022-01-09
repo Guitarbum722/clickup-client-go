@@ -64,12 +64,13 @@ type FoldersResponse struct {
 	Folders []SingleFolder `json:"folders"`
 }
 
-func (c *Client) FoldersForSpace(ctx context.Context, spaceID string, includeArchived bool) (*FoldersResponse, error) {
+// FoldersForSpace queries all folders for a workspace.
+func (c *Client) FoldersForSpace(ctx context.Context, workspaceID string, includeArchived bool) (*FoldersResponse, error) {
 
 	urlValues := url.Values{}
 	urlValues.Set("archived", strconv.FormatBool(includeArchived))
 
-	endpoint := fmt.Sprintf("/space/%s/folder/?%s", spaceID, urlValues.Encode())
+	endpoint := fmt.Sprintf("/space/%s/folder/?%s", workspaceID, urlValues.Encode())
 
 	var folders FoldersResponse
 
@@ -80,6 +81,7 @@ func (c *Client) FoldersForSpace(ctx context.Context, spaceID string, includeArc
 	return &folders, nil
 }
 
+// FolderByID queries a single folder with folderID.
 func (c *Client) FolderByID(ctx context.Context, folderID string) (*SingleFolder, error) {
 	endpoint := fmt.Sprintf("/folder/%s", folderID)
 

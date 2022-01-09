@@ -40,8 +40,8 @@ type CreateChecklistRequest struct {
 
 type UpdateChecklistRequest struct {
 	ChecklistID string `json:"-"`
-	Name        string `json:"name"`
-	Position    int    `json:"position"`
+	Name        string `json:"name,omitempty"`
+	Position    int    `json:"position,omitempty"`
 }
 
 type CreateChecklistItemRequest struct {
@@ -57,6 +57,7 @@ type UpdateChecklistItemRequest struct {
 	Resolved        bool       `json:"resolved"`
 }
 
+// CreateChecklist adds a new checklist to the specified task id in request.
 func (c *Client) CreateChecklist(ctx context.Context, request *CreateChecklistRequest) (*ChecklistResponse, error) {
 	if request.TaskID == "" {
 		return nil, fmt.Errorf("must provide task id: %w", ErrValidation)
@@ -86,6 +87,7 @@ func (c *Client) CreateChecklist(ctx context.Context, request *CreateChecklistRe
 	return &checklist, nil
 }
 
+// UpdateChecklist makes changes to an existing checklist based on the fields set in request.
 func (c *Client) UpdateChecklist(ctx context.Context, request *UpdateChecklistRequest) (*ChecklistResponse, error) {
 	if request.ChecklistID == "" {
 		return nil, fmt.Errorf("must provide checklist id: %w", ErrValidation)
@@ -108,6 +110,7 @@ func (c *Client) UpdateChecklist(ctx context.Context, request *UpdateChecklistRe
 	return &checklist, nil
 }
 
+// DeleteChecklist removes an existing checklist based on checklistID.
 func (c *Client) DeleteChecklist(ctx context.Context, checklistID string) error {
 	if checklistID == "" {
 		return fmt.Errorf("must provide checklistID: %w", ErrValidation)
@@ -118,6 +121,7 @@ func (c *Client) DeleteChecklist(ctx context.Context, checklistID string) error 
 	return c.call(ctx, http.MethodDelete, endpoint, nil, &struct{}{})
 }
 
+// CreateChecklistItem appends a line item to an existing checklist using ChecklistID on request.
 func (c *Client) CreateChecklistItem(ctx context.Context, request *CreateChecklistItemRequest) (*ChecklistResponse, error) {
 	if request.ChecklistID == "" {
 		return nil, fmt.Errorf("must provide a checklist id: %w", ErrValidation)
@@ -140,6 +144,7 @@ func (c *Client) CreateChecklistItem(ctx context.Context, request *CreateCheckli
 	return &checklist, nil
 }
 
+// UpdateChecklistItem updates an existing checklist item based on ChecklistID and ChecklistItemID on request.
 func (c *Client) UpdateChecklistItem(ctx context.Context, request *UpdateChecklistItemRequest) (*ChecklistResponse, error) {
 	if request.ChecklistID == "" {
 		return nil, fmt.Errorf("must provide checklist id: %w", ErrValidation)
@@ -165,6 +170,7 @@ func (c *Client) UpdateChecklistItem(ctx context.Context, request *UpdateCheckli
 	return &checklist, nil
 }
 
+// DeleteChecklistItem removes an existing checklist item using checklistID and checklistItemID.
 func (c *Client) DeleteChecklistItem(ctx context.Context, checklistID, checklistItemID string) error {
 	if checklistID == "" {
 		return fmt.Errorf("must provide a checklist id: %w", ErrValidation)

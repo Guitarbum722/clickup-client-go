@@ -20,6 +20,7 @@ type APITokenAuthenticator struct {
 	APIToken string
 }
 
+// AuthenticateFor adds an API token to the Authorization header of req.
 func (d *APITokenAuthenticator) AuthenticateFor(req *http.Request) error {
 	req.Header.Add("Authorization", d.APIToken)
 	return nil
@@ -43,11 +44,20 @@ func (c *Client) AuthenticateFor(req *http.Request) error {
 
 const basePath = "https://api.clickup.com/api/v2"
 
+// NewClient initializes and returns a pointer to a Client.
+// If opts.Doer is not provided, an http.Client with a 20 seconds timeout is used.
+// If opts.Authenticator is not provided, an APITokenAuthenticator is used.
 func NewClient(opts *ClientOpts) *Client {
+	auth := opts.Authenticator
+
+	if auth == nil {
+		auth = &APITokenAuthenticator{}
+	}
+
 	if opts.Doer != nil {
 		return &Client{
 			doer:          opts.Doer,
-			authenticator: opts.Authenticator,
+			authenticator: auth,
 			baseURL:       basePath,
 		}
 	}
@@ -56,7 +66,7 @@ func NewClient(opts *ClientOpts) *Client {
 		doer: &http.Client{
 			Timeout: time.Duration(time.Second * 20),
 		},
-		authenticator: opts.Authenticator,
+		authenticator: auth,
 		baseURL:       basePath,
 	}
 }
