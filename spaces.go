@@ -237,5 +237,8 @@ func (c *Client) CreateSpaceForWorkspace(ctx context.Context, space CreateSpaceR
 // }
 
 func (c *Client) DeleteSpace(ctx context.Context, spaceID string) error {
+	if spaceID == "" {
+		return fmt.Errorf("must provide a space id to delete: %w", ErrValidation)
+	}
 	return c.call(ctx, http.MethodGet, fmt.Sprintf("/space/%s", spaceID), nil, &struct{}{})
 }

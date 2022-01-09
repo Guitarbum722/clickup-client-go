@@ -227,3 +227,63 @@ func TestClient_SpaceByID(t *testing.T) {
 		})
 	}
 }
+
+func TestClient_DeleteSpace(t *testing.T) {
+	type fields struct {
+		doer          ClientDoer
+		authenticator Authenticator
+	}
+	type args struct {
+		ctx     context.Context
+		spaceID string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "Success space id provided",
+			fields: fields{
+				doer: newMockClientDoer(func(req *http.Request) (*http.Response, error) {
+					body := `{}`
+					return &http.Response{
+						StatusCode: http.StatusOK,
+						Body:       ioutil.NopCloser(strings.NewReader(body)),
+						Request:    req,
+					}, nil
+				}),
+				authenticator: &APITokenAuthenticator{},
+			},
+			args: args{
+				ctx:     context.Background(),
+				spaceID: "test id",
+			},
+			wantErr: false,
+		},
+		{
+			name: "Fail missing space ID",
+			fields: fields{
+				doer:          nil,
+				authenticator: &APITokenAuthenticator{},
+			},
+			args: args{
+				ctx:     context.Background(),
+				spaceID: "",
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Client{
+				doer:          tt.fields.doer,
+				authenticator: tt.fields.authenticator,
+			}
+			if err := c.DeleteSpace(tt.args.ctx, tt.args.spaceID); (err != nil) != tt.wantErr {
+				t.Errorf("Client.DeleteSpace() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
