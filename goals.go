@@ -17,7 +17,7 @@ import (
 )
 
 type CreateGoalRequest struct {
-	WorkspaceID    string
+	WorkspaceID    string `json:"-"`
 	Name           string `json:"name"`
 	DueDate        int    `json:"due_date"`
 	Description    string `json:"description"`
@@ -72,7 +72,7 @@ func (c *Client) CreateGoal(ctx context.Context, goal CreateGoalRequest) (*Creat
 }
 
 type UpdateGoalRequest struct {
-	GoalID         string
+	GoalID         string `json:"-"`
 	Name           string `json:"name,omitempty"`
 	DueDate        int    `json:"due_date,omitempty"`
 	Description    string `json:"description,omitempty"`
@@ -205,7 +205,7 @@ const (
 )
 
 type CreateKeyResultRequest struct {
-	GoalID     string
+	GoalID     string        `json:"-"`
 	Name       string        `json:"name"`
 	Owners     []int         `json:"owners"`
 	Type       KeyResultType `json:"type"`
@@ -264,7 +264,7 @@ func (c *Client) CreateKeyResultForGoal(ctx context.Context, keyResult CreateKey
 }
 
 type UpdateKeyResultRequest struct {
-	ID               string
+	ID               string     `json:"-"`
 	GoalID           string     `json:"goal_id,omitempty"`
 	Name             string     `json:"name,omitempty"`
 	Creator          int        `json:"creator,omitempty"`
