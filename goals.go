@@ -1,3 +1,9 @@
+// Copyright (c) 2022, John Moore
+// All rights reserved.
+
+// This source code is licensed under the BSD-style license found in the
+// LICENSE file in the root directory of this source tree.
+
 package clickup
 
 import (
@@ -182,6 +188,9 @@ func (c *Client) GoalForWorkSpace(ctx context.Context, goalID string) (*GoalResp
 }
 
 func (c *Client) DeleteGoal(ctx context.Context, goalID string) error {
+	if goalID == "" {
+		return fmt.Errorf("must provide a goal id to detelet: %w", ErrValidation)
+	}
 	return c.call(ctx, http.MethodDelete, fmt.Sprintf("/goal/%s", goalID), nil, &struct{}{})
 }
 
@@ -295,5 +304,8 @@ func (c *Client) UpdateKeyResult(ctx context.Context, keyResult UpdateKeyResultR
 }
 
 func (c *Client) DeleteKeyResult(ctx context.Context, keyResultID string) error {
+	if keyResultID == "" {
+		return fmt.Errorf("must provide key result id to delete: %w", ErrValidation)
+	}
 	return c.call(ctx, http.MethodDelete, fmt.Sprintf("/key_result/%s", keyResultID), nil, &struct{}{})
 }
