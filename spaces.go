@@ -202,39 +202,34 @@ func (c *Client) CreateSpaceForWorkspace(ctx context.Context, space CreateSpaceR
 	return &newSpace, nil
 }
 
-// type UpdateSpaceRequest struct {
-// 	SpaceID           string
-// 	Name              string    `json:"name,omitempty"`
-// 	MultipleAssignees bool      `json:"multiple_assignees,omitempty"`
-// 	Features          *Features `json:"features,omitempty"`
-// }
+type UpdateSpaceRequest struct {
+	ID                string
+	Name              string    `json:"name,omitempty"`
+	MultipleAssignees bool      `json:"multiple_assignees,omitempty"`
+	Features          *Features `json:"features,omitempty"`
+}
 
-// func (c *Client) UpdateSpaceForWorkspace(ctx context.Context, space UpdateSpaceRequest) (*SingleSpace, error) {
-// 	// Choosing not to implement at this time.  The update behavior is not documented at this time.
-// 	// For instance, sending nulls for certain values have no impact (assumed to be desired).  Yet,
-// 	// omitting the Name field on the Space if it's empty ("") still sets the space name to empty.
-// 	panic("NOT IMPLEMENTED")
-// 	// if space.SpaceID == "" {
-// 	// 	return nil, fmt.Errorf("must provide a workspace id: %w", ErrValidation)
-// 	// }
+func (c *Client) UpdateSpaceForWorkspace(ctx context.Context, space UpdateSpaceRequest) (*SingleSpace, error) {
+	if space.ID == "" {
+		return nil, fmt.Errorf("must provide a workspace id: %w", ErrValidation)
+	}
 
-// 	// b, err := json.Marshal(space)
-// 	// if err != nil {
-// 	// 	return nil, fmt.Errorf("unable to serialize new space: %w", err)
-// 	// }
-// 	// fmt.Println(string(b))
-// 	// buf := bytes.NewBuffer(b)
+	b, err := json.Marshal(space)
+	if err != nil {
+		return nil, fmt.Errorf("unable to serialize new space: %w", err)
+	}
+	buf := bytes.NewBuffer(b)
 
-// 	// endpoint := fmt.Sprintf("/space/%s", space.SpaceID)
+	endpoint := fmt.Sprintf("/space/%s", space.ID)
 
-// 	// var updatedSpace SingleSpace
+	var updatedSpace SingleSpace
 
-// 	// if err := c.call(ctx, http.MethodPut, endpoint, buf, &updatedSpace); err != nil {
-// 	// 	return nil, fmt.Errorf("failed to make clickup request: %w", err)
-// 	// }
+	if err := c.call(ctx, http.MethodPut, endpoint, buf, &updatedSpace); err != nil {
+		return nil, fmt.Errorf("failed to make clickup request: %w", err)
+	}
 
-// 	// return &updatedSpace, nil
-// }
+	return &updatedSpace, nil
+}
 
 func (c *Client) DeleteSpace(ctx context.Context, spaceID string) error {
 	if spaceID == "" {

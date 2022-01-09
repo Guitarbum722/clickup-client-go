@@ -287,3 +287,135 @@ func TestClient_DeleteSpace(t *testing.T) {
 		})
 	}
 }
+
+func TestClient_UpdateSpaceForWorkspace(t *testing.T) {
+	type fields struct {
+		doer          ClientDoer
+		authenticator Authenticator
+	}
+	type args struct {
+		ctx   context.Context
+		space UpdateSpaceRequest
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "Success space id provided",
+			fields: fields{
+				doer: newMockClientDoer(func(req *http.Request) (*http.Response, error) {
+					body := `{"id": "test id"}`
+					return &http.Response{
+						StatusCode: http.StatusOK,
+						Body:       ioutil.NopCloser(strings.NewReader(body)),
+						Request:    req,
+					}, nil
+				}),
+				authenticator: &APITokenAuthenticator{},
+			},
+			args: args{
+				ctx: context.Background(),
+				space: UpdateSpaceRequest{
+					ID: "test id",
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "Fail missing space ID",
+			fields: fields{
+				doer:          nil,
+				authenticator: &APITokenAuthenticator{},
+			},
+			args: args{
+				ctx: context.Background(),
+				space: UpdateSpaceRequest{
+					ID: "",
+				},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Client{
+				doer:          tt.fields.doer,
+				authenticator: tt.fields.authenticator,
+			}
+			_, err := c.UpdateSpaceForWorkspace(tt.args.ctx, tt.args.space)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Client.UpdateSpaceForWorkspace() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+		})
+	}
+}
+
+func TestClient_CreateSpaceForWorkspace(t *testing.T) {
+	type fields struct {
+		doer          ClientDoer
+		authenticator Authenticator
+	}
+	type args struct {
+		ctx   context.Context
+		space CreateSpaceRequest
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "Success workspace id provided",
+			fields: fields{
+				doer: newMockClientDoer(func(req *http.Request) (*http.Response, error) {
+					body := `{"id": "test id"}`
+					return &http.Response{
+						StatusCode: http.StatusOK,
+						Body:       ioutil.NopCloser(strings.NewReader(body)),
+						Request:    req,
+					}, nil
+				}),
+				authenticator: &APITokenAuthenticator{},
+			},
+			args: args{
+				ctx: context.Background(),
+				space: CreateSpaceRequest{
+					WorkspaceID: "test id",
+				},
+			},
+			wantErr: false,
+		},
+		{
+			name: "Fail missing workspace ID",
+			fields: fields{
+				doer:          nil,
+				authenticator: &APITokenAuthenticator{},
+			},
+			args: args{
+				ctx: context.Background(),
+				space: CreateSpaceRequest{
+					WorkspaceID: "",
+				},
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Client{
+				doer:          tt.fields.doer,
+				authenticator: tt.fields.authenticator,
+			}
+			_, err := c.CreateSpaceForWorkspace(tt.args.ctx, tt.args.space)
+			if (err != nil) != tt.wantErr {
+				t.Errorf("Client.CreateSpaceForWorkspace() error = %v, wantErr %v", err, tt.wantErr)
+				return
+			}
+		})
+	}
+}
