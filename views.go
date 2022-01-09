@@ -142,6 +142,9 @@ func (c *Client) ViewsFor(ctx context.Context, viewListType ViewListType, id str
 }
 
 func (c *Client) DeleteView(ctx context.Context, viewID string) error {
+	if viewID == "" {
+		return fmt.Errorf("must provide a view id to delete: %w", ErrValidation)
+	}
 	return c.call(ctx, http.MethodDelete, fmt.Sprintf("/view/%s", viewID), nil, &struct{}{})
 }
 

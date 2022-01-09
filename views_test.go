@@ -227,3 +227,63 @@ func TestClient_TasksForView(t *testing.T) {
 		})
 	}
 }
+
+func TestClient_DeleteView(t *testing.T) {
+	type fields struct {
+		doer          ClientDoer
+		authenticator Authenticator
+	}
+	type args struct {
+		ctx    context.Context
+		viewID string
+	}
+	tests := []struct {
+		name    string
+		fields  fields
+		args    args
+		wantErr bool
+	}{
+		{
+			name: "Success view id provided",
+			fields: fields{
+				doer: newMockClientDoer(func(req *http.Request) (*http.Response, error) {
+					body := `{}`
+					return &http.Response{
+						StatusCode: http.StatusOK,
+						Body:       ioutil.NopCloser(strings.NewReader(body)),
+						Request:    req,
+					}, nil
+				}),
+				authenticator: &APITokenAuthenticator{},
+			},
+			args: args{
+				ctx:    context.Background(),
+				viewID: "test id",
+			},
+			wantErr: false,
+		},
+		{
+			name: "Fail missing webhook ID",
+			fields: fields{
+				doer:          nil,
+				authenticator: &APITokenAuthenticator{},
+			},
+			args: args{
+				ctx:    context.Background(),
+				viewID: "",
+			},
+			wantErr: true,
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			c := &Client{
+				doer:          tt.fields.doer,
+				authenticator: tt.fields.authenticator,
+			}
+			if err := c.DeleteView(tt.args.ctx, tt.args.viewID); (err != nil) != tt.wantErr {
+				t.Errorf("Client.DeleteView() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}

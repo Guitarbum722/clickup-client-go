@@ -184,7 +184,9 @@ func (w *webhookVerifyResult) SignatureGenerated() string {
 }
 
 func (c *Client) CreateWebhook(ctx context.Context, workspaceID string, webhook *CreateWebhookRequest) (*CreateWebhookResponse, error) {
-
+	if workspaceID == "" {
+		return nil, fmt.Errorf("must provide workspace id to create webhook: %w", ErrValidation)
+	}
 	b, err := json.Marshal(webhook)
 	if err != nil {
 		return nil, fmt.Errorf("unable to serialize new webhook: %w", err)
@@ -234,12 +236,17 @@ func (c *Client) UpdateWebhook(ctx context.Context, webhook *UpdateWebhookReques
 	return &updatedWebhook, nil
 }
 
-func (c *Client) DeleteWebhook(ctx context.Context, id string) error {
-	return c.call(ctx, http.MethodGet, fmt.Sprintf("/webhook/%s", id), nil, &struct{}{})
+func (c *Client) DeleteWebhook(ctx context.Context, webhookID string) error {
+	if webhookID == "" {
+		return fmt.Errorf("must provide a webhook id to delete: %w", ErrValidation)
+	}
+	return c.call(ctx, http.MethodGet, fmt.Sprintf("/webhook/%s", webhookID), nil, &struct{}{})
 }
 
 func (c *Client) WebhooksFor(ctx context.Context, workspaceID string) (*WebhooksQueryResponse, error) {
-
+	if workspaceID == "" {
+		return nil, fmt.Errorf("must provide a workspace id to get webhooks: %w", ErrValidation)
+	}
 	endpoint := fmt.Sprintf("/team/%s/webhook", workspaceID)
 
 	var webhooks WebhooksQueryResponse
