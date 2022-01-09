@@ -142,7 +142,7 @@ func (c *Client) ViewsFor(ctx context.Context, viewListType ViewListType, id str
 }
 
 func (c *Client) DeleteView(ctx context.Context, viewID string) error {
-	return c.call(ctx, http.MethodPost, fmt.Sprintf("/view/%s", viewID), nil, &struct{}{})
+	return c.call(ctx, http.MethodDelete, fmt.Sprintf("/view/%s", viewID), nil, &struct{}{})
 }
 
 // TasksForView requires possible pagination.  Clickup documents that a page will have a
