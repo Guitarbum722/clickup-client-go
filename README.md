@@ -104,10 +104,69 @@ Other webhook events...
 	EventKeyResultDeleted        
 ```
 
+### Comments
+
+Comments are not very intuitive via Clickup's API (IMO). This library provides some helpers to construct a comment request (builder).
+The comment request mode is completely exported, so feel free to construct it yourself if desired.
+
+```go
+	comment := clickup.NewCreateTaskCommentRequest(
+		os.Getenv("CLICKUP_TASK_ID"),
+		true,
+		os.Getenv("CLICKUP_WORKSPACE_ID"),
+	)
+	comment.BulletedListItem("Bullet Item 4asdf", nil)
+	comment.BulletedListItem("Bullet Item 5", nil)
+	comment.BulletedListItem("Bullet Item 6", &clickup.Attributes{Italic: true})
+	comment.NumberedListItem("Numbered Item 1", nil)
+	comment.ChecklistItem("Checklist item 1", false, nil)
+	comment.ChecklistItem("Checklist item 2", true, nil)
+
+	res, err := client.CreateTaskComment(context.Background(), *comment)
+	if err != nil {
+		panic(err)
+	}
+```
+
 
 ### Pagination
 
 The clickup API is a little inconsistent with pagination.  This client library will aim to document behavior as well as it can.  For example, use the `Page` attribute in `TaskQueryOptions` and call `TasksForList()` again.  
 
 Unfortunately, the GET Tasks operation returns up to 100 tasks and the caller must know that the last page was reached only if there are less than 100.
+
+### Client Library Progress
+
+✅️ Implemented or partially implemented
+
+🙅️ Not implemented
+
+
+***
+
+✅️ Attachments
+✅️ Authorization (API Key supported "out of box." See `Authenticator` interface to implement OAuth, etc.)
+✅️ Checklists
+✅️ Comments
+✅️ Folders
+✅️ Goals
+🙅️ Guests
+✅️ Lists
+🙅️ Members
+🙅️ Shared Hierarchy
+✅️ Spaces
+✅️ Tags
+✅️ Tasks
+✅️ Task Templates
+✅️ Team
+✅️ Team
+🙅️ Time Tracking
+🙅️ Users
+✅️ Views
+✅️ Webhooks 
+
+
+### Contributions
+
+Open a PR with your fork or open an issue.  Open to help!
 
