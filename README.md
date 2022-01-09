@@ -145,24 +145,41 @@ Unfortunately, the GET Tasks operation returns up to 100 tasks and the caller mu
 ***
 
 ✅️ Attachments
+
 ✅️ Authorization (API Key supported "out of box." See `Authenticator` interface to implement OAuth, etc.)
+
 ✅️ Checklists
+
 ✅️ Comments
+
 ✅️ Folders
+
 ✅️ Goals
+
 🙅️ Guests
+
 ✅️ Lists
+
 🙅️ Members
+
 🙅️ Shared Hierarchy
+
 ✅️ Spaces
+
 ✅️ Tags
+
 ✅️ Tasks
+
 ✅️ Task Templates
-✅️ Team
-✅️ Team
+
+✅️ Teams
+
 🙅️ Time Tracking
+
 🙅️ Users
+
 ✅️ Views
+
 ✅️ Webhooks 
 
 
