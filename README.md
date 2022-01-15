@@ -1,5 +1,7 @@
 # clickup-client-go
 
+[![Go Reference](https://pkg.go.dev/badge/github.com/Guitarbum722/clickup-client-go.svg)](https://pkg.go.dev/github.com/Guitarbum722/clickup-client-go)
+
 ### Get Started
 
 Create a Clickup Client by providing a `ClientOpts`.  The default `Doer` is an `http.Client` with a `20` second timeout.
