@@ -36,6 +36,8 @@ type AttachmentParams struct {
 	Reader   io.Reader
 }
 
+// CreateTaskAttachment attaches a binary document such as an image, text file, etc. to a specific Clickup task using the
+// io.Reader on params.
 func (c *Client) CreateTaskAttachment(ctx context.Context, taskID, workspaceID string, useCustomTaskIDs bool, params *AttachmentParams) (*CreateAttachmentResponse, error) {
 	if useCustomTaskIDs && workspaceID == "" {
 		return nil, fmt.Errorf("workspaceID must be provided if querying by custom task id: %w", ErrValidation)

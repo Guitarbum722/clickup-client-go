@@ -10,6 +10,8 @@ import (
 	"net/http"
 )
 
+// Authenticator adds authentication details to an http.Request.
+// Typically the Authorization header will be added by the implementation.
 type Authenticator interface {
 	AuthenticateFor(*http.Request) error
 }

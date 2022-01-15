@@ -12,8 +12,10 @@ import (
 	"errors"
 	"io/ioutil"
 	"net/http"
+	"reflect"
 	"strings"
 	"testing"
+	"time"
 )
 
 type mockAuthenticator struct{}
@@ -120,6 +122,59 @@ func TestClient_call(t *testing.T) {
 			}
 			if err := c.call(tt.args.ctx, tt.args.method, tt.args.uri, tt.args.data, tt.args.result); (err != nil) != tt.wantErr {
 				t.Errorf("Client.call() error = %v, wantErr %v", err, tt.wantErr)
+			}
+		})
+	}
+}
+
+func TestNewClient(t *testing.T) {
+	type args struct {
+		opts *ClientOpts
+	}
+	tests := []struct {
+		name string
+		args args
+		want *Client
+	}{
+		{
+			name: "Success new client with injected opts",
+			args: args{
+				opts: &ClientOpts{
+					Doer: &http.Client{
+						Timeout: time.Duration(time.Second * 2),
+					},
+					Authenticator: &mockAuthenticator{},
+				},
+			},
+			want: &Client{
+				doer: &http.Client{
+					Timeout: time.Duration(time.Second * 2),
+				},
+				authenticator: &mockAuthenticator{},
+				baseURL:       "https://api.clickup.com/api/v2",
+			},
+		},
+		{
+			name: "Success new client with defaults",
+			args: args{
+				opts: &ClientOpts{
+					Doer:          nil,
+					Authenticator: nil,
+				},
+			},
+			want: &Client{
+				doer: &http.Client{
+					Timeout: time.Duration(time.Second * 20),
+				},
+				authenticator: &APITokenAuthenticator{},
+				baseURL:       "https://api.clickup.com/api/v2",
+			},
+		},
+	}
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			if got := NewClient(tt.args.opts); !reflect.DeepEqual(got, tt.want) {
+				t.Errorf("NewClient() = %v, want %v", got, tt.want)
 			}
 		})
 	}

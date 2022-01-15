@@ -113,8 +113,8 @@ func TestClient_UpdateGoal(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				goal: UpdateGoalRequest{
-					GoalID: "Test GoalID",
-					Name:   "test goal update",
+					ID:   "Test GoalID",
+					Name: "test goal update",
 				},
 			},
 			wantErr: false,
@@ -128,8 +128,8 @@ func TestClient_UpdateGoal(t *testing.T) {
 			args: args{
 				ctx: context.Background(),
 				goal: UpdateGoalRequest{
-					GoalID: "",
-					Name:   "test goal",
+					ID:   "",
+					Name: "test goal",
 				},
 			},
 			wantErr: true,
