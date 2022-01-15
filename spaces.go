@@ -180,6 +180,7 @@ type CreateSpaceRequest struct {
 	Features          *Features `json:"features,omitempty"`
 }
 
+// CreateSpaceForWorkspace uses the parameters from space to create a new space in the specified workspace.
 func (c *Client) CreateSpaceForWorkspace(ctx context.Context, space CreateSpaceRequest) (*SingleSpace, error) {
 	if space.WorkspaceID == "" {
 		return nil, fmt.Errorf("must provide a workspace id: %w", ErrValidation)
@@ -209,6 +210,7 @@ type UpdateSpaceRequest struct {
 	Features          *Features `json:"features,omitempty"`
 }
 
+// UpdateSpaceForWorkspace makes changes to an existing space using parameters specified in space.
 func (c *Client) UpdateSpaceForWorkspace(ctx context.Context, space UpdateSpaceRequest) (*SingleSpace, error) {
 	if space.ID == "" {
 		return nil, fmt.Errorf("must provide a workspace id: %w", ErrValidation)
@@ -231,6 +233,7 @@ func (c *Client) UpdateSpaceForWorkspace(ctx context.Context, space UpdateSpaceR
 	return &updatedSpace, nil
 }
 
+// DeleteSpace removes an existing space using spaceID.
 func (c *Client) DeleteSpace(ctx context.Context, spaceID string) error {
 	if spaceID == "" {
 		return fmt.Errorf("must provide a space id to delete: %w", ErrValidation)

@@ -49,6 +49,7 @@ type ListsResponse struct {
 	Lists []SingleList `json:"lists"`
 }
 
+// ListsForfolder returns any lists associated to folderID.  Use includeArchived to return archived lists.
 func (c *Client) ListsForFolder(ctx context.Context, folderID string, includeArchived bool) (*ListsResponse, error) {
 
 	urlValues := url.Values{}
@@ -65,6 +66,7 @@ func (c *Client) ListsForFolder(ctx context.Context, folderID string, includeArc
 	return &lists, nil
 }
 
+// ListByID returns a single list using listID.
 func (c *Client) ListByID(ctx context.Context, listID string) (*SingleList, error) {
 
 	endpoint := fmt.Sprintf("/list/%s", listID)

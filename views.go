@@ -89,6 +89,7 @@ type TasksForViewResponse struct {
 	LastPage bool         `json:"last_page"`
 }
 
+// ViewByID returns data describing a single view associated with viewID.
 func (c *Client) ViewByID(ctx context.Context, viewID string) (*GetViewResponse, error) {
 	endpoint := fmt.Sprintf("/view/%s", viewID)
 
@@ -124,6 +125,9 @@ func (v ViewListType) String() string {
 		return "UNKNOWN_VIEW_LIST_TYPE"
 	}
 }
+
+// ViewsFor uses viewListType to return views for a team, space, forlder, or list.  See ViewListType.
+// id represents the id of the corresponding ViewListType.
 func (c *Client) ViewsFor(ctx context.Context, viewListType ViewListType, id string) (*GetViewsResponse, error) {
 	viewsType := viewListType.String()
 	if viewsType == "UNKNOWN_VIEW_LIST_TYPE" {
@@ -141,6 +145,7 @@ func (c *Client) ViewsFor(ctx context.Context, viewListType ViewListType, id str
 	return &views, nil
 }
 
+// DeleteView removes an existing view with viewID.
 func (c *Client) DeleteView(ctx context.Context, viewID string) error {
 	if viewID == "" {
 		return fmt.Errorf("must provide a view id to delete: %w", ErrValidation)

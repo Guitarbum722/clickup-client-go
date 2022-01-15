@@ -25,6 +25,7 @@ type TagsQueryResponse struct {
 	Tags []Tag `json:"tags"`
 }
 
+// TagsForSpace returns a listing of tags associated to the space using spaceID.
 func (c *Client) TagsForSpace(ctx context.Context, spaceID string) (*TagsQueryResponse, error) {
 	endpoint := fmt.Sprintf("/space/%s/tag", spaceID)
 
@@ -37,6 +38,7 @@ func (c *Client) TagsForSpace(ctx context.Context, spaceID string) (*TagsQueryRe
 	return &tagsResponse, nil
 }
 
+// CreateSpaceTag adds a new tag to the space with spaceID.
 func (c *Client) CreateSpaceTag(ctx context.Context, spaceID string, tag Tag) error {
 	if tag.Name == "" {
 		return fmt.Errorf("must provide a name for new tag: %w", ErrValidation)
@@ -52,6 +54,7 @@ func (c *Client) CreateSpaceTag(ctx context.Context, spaceID string, tag Tag) er
 	return c.call(ctx, http.MethodPost, endpoint, buf, &struct{}{})
 }
 
+// UpdateSpaceTag updates an existing tag in the specified space with the parameters from tag.
 func (c *Client) UpdateSpaceTag(ctx context.Context, spacID, tag Tag) error {
 	panic("TODO not implemented")
 }

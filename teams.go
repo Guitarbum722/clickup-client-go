@@ -42,6 +42,7 @@ type TeamMember struct {
 	InvitedBy TeamUser `json:"invited_by"`
 }
 
+// Teams returns a listing of teams for the authenticated user (the Client).
 func (c *Client) Teams(ctx context.Context) (*TeamsResponse, error) {
 	endpoint := fmt.Sprintf("/team")
 

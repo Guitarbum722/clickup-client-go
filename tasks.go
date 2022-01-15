@@ -248,6 +248,7 @@ func queryParamsFor(opts *TaskQueryOptions) *url.Values {
 	return urlValues
 }
 
+// TaskTimeInStatus returns status history for taskID.  useCustomTaskIDs should be true if querying with a custom ID.
 func (c *Client) TaskTimeInStatus(ctx context.Context, taskID, workspaceID string, useCustomTaskIDs bool) (*TaskTimeInStatusResponse, error) {
 	if useCustomTaskIDs && workspaceID == "" {
 		return nil, fmt.Errorf("workspaceID must be provided if querying by custom task id: %w", ErrValidation)
@@ -269,6 +270,8 @@ func (c *Client) TaskTimeInStatus(ctx context.Context, taskID, workspaceID strin
 	return &taskTimeInStatus, nil
 }
 
+// BulkTaskTimeInStatus returns task status history data for the provided taskIDs.  Must provide
+// >= 2 and <= 100 task IDs at a time.
 func (c *Client) BulkTaskTimeInStatus(ctx context.Context, taskIDs []string, workspaceID string, useCustomTaskIDs bool) (map[string]TaskTimeInStatusResponse, error) {
 	if useCustomTaskIDs && workspaceID == "" {
 		return nil, fmt.Errorf("workspaceID must be provided if querying by custom task id: %w", ErrValidation)
@@ -313,6 +316,7 @@ func (c *Client) TasksForList(ctx context.Context, listID string, queryOpts *Tas
 	return &tasks, nil
 }
 
+// TaskByID queries a single task.
 func (c *Client) TaskByID(ctx context.Context, taskID, workspaceID string, useCustomTaskIDs, includeSubtasks bool) (*SingleTask, error) {
 	if useCustomTaskIDs && workspaceID == "" {
 		return nil, fmt.Errorf("workspaceID must be provided if querying by custom task id: %w", ErrValidation)
@@ -345,6 +349,7 @@ type TaskRequest struct {
 	StartDateTime bool     `json:"start_date_time,omitempty"`
 }
 
+// CreateTask inserts a new task into the specified list.
 func (c *Client) CreateTask(ctx context.Context, listID string, task TaskRequest) (*SingleTask, error) {
 	if listID == "" {
 		return nil, fmt.Errorf("must provide a list id to create a task: %w", ErrValidation)
@@ -382,6 +387,7 @@ type TaskUpdateRequest struct {
 	StartDateTime bool     `json:"start_date_time,omitempty"`
 }
 
+// UpdateTask changes an existing task.
 func (c *Client) UpdateTask(ctx context.Context, task *TaskUpdateRequest, workspaceID string, useCustomTaskIDs bool) (*SingleTask, error) {
 	if useCustomTaskIDs && workspaceID == "" {
 		return nil, fmt.Errorf("workspaceID must be provided if updating by custom task id: %w", ErrValidation)
@@ -411,6 +417,7 @@ func (c *Client) UpdateTask(ctx context.Context, task *TaskUpdateRequest, worksp
 	return &updatedTask, nil
 }
 
+// DeleteTask removes an existing task.
 func (c *Client) DeleteTask(ctx context.Context, taskID, workspaceID string, useCustomTaskIDs bool) error {
 	if useCustomTaskIDs && workspaceID == "" {
 		return fmt.Errorf("workspaceID must be provided if deleting by custom task id: %w", ErrValidation)

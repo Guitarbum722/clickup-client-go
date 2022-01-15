@@ -171,6 +171,8 @@ func VerifyWebhookSignature(webhookRequest *http.Request, secret string) (*webho
 	}, nil
 }
 
+// Valid returns true if the wwebhookVerifyResult's signature matches the
+// signature generated for the webhook upon creation.
 func (w *webhookVerifyResult) Valid() bool {
 	return w.validSignature
 }
@@ -183,6 +185,11 @@ func (w *webhookVerifyResult) SignatureGenerated() string {
 	return w.signatureGenerated
 }
 
+// CreateWebhook activates a new webhook for workspaceID using the parameters of webhook.
+// You can scope the webhook to a list, folder, or even specific task by setting the appropriate ID fields
+// on webhook (CreateWebhookRequest).  See WebhookEvent for a listing of optional event types.
+// The caller should keep track of the Secret provided with the CreateWebhookResponse to compare against the
+// signature sent in a webhook's message body.
 func (c *Client) CreateWebhook(ctx context.Context, workspaceID string, webhook *CreateWebhookRequest) (*CreateWebhookResponse, error) {
 	if workspaceID == "" {
 		return nil, fmt.Errorf("must provide workspace id to create webhook: %w", ErrValidation)
@@ -214,6 +221,7 @@ type UpdateWebhookRequest struct {
 	Status   string         `json:"status,omitempty"`
 }
 
+// UpdateWebhook changes an existing webhook.
 func (c *Client) UpdateWebhook(ctx context.Context, webhook *UpdateWebhookRequest) (*UpdateWebhookResponse, error) {
 	if webhook.ID == "" {
 		return nil, fmt.Errorf("must provide a webhook id: %w", ErrValidation)
@@ -236,6 +244,7 @@ func (c *Client) UpdateWebhook(ctx context.Context, webhook *UpdateWebhookReques
 	return &updatedWebhook, nil
 }
 
+// DeleteWebhook removes an existing webhook.
 func (c *Client) DeleteWebhook(ctx context.Context, webhookID string) error {
 	if webhookID == "" {
 		return fmt.Errorf("must provide a webhook id to delete: %w", ErrValidation)
@@ -243,6 +252,7 @@ func (c *Client) DeleteWebhook(ctx context.Context, webhookID string) error {
 	return c.call(ctx, http.MethodGet, fmt.Sprintf("/webhook/%s", webhookID), nil, &struct{}{})
 }
 
+// WebhooksFor returns a listing of all webhooks for a workspace.
 func (c *Client) WebhooksFor(ctx context.Context, workspaceID string) (*WebhooksQueryResponse, error) {
 	if workspaceID == "" {
 		return nil, fmt.Errorf("must provide a workspace id to get webhooks: %w", ErrValidation)
