@@ -80,6 +80,8 @@ type GroupsQueryResponse struct {
 	Groups []Group `json:"groups"`
 }
 
+// GroupsForWorkspace queries for any groups in a workspace and returns their corresponding data.
+// optionalGroupIDs can be provided to narrow the data returned to the explicit groups quried.
 func (c *Client) GroupsForWorkspace(ctx context.Context, workspaceID string, optionalGroupIDs ...string) (*GroupsQueryResponse, error) {
 	if workspaceID == "" {
 		return nil, fmt.Errorf("must provide a workspaceID: %w", ErrValidation)
@@ -119,6 +121,7 @@ type CreateGroupResponse struct {
 	Members     []TeamUser `json:"members"`
 }
 
+// CreateGroup adds a new group to a workspace using group.WorkspaceID.
 func (c *Client) CreateGroup(ctx context.Context, group CreateGroupRequest) (*CreateGroupResponse, error) {
 	if group.WorkspaceID == "" {
 		return nil, fmt.Errorf("must provide a workspace ID: %w", ErrValidation)
@@ -162,6 +165,7 @@ type UpdateGroupResponse struct {
 	Members     []TeamUser `json:"members"`
 }
 
+// UpdateGroup changes an existing group using group.ID.
 func (c *Client) UpdateGroup(ctx context.Context, group UpdateGroupRequest) (*UpdateGroupResponse, error) {
 	if group.ID == "" {
 		return nil, fmt.Errorf("must provide an ID: %w", ErrValidation)
@@ -184,6 +188,7 @@ func (c *Client) UpdateGroup(ctx context.Context, group UpdateGroupRequest) (*Up
 	return &updatedGroup, nil
 }
 
+// DeleteGroup removes an existing group with an id of groupID.
 func (c *Client) DeleteGroup(ctx context.Context, groupID string) error {
 	if groupID == "" {
 		return fmt.Errorf("must provide a group id to delete: %w", ErrValidation)
