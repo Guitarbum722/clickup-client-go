@@ -14,7 +14,7 @@ import (
 	"testing"
 )
 
-func TestClient_Teams(t *testing.T) {
+func TestClient_TeamsForWorkspace(t *testing.T) {
 	type fields struct {
 		doer    ClientDoer
 		baseURL string
@@ -60,7 +60,7 @@ func TestClient_Teams(t *testing.T) {
 				authenticator: &APITokenAuthenticator{},
 				baseURL:       tt.fields.baseURL,
 			}
-			_, err := c.Teams(context.Background())
+			_, err := c.TeamsForWorkspace(context.Background())
 			if (err != nil) != tt.wantErr {
 				t.Errorf("Client.Teams() error = %v, wantErr %v", err, tt.wantErr)
 				return
