@@ -164,7 +164,7 @@ Unfortunately, the GET Tasks operation returns up to 100 tasks and the caller mu
 
 🙅️ Members
 
-🙅️ Shared Hierarchy
+✅️ Shared Hierarchy
 
 ✅️ Spaces
 
