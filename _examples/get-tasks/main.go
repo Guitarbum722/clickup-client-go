@@ -21,7 +21,7 @@ func main() {
 	client := clickup.NewClient(&clickup.ClientOpts{
 		Doer: nil,
 		Authenticator: &clickup.APITokenAuthenticator{
-			APIToken: os.Args[1],
+			APIToken: os.Getenv("CLICKUP_API_KEY"),
 		},
 	})
 
@@ -30,13 +30,16 @@ func main() {
 	}
 
 	for {
-		tasks, err := client.TasksForList(context.Background(), os.Args[2], queryOpts)
+		tasks, err := client.TasksForList(context.Background(), os.Getenv("CLICKUP_LIST_ID"), queryOpts)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
 		for _, task := range tasks.Tasks {
 			fmt.Println("Task: ", task.CustomID, task.Name)
+			for _, field := range task.CustomFields {
+				fmt.Println(field.Name, field.ID, field.Type, field.Value)
+			}
 		}
 		if len(tasks.Tasks) < clickup.MaxPageSize {
 			return

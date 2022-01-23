@@ -431,3 +431,42 @@ func (c *Client) DeleteTask(ctx context.Context, taskID, workspaceID string, use
 
 	return c.call(ctx, http.MethodDelete, endpoint, nil, &struct{}{})
 }
+
+type CustomFieldInfo struct {
+	val interface{}
+	typ string
+}
+
+// CustomFieldVal finds the value from a list of arbitrary custome fields and types
+// from the task t.  fieldName is used as the target field to extract.
+// Custom fields that are of type "date" will be returned in the CustomFieldInfo
+// as a string of unix milliseconds.
+// CustomFieldInfo is an interface{} and should be handled accordingly.
+// The consumer of this library can do any of this themselves with the SingleTask
+// model.  This is simply a utility function.
+func (t *SingleTask) CustomFieldVal(fieldName string) *CustomFieldInfo {
+	var cf CustomFieldInfo
+
+	for _, field := range t.CustomFields {
+		if field.Name == fieldName {
+			if field.Type == "date" {
+				if field.Value == nil {
+					cf.val = ""
+					return &cf
+				}
+				cf.val = field.Value.(string)
+				cf.typ = field.Type
+				return &cf
+			}
+			for _, v := range field.TypeConfig.Options {
+				if float64(v.Orderindex) == field.Value.(float64) {
+					cf.val = v.Name
+					cf.typ = field.Type
+					break
+				}
+			}
+			break
+		}
+	}
+	return &cf
+}
