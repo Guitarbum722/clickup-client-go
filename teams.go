@@ -151,7 +151,7 @@ type UpdateGroupRequest struct {
 	Members []struct {
 		Add    []int `json:"add,omitempty"`
 		Remove []int `json:"rem,omitempty"`
-	} `json:"members,omitempty`
+	} `json:"members,omitempty"`
 }
 
 type UpdateGroupResponse struct {
