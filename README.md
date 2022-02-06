@@ -154,6 +154,8 @@ Unfortunately, the GET Tasks operation returns up to 100 tasks and the caller mu
 
 ✅️ Comments
 
+✅️ Dependencies
+
 ✅️ Folders
 
 ✅️ Goals
