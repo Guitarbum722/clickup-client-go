@@ -159,6 +159,14 @@ func TestClient_DeleteWebhook(t *testing.T) {
 			name: "Success webhook id provided",
 			fields: fields{
 				doer: newMockClientDoer(func(req *http.Request) (*http.Response, error) {
+					if req.Method != http.MethodDelete {
+						return &http.Response{
+							StatusCode: http.StatusNotFound,
+							Body:       ioutil.NopCloser(strings.NewReader("")),
+							Request:    req,
+						}, nil
+					}
+
 					body := `{}`
 					return &http.Response{
 						StatusCode: http.StatusOK,
@@ -248,7 +256,8 @@ func TestClient_UpdateWebhook(t *testing.T) {
 				webhook: &UpdateWebhookRequest{
 					ID:       "",
 					Endpoint: "https://endpoint.clickup",
-				}},
+				},
+			},
 			wantErr: true,
 		},
 	}
