@@ -249,7 +249,7 @@ func (c *Client) DeleteWebhook(ctx context.Context, webhookID string) error {
 	if webhookID == "" {
 		return fmt.Errorf("must provide a webhook id to delete: %w", ErrValidation)
 	}
-	return c.call(ctx, http.MethodGet, fmt.Sprintf("/webhook/%s", webhookID), nil, &struct{}{})
+	return c.call(ctx, http.MethodDelete, fmt.Sprintf("/webhook/%s", webhookID), nil, &struct{}{})
 }
 
 // WebhooksFor returns a listing of all webhooks for a workspace.
