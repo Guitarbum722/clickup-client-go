@@ -40,13 +40,13 @@ type WebhookEventMessage struct {
 		Before struct {
 			Status     string `json:"status"`
 			Color      string `json:"color"`
-			Orderindex int    `json:"orderindex"`
+			Orderindex int    `json:"-"`
 			Type       string `json:"type"`
 		} `json:"before"`
 		After struct {
 			Status     string `json:"status"`
 			Color      string `json:"color"`
-			Orderindex int    `json:"orderindex"`
+			Orderindex int    `json:"-"`
 			Type       string `json:"type"`
 		} `json:"after"`
 	} `json:"history_items"`

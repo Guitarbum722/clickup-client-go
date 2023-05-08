@@ -16,14 +16,14 @@ type ChecklistResponse struct {
 		TaskID      string `json:"task_id"`
 		Name        string `json:"name"`
 		DateCreated string `json:"date_created"`
-		Orderindex  int    `json:"orderindex"`
+		Orderindex  int    `json:"-"`
 		Creator     int    `json:"creator"`
 		Resolved    int    `json:"resolved"`
 		Unresolved  int    `json:"unresolved"`
 		Items       []struct {
 			ID          string   `json:"id"`
 			Name        string   `json:"name"`
-			Orderindex  int      `json:"orderindex"`
+			Orderindex  int      `json:"-"`
 			Assignee    TeamUser `json:"assignee"`
 			Resolved    bool     `json:"resolved"`
 			DateCreated string   `json:"date_created"`

@@ -17,7 +17,7 @@ import (
 type SingleList struct {
 	ID         string `json:"id"`
 	Name       string `json:"name"`
-	Orderindex int    `json:"orderindex"`
+	Orderindex int    `json:"-"`
 	Status     struct {
 	} `json:"status"`
 	Priority struct {

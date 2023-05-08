@@ -73,7 +73,7 @@ type SingleView struct {
 	Creator     int    `json:"creator"`
 	Visibility  string `json:"visibility"`
 	Protected   bool   `json:"protected"`
-	Orderindex  int    `json:"orderindex"`
+	Orderindex  int    `json:"-"`
 }
 
 type GetViewResponse struct {
