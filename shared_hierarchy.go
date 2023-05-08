@@ -17,9 +17,9 @@ type SharedHierarchyResponse struct {
 				Status     string `json:"status"`
 				Color      string `json:"color"`
 				Type       string `json:"type"`
-				Orderindex int    `json:"orderindex"`
+				Orderindex int    `json:"-"`
 			} `json:"status"`
-			Orderindex  string `json:"orderindex"`
+			Orderindex  string `json:"-"`
 			DateCreated string `json:"date_created"`
 			DateUpdated string `json:"date_updated"`
 			DateClosed  string `json:"date_closed"`
@@ -61,7 +61,7 @@ type SharedHierarchyResponse struct {
 						ID         string `json:"id"`
 						Name       string `json:"name"`
 						Color      string `json:"color"`
-						Orderindex int    `json:"orderindex"`
+						Orderindex int    `json:"-"`
 					} `json:"options"`
 				} `json:"type_config"`
 				DateCreated    string `json:"date_created"`
@@ -95,14 +95,14 @@ type SharedHierarchyResponse struct {
 		Lists []struct {
 			ID         string `json:"id"`
 			Name       string `json:"name"`
-			Orderindex int    `json:"orderindex"`
+			Orderindex int    `json:"-"`
 			TaskCount  string `json:"task_count"`
 			Archived   bool   `json:"archived"`
 		} `json:"lists"`
 		Folders []struct {
 			ID         string `json:"id"`
 			Name       string `json:"name"`
-			Orderindex int    `json:"orderindex"`
+			Orderindex int    `json:"-"`
 			TaskCount  string `json:"task_count"`
 			Archived   bool   `json:"archived"`
 		} `json:"folders"`

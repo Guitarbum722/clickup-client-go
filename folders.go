@@ -17,7 +17,7 @@ import (
 type SingleFolder struct {
 	ID               string `json:"id"`
 	Name             string `json:"name"`
-	Orderindex       int    `json:"orderindex"`
+	Orderindex       int    `json:"-"`
 	OverrideStatuses bool   `json:"override_statuses"`
 	Hidden           bool   `json:"hidden"`
 	Space            struct {
@@ -29,7 +29,7 @@ type SingleFolder struct {
 	Lists     []struct {
 		ID         string `json:"id"`
 		Name       string `json:"name"`
-		Orderindex int    `json:"orderindex"`
+		Orderindex int    `json:"-"`
 		Status     struct {
 		} `json:"status"`
 		Priority struct {
@@ -51,7 +51,7 @@ type SingleFolder struct {
 		Statuses         []struct {
 			ID         string `json:"id"`
 			Status     string `json:"status"`
-			Orderindex int    `json:"orderindex"`
+			Orderindex int    `json:"-"`
 			Color      string `json:"color"`
 			Type       string `json:"type"`
 		} `json:"statuses"`

@@ -20,7 +20,7 @@ type Status struct {
 	ID         string `json:"id"`
 	Status     string `json:"status"`
 	Color      string `json:"color"`
-	Orderindex int    `json:"orderindex"`
+	Orderindex int    `json:"-"`
 	Type       string `json:"type"`
 }
 
@@ -31,7 +31,7 @@ type SingleTask struct {
 	TextContent string     `json:"text_content"`
 	Description string     `json:"description"`
 	Status      Status     `json:"status"`
-	Orderindex  string     `json:"orderindex"`
+	Orderindex  string     `json:"-"`
 	DateCreated string     `json:"date_created"`
 	DateUpdated string     `json:"date_updated"`
 	DateClosed  string     `json:"date_closed"`
@@ -44,14 +44,14 @@ type SingleTask struct {
 		TaskID      string `json:"task_id"`
 		Name        string `json:"name"`
 		DateCreated string `json:"date_created"`
-		Orderindex  int    `json:"orderindex"`
+		Orderindex  int    `json:"-"`
 		Creator     int    `json:"creator"`
 		Resolved    int    `json:"resolved"`
 		Unresolved  int    `json:"unresolved"`
 		Items       []struct {
 			ID         string `json:"id"`
 			Name       string `json:"name"`
-			Orderindex int    `json:"orderindex"`
+			Orderindex int    `json:"-"`
 			Assignee   struct {
 				ID             int    `json:"id"`
 				Username       string `json:"username"`
@@ -70,7 +70,7 @@ type SingleTask struct {
 		ID         string `json:"id"`
 		Priority   string `json:"priority"`
 		Color      string `json:"color"`
-		Orderindex string `json:"orderindex"`
+		Orderindex string `json:"-"`
 	} `json:"priority"`
 	DueDate      string `json:"due_date"`
 	StartDate    string `json:"start_date"`
@@ -88,7 +88,7 @@ type SingleTask struct {
 				ID         string `json:"id"`
 				Name       string `json:"name"`
 				Color      string `json:"color"`
-				Orderindex int    `json:"orderindex"`
+				Orderindex int    `json:"-"`
 			} `json:"options"`
 		} `json:"type_config"`
 		DateCreated    string      `json:"date_created"`
@@ -161,7 +161,7 @@ type TaskTimeInStatusResponse struct {
 			ByMinute int    `json:"by_minute"`
 			Since    string `json:"since"`
 		} `json:"total_time"`
-		Orderindex int `json:"orderindex"`
+		Orderindex int `json:"-"`
 	} `json:"status_history"`
 }
 

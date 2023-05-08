@@ -24,7 +24,7 @@ type SingleSpace struct {
 		ID         string `json:"id"`
 		Status     string `json:"status"`
 		Type       string `json:"type"`
-		Orderindex int    `json:"orderindex"`
+		Orderindex int    `json:"-"`
 		Color      string `json:"color"`
 	} `json:"statuses"`
 	MultipleAssignees bool `json:"multiple_assignees"`
@@ -50,7 +50,7 @@ type SingleSpace struct {
 				ID         string `json:"id"`
 				Priority   string `json:"priority"`
 				Color      string `json:"color"`
-				Orderindex string `json:"orderindex"`
+				Orderindex string `json:"-"`
 			} `json:"priorities"`
 		} `json:"priorities"`
 		Tags struct {
