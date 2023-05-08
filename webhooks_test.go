@@ -7,6 +7,7 @@
 package clickup
 
 import (
+	"bytes"
 	"context"
 	"io"
 	"io/ioutil"
@@ -20,6 +21,7 @@ func TestVerifyWebhookSignature(t *testing.T) {
 	type args struct {
 		webhookRequest *http.Request
 		secret         string
+		body           []byte
 	}
 	tests := []struct {
 		name    string
@@ -34,9 +36,9 @@ func TestVerifyWebhookSignature(t *testing.T) {
 					Header: http.Header{
 						"X-Signature": []string{"2831500d379c7e90a2c8b3ff55dec81a42889b8a91f6b97f8513d98ebb6b23bf"},
 					},
-					Body: io.NopCloser(strings.NewReader(`{"event":"taskUpdated"}`)),
 				},
 				secret: "imiO3dJZfIlyykAG",
+				body:   []byte(`{"event":"taskUpdated"}`),
 			},
 			want: &webhookVerifyResult{
 				validSignature:       true,
@@ -52,8 +54,8 @@ func TestVerifyWebhookSignature(t *testing.T) {
 					Header: http.Header{
 						"X-Signature": []string{"123456"},
 					},
-					Body: io.NopCloser(strings.NewReader(`{"event":"taskUpdated"}`)),
 				},
+				body:   []byte(`{"event":"taskUpdated"}`),
 				secret: "imiO3dJZfIlyykAG",
 			},
 			want: &webhookVerifyResult{
@@ -66,6 +68,7 @@ func TestVerifyWebhookSignature(t *testing.T) {
 	}
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
+			tt.args.webhookRequest.Body = io.NopCloser(bytes.NewReader(tt.args.body))
 			got, err := VerifyWebhookSignature(tt.args.webhookRequest, tt.args.secret)
 			if (err != nil) != tt.wantErr {
 				t.Errorf("VerifyWebhookSignature() error = %v, wantErr %v", err, tt.wantErr)
@@ -73,6 +76,17 @@ func TestVerifyWebhookSignature(t *testing.T) {
 			}
 			if !reflect.DeepEqual(got, tt.want) {
 				t.Errorf("VerifyWebhookSignature() = %v, want %v", got, tt.want)
+			}
+
+			// also check that the the request body may still be read elsewhere (such as another handler)
+			body, err := io.ReadAll(tt.args.webhookRequest.Body)
+			if err != nil {
+				t.Errorf("unexpected error reading request body: %v", err)
+				return
+			}
+
+			if !bytes.Equal(tt.args.body, body) {
+				t.Errorf("request body after verification = %s, want %s", body, tt.args.body)
 			}
 		})
 	}

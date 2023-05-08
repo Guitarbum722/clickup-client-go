@@ -14,7 +14,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
-	"io/ioutil"
+	"io"
 	"net/http"
 )
 
@@ -155,11 +155,14 @@ type webhookVerifyResult struct {
 // thus the WebhookVerifyResult.ValidSignature() should be called.
 func VerifyWebhookSignature(webhookRequest *http.Request, secret string) (*webhookVerifyResult, error) {
 	h := hmac.New(sha256.New, []byte(secret))
-	b, err := ioutil.ReadAll(webhookRequest.Body)
-	if err != nil {
+
+	var buf bytes.Buffer
+	body := io.TeeReader(webhookRequest.Body, &buf)
+	webhookRequest.Body = io.NopCloser(&buf)
+	if _, err := io.Copy(h, body); err != nil {
 		return nil, err
 	}
-	h.Write(b)
+
 	sha := hex.EncodeToString(h.Sum(nil))
 
 	sigHeader := webhookRequest.Header.Get("X-Signature")
