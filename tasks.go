@@ -82,14 +82,28 @@ type SingleTask struct {
 		Name       string `json:"name"`
 		Type       string `json:"type"`
 		TypeConfig struct {
-			Default     int    `json:"default"`
-			Placeholder string `json:"placeholder"`
-			Options     []struct {
+			Simple             bool   `json:"simple"`
+			Default            int    `json:"default"`
+			Placeholder        string `json:"placeholder"`
+			NewDropDown        bool   `json:"new_drop_down"`
+			SingleUser         bool   `json:"single_user"`
+			IncludeGroups      bool   `json:"include_groups"`
+			IncludeGuests      bool   `json:"include_guests"`
+			IncludeTeamMembers bool   `json:"include_team_members"`
+			Formula            string `json:"formula"`
+			CompleteOn         int    `json:"complete_on"`
+			SubtaskRollup      bool   `json:"subtask_rollup"`
+			Options            []struct {
 				ID         string `json:"id"`
 				Name       string `json:"name"`
 				Color      string `json:"color"`
 				Orderindex int    `json:"-"`
 			} `json:"options"`
+			Fields   []interface{} `json:"fields"`
+			Tracking struct {
+				Subtasks   bool `json:"subtasks"`
+				Checklists bool `json:"checklists"`
+			} `json:"tracking"`
 		} `json:"type_config"`
 		DateCreated    string      `json:"date_created"`
 		HideFromGuests bool        `json:"hide_from_guests"`
@@ -304,7 +318,6 @@ func (c *Client) BulkTaskTimeInStatus(ctx context.Context, taskIDs []string, wor
 // the Page in queryOpts if the number of tasks is 100.
 // ie. if the current page returns 100 tasks (the maximum page size), then another query should be made to get the next page.
 func (c *Client) TasksForList(ctx context.Context, listID string, queryOpts *TaskQueryOptions) (*GetTasksResponse, error) {
-
 	endpoint := fmt.Sprintf("/list/%s/task/?%s", listID, queryParamsFor(queryOpts).Encode())
 
 	var tasks GetTasksResponse
