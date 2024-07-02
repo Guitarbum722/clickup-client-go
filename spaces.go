@@ -38,6 +38,12 @@ type SingleSpace struct {
 		Sprints struct {
 			Enabled bool `json:"enabled"`
 		} `json:"sprints"`
+		TimeTracking struct {
+			Enabled           bool `json:"enabled"`
+			Harvest           bool `json:"harvest"`
+			Rollup            bool `json:"rollup"`
+			DefaultToBillable int  `json:"default_to_billable"`
+		} `json:"time_tracking"`
 		Points struct {
 			Enabled bool `json:"enabled"`
 		} `json:"points"`
@@ -56,14 +62,19 @@ type SingleSpace struct {
 		Tags struct {
 			Enabled bool `json:"enabled"`
 		} `json:"tags"`
+		WIPLimits struct {
+			Enabled bool `json:"enabled"`
+		} `json:"wip_limits"`
+		TimeEstimates struct {
+			Enabled     bool `json:"enabled"`
+			Rollup      bool `json:"rollup"`
+			PerAssignee bool `json:"per_assignee"`
+		} `json:"time_estimates"`
 		CheckUnresolved struct {
-			Enabled  bool `json:"enabled"`
-			Subtasks struct {
-			} `json:"subtasks"`
-			Checklists struct {
-			} `json:"checklists"`
-			Comments struct {
-			} `json:"comments"`
+			Enabled    bool `json:"enabled"`
+			Subtasks   bool `json:"subtasks"`
+			Checklists bool `json:"checklists"`
+			Comments   bool `json:"comments"`
 		} `json:"check_unresolved"`
 		Zoom struct {
 			Enabled bool `json:"enabled"`
@@ -74,9 +85,21 @@ type SingleSpace struct {
 		CustomFields struct {
 			Enabled bool `json:"enabled"`
 		} `json:"custom_fields"`
+		RemapDependencies struct {
+			Enabled bool `json:"enabled"`
+		} `json:"remap_dependencies"`
 		DependencyWarning struct {
 			Enabled bool `json:"enabled"`
 		} `json:"dependency_warning"`
+		StatusPies struct {
+			Enabled bool `json:"enabled"`
+		} `json:"status_pies"`
+		MultipleAssignees struct {
+			Enabled bool `json:"enabled"`
+		} `json:"multiple_assignees"`
+		Emails struct {
+			Enabled bool `json:"enabled"`
+		} `json:"emails"`
 	} `json:"features"`
 	Archived bool `json:"archived"`
 	Members  []struct {
